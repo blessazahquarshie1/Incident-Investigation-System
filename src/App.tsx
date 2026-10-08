@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import AppShell from './components/AppShell'
+import ErrorBoundary from './components/ErrorBoundary'
 import DashboardPage from './pages/DashboardPage'
 import CasesPage from './pages/CasesPage'
 import CaseDetailPage from './pages/CaseDetailPage'
@@ -18,32 +19,36 @@ import RelationshipGraphPage from './pages/RelationshipGraphPage'
 import InvestigatorsPage from './pages/InvestigatorsPage'
 import ReportsPage from './pages/ReportsPage'
 import SearchPage from './pages/SearchPage'
+import NotFoundPage from './pages/NotFoundPage'
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<AppShell />}>
-          <Route index element={<DashboardPage />} />
-          <Route path="cases" element={<CasesPage />} />
-          <Route path="cases/:caseId" element={<CaseDetailPage />} />
-          <Route path="incidents" element={<IncidentsPage />} />
-          <Route path="incidents/:id" element={<IncidentDetailPage />} />
-          <Route path="persons" element={<PersonsPage />} />
-          <Route path="persons/:id" element={<PersonDetailPage />} />
-          <Route path="evidence" element={<EvidencePage />} />
-          <Route path="evidence/:id" element={<EvidenceDetailPage />} />
-          <Route path="vehicles" element={<VehiclesPage />} />
-          <Route path="vehicles/:id" element={<VehicleDetailPage />} />
-          <Route path="locations" element={<LocationsPage />} />
-          <Route path="locations/:id" element={<LocationDetailPage />} />
-          <Route path="timeline" element={<TimelinePage />} />
-          <Route path="graph" element={<RelationshipGraphPage />} />
-          <Route path="investigators" element={<InvestigatorsPage />} />
-          <Route path="reports" element={<ReportsPage />} />
-          <Route path="search" element={<SearchPage />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<AppShell />}>
+            <Route index element={<DashboardPage />} />
+            <Route path="cases" element={<CasesPage />} />
+            <Route path="cases/:caseId" element={<CaseDetailPage />} />
+            <Route path="incidents" element={<IncidentsPage />} />
+            <Route path="incidents/:id" element={<IncidentDetailPage />} />
+            <Route path="persons" element={<PersonsPage />} />
+            <Route path="persons/:id" element={<PersonDetailPage />} />
+            <Route path="evidence" element={<EvidencePage />} />
+            <Route path="evidence/:id" element={<EvidenceDetailPage />} />
+            <Route path="vehicles" element={<VehiclesPage />} />
+            <Route path="vehicles/:id" element={<VehicleDetailPage />} />
+            <Route path="locations" element={<LocationsPage />} />
+            <Route path="locations/:id" element={<LocationDetailPage />} />
+            <Route path="timeline" element={<TimelinePage />} />
+            <Route path="graph" element={<RelationshipGraphPage />} />
+            <Route path="investigators" element={<InvestigatorsPage />} />
+            <Route path="reports" element={<ReportsPage />} />
+            <Route path="search" element={<SearchPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </ErrorBoundary>
   )
 }

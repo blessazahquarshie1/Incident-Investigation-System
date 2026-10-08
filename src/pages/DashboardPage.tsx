@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useInvestigationStore } from '../store/useInvestigationStore'
 import { getDashboardStats } from '../lib/dashboard'
@@ -7,7 +7,6 @@ import StatCard from '../components/StatCard'
 import PriorityBadge from '../components/PriorityBadge'
 import ActivityFeed from '../components/ActivityFeed'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
-import { formatDateTime } from '../lib/dates'
 import { getOfficerName } from '../lib/lookup'
 import { Briefcase, AlertTriangle, Users, FileSearch, Search } from 'lucide-react'
 
@@ -21,6 +20,10 @@ const STATUS_COLORS: Record<string, string> = {
 const TYPE_COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316', '#eab308', '#22c55e', '#14b8a6']
 
 export default function DashboardPage() {
+  useEffect(() => {
+    document.title = 'Dashboard · Incident Investigation System'
+  }, [])
+
   const data = useInvestigationStore(s => s.data)
   const stats = useMemo(() => getDashboardStats(data), [data])
 

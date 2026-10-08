@@ -10,7 +10,7 @@
 | 06 | Algorithms | done | pass | pass |
 | 07 | Timeline + conflicts | done | pass | pass |
 | 08 | Relationship graph | done | pass | pass |
-| 09 | Custody + activity log | pending | — | — |
+| 09 | Custody + activity log | done | pass | pass |
 | 10 | Reports + polish | pending | — | — |
 
 ---

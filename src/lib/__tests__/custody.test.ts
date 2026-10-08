@@ -8,7 +8,7 @@ import {
   applyCustodyAction,
   ALLOWED_ACTIONS,
 } from '../custody'
-import type { Evidence, CustodyAction } from '../../types'
+import type { Evidence } from '../../types'
 
 describe('deriveStatus', () => {
   it('correctly derives status from every mock evidence custodyHistory', () => {

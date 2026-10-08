@@ -13,6 +13,8 @@ import DataTable from '../components/DataTable'
 import EmptyState from '../components/EmptyState'
 import CaseTimelineTab from '../components/CaseTimelineTab'
 import CaseConnectionsTab from '../components/CaseConnectionsTab'
+import ActivityFeed from '../components/ActivityFeed'
+import type { ActivityLogEntry } from '../types'
 
 export default function CaseDetailPage() {
   const { caseId } = useParams<{ caseId: string }>()
@@ -263,7 +265,7 @@ function NotesTab({ kase, notes }: any) {
         {sorted.map(n => (
           <Card key={n.id} title={getOfficerName(data, n.authorId)}>
             <div className="text-xs text-slate-500 mb-2">{formatDateTime(n.createdAt)}</div>
-            <div className="text-slate-800 whitespace-pre-wrap">{n.content}</div>
+            <div className="text-slate-800 whitespace-pre-wrap">{n.text}</div>
           </Card>
         ))}
       </div>
@@ -271,33 +273,33 @@ function NotesTab({ kase, notes }: any) {
   )
 }
 
-function ActivityTab({ activity }: any) {
-  const data = useInvestigationStore(s => s.data)
+function ActivityTab({ activity }: { activity: ActivityLogEntry[] }) {
   const [filter, setFilter] = useState('')
   
-  const filtered = filter ? activity.filter((a: any) => a.action === filter) : activity
+  const filtered = useMemo(() => {
+    return filter ? activity.filter(a => a.action === filter) : activity
+  }, [activity, filter])
+
+  const actionTypes = useMemo(() => {
+    return Array.from(new Set(activity.map(a => a.action)))
+  }, [activity])
 
   return (
     <div className="space-y-6 pt-4">
       <div className="flex gap-2 items-center">
-        <label className="text-sm font-medium">Filter by action:</label>
-        <select className="border p-2 rounded" value={filter} onChange={e => setFilter(e.target.value)}>
-          <option value="">All actions</option>
-          {Array.from(new Set(activity.map((a: any) => a.action))).map((act: any) => (
+        <label className="text-[13px] font-medium text-slate-700">Filter by action:</label>
+        <select
+          className="border border-slate-200 bg-white p-2 rounded-lg text-[13px] focus:border-blue-500 focus:outline-none"
+          value={filter}
+          onChange={e => setFilter(e.target.value)}
+        >
+          <option value="">All actions ({activity.length})</option>
+          {actionTypes.map(act => (
             <option key={act} value={act}>{act}</option>
           ))}
         </select>
       </div>
-      <div className="space-y-2 border-l-2 border-slate-200 ml-3 pl-4">
-        {filtered.map((a: any) => (
-          <div key={a.id} className="relative pb-4">
-            <div className="absolute -left-[23px] top-1 w-3 h-3 bg-blue-500 rounded-full border-2 border-white" />
-            <div className="text-sm font-semibold text-slate-800">{a.description}</div>
-            <div className="text-xs text-slate-500">{formatDateTime(a.timestamp)} · {getOfficerName(data, a.officerId)}</div>
-          </div>
-        ))}
-        {filtered.length === 0 && <div className="text-sm text-slate-500">No activity recorded.</div>}
-      </div>
+      <ActivityFeed entries={filtered} emptyMessage="No activity matches this filter." />
     </div>
   )
 }

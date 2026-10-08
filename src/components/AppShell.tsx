@@ -77,9 +77,9 @@ export default function AppShell() {
   }, [])
 
   return (
-    <div className="flex h-screen w-full flex-col bg-slate-50 text-slate-900">
+    <div className="flex h-screen w-full flex-col bg-slate-50 text-slate-900 print:bg-white print:h-auto print:overflow-visible">
       {/* Top Bar */}
-      <header className="flex h-16 w-full shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-6">
+      <header className="flex h-16 w-full shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-6 print:hidden">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm">
             <Shield className="h-5 w-5" />
@@ -143,9 +143,9 @@ export default function AppShell() {
       </header>
 
       {/* Body: Sidebar + Content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden print:overflow-visible print:h-auto">
         {/* Sidebar */}
-        <aside className="shrink-0 border-r border-slate-200 bg-white w-14 lg:w-64 transition-all">
+        <aside className="shrink-0 border-r border-slate-200 bg-white w-14 lg:w-64 transition-all print:hidden">
           <nav className="flex h-full flex-col justify-between p-2 lg:p-4">
             <div className="space-y-0.5">
               {navItems.map(item => {
@@ -182,8 +182,8 @@ export default function AppShell() {
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 overflow-y-auto p-6 sm:p-8">
-          <div className="mx-auto max-w-7xl">
+        <main className="flex-1 overflow-y-auto p-6 sm:p-8 print:p-0 print:overflow-visible print:h-auto">
+          <div className="mx-auto max-w-7xl print:max-w-none print:w-full">
             <Outlet />
           </div>
         </main>

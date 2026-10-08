@@ -255,3 +255,32 @@ A coloured network of people, vehicles, incidents, evidence, and places for the 
 2. What does the force layout do, and why is it computed once instead of animated?
 3. Why do we show a single case first instead of the whole network?
 
+## Step 09 — Evidence chain of custody and the activity log
+
+**What was built:**
+A finite state machine governing legal evidence custody statuses and transitions, complete with validation rejecting invalid actions (such as transferring destroyed evidence), an append-only custody history timeline with custodian tracking, a reusable ActivityFeed component, and unified activity logging across all data modifications in the system.
+
+**How it works (plain English):**
+A **state machine** is a set of states (collected, in the evidence room, destroyed…) and strict rules about which move is allowed from each state. Writing the rules as a table means a rule can be read, checked and changed without hunting through the code. The app **refuses** an invalid move instead of trusting the user, which is how real systems protect important records. The **chain of custody** is an append-only history: entries are added, never edited, so the record of who held the evidence is trustworthy.
+
+**Key concepts:**
+- **Finite State Machine (FSM)**: lookup table of allowed transitions between discrete states.
+- **Derived status**: deriving item status dynamically from the tail of an append-only log rather than manual user input.
+- **Append-only audit trail**: guaranteeing legal evidentiary integrity by only adding new records and never editing old ones.
+- **Unified activity logging**: capturing all user operations (case creation, priority shifts, evidence uploads, custody handovers) in a chronological activity log.
+
+**Files to open:**
+- `src/lib/custody.ts` — state machine rules, validation, and transition application.
+- `src/lib/__tests__/custody.test.ts` — unit test suite for state transition rules.
+- `src/components/CustodySection.tsx` — interactive custody workbench with disabled reasons and modals.
+- `src/components/ActivityFeed.tsx` — reusable day-grouped activity feed.
+
+**What I should see:**
+A destroyed item (e.g. `E-031`) that cannot be touched and clearly explains why; an active item (`E-024`) whose history grows when an officer transfers it or starts analysis; and a case activity log that records every action.
+
+**I should be able to explain:**
+1. What is a state machine and where is it in this app?
+2. Why is the status derived from the history rather than typed in separately?
+3. Why does the history only ever add entries and never edit old ones?
+
+

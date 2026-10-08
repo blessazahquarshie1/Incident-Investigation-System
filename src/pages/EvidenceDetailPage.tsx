@@ -9,6 +9,7 @@ import EntityIcon from '../components/EntityIcon'
 import StatusBadge from '../components/StatusBadge'
 import { formatDate } from '../lib/dates'
 import { getOfficerName, getLocationName } from '../lib/lookup'
+import CustodySection from '../components/CustodySection'
 import type { EntityType } from '../types'
 
 export default function EvidenceDetailPage() {
@@ -76,7 +77,7 @@ export default function EvidenceDetailPage() {
           })}
         </div>
       </Card>
-      <div id="custody-section"><EmptyState title="Chain of custody" description="Custody tracking is built in Step 09." /></div>
+      <CustodySection evidence={entity} />
     </div>
   )
 }
