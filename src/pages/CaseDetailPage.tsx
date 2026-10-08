@@ -278,7 +278,7 @@ function NotesTab({ kase, notes }: { kase: Case; notes: Note[] }) {
       <div className="space-y-4">
         {sorted.map(n => (
           <Card key={n.id} title={getOfficerName(data, n.authorId)}>
-            <div className="text-xs text-slate-500 mb-2">{formatDateTime(n.createdAt)}</div>
+            <div className="text-[13px] text-slate-500 mb-2">{formatDateTime(n.createdAt)}</div>
             <div className="text-slate-800 whitespace-pre-wrap">{n.text}</div>
           </Card>
         ))}

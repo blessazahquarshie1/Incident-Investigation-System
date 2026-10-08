@@ -67,7 +67,7 @@ export default function EvidenceDetailPage() {
                       <EntityIcon type={type as EntityType} />
                       <div className="flex-1 min-w-0">
                         <Link to={`/${type}s/${item.id}`} className="text-sm font-medium text-blue-600 hover:underline truncate block">{item.label}</Link>
-                        <div className="text-xs text-slate-500 truncate">{item.relationship}</div>
+                        <div className="text-[13px] text-slate-500 truncate">{item.relationship}</div>
                       </div>
                     </div>
                   ))}

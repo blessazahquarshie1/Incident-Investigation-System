@@ -41,9 +41,6 @@
 2. Why does Tailwind use class names instead of a separate `.css` file?
 3. What is a component, and how is `AppShell` different from a page?
 
----
-
-*(Remaining steps will be filled in as they are completed.)*
 
 
 ## Step 01: Font size fix + shared components
@@ -282,5 +279,59 @@ A destroyed item (e.g. `E-031`) that cannot be touched and clearly explains why;
 1. What is a state machine and where is it in this app?
 2. Why is the status derived from the history rather than typed in separately?
 3. Why does the history only ever add entries and never edit old ones?
+
+---
+
+## Step 10 — Reports and polish
+
+**What was built:**
+A comprehensive CID case briefing report generator (`/reports`) compiling 7 distinct analytical sections into an official intelligence dossier with print/PDF export styling. An application-wide polish pass was completed: wrapping all routes in a React `ErrorBoundary`, adding a friendly 404 `NotFoundPage`, enforcing dynamic `document.title` across all pages, auditing and fixing all typography so no element falls below 13px, removing all `any` types, ensuring 0 linter warnings across 98 files, creating the specification verification checklist (`docs/SPEC_CHECKLIST.md`), writing a 12-step supervisor demonstration script (`docs/DEMO_SCRIPT.md`), and documenting the system in the project root `README.md`.
+
+**How it works (plain English):**
+A **report** is the same data as the rest of the app, assembled into one readable document, so the report page adds no new logic: it reuses the functions from earlier steps. **Polish** is the work that makes software feel finished: what happens when something is missing, wrong or empty. The **checklist** turns the supervisor's spec into a list we can tick off, so nothing is forgotten.
+
+Think of building the application like constructing and furnishing an intelligence operations center. Steps 01 through 09 built the command rooms, the specialized forensics tools, the timeline analysis room, and the evidence vault. Step 10 does two things: first, it creates the official briefing binder (the dossier report) that pulls together summary findings from every room when leadership needs a physical brief. Second, it does the final quality inspection: checking that every exit sign is lit (404 page), the fire extinguishers are tested (error boundary), every label is clearly legible (font size standards), and every procedure manual matches the operational blueprint (spec checklist).
+
+**Key concepts:**
+- **Report compilation via pure functional synthesis:** Rather than duplicating querying logic, `buildCaseReport` in `src/lib/report.ts` calls existing pure functions (`getCasePeople`, `buildTimeline`, `detectTimelineConflicts`, `calculateConnection`) to compile a single immutably structured report object.
+- **Print media query styling (`@media print`):** Using Tailwind print utility variants (`print:hidden`, `print:bg-white`, `print:border-none`, `print:shadow-none`, `print:overflow-visible`) to selectively strip navigation sidebars, top bars, and buttons while preserving document headers, official mastheads, and high-contrast tables for paper or PDF export.
+- **Class-based Error Boundary lifecycle:** Using `componentDidCatch` and `static getDerivedStateFromError` to catch uncaught JavaScript runtime exceptions anywhere in the React component tree and render a graceful recovery screen with a reload button rather than a blank white screen.
+- **Graceful degradation and empty states:** Providing helpful guidance on missing IDs, empty search queries, or zero-item filter results rather than blank screens or null-pointer crashes.
+- **Strict typography scale defense:** Ensuring that even tiny annotations, timestamps, and badges never drop below 13px (`text-[13px]`) to maintain accessibility and readability on desktop and tablet displays.
+
+**Files to open:**
+- `src/lib/report.ts` — pure data function assembling all 7 report sections.
+- `src/pages/ReportsPage.tsx` — printable dossier view with CID masthead and print stylesheet.
+- `src/components/ErrorBoundary.tsx` — crash recovery wrapper around route elements.
+- `src/pages/NotFoundPage.tsx` — friendly 404 page with navigation link.
+- `docs/SPEC_CHECKLIST.md` — itemized specification matrix verifying 100% feature coverage.
+- `docs/DEMO_SCRIPT.md` — 12-step click-by-click walkthrough for supervisors.
+- `README.md` — project overview, directory map, and page catalog.
+
+**What I should see:**
+A printable case report, no broken pages, and a ticked spec checklist. When visiting `/reports`, selecting any case displays its executive summary, subject directory, evidence custody status, chronological event sequence, alibi conflict audit, top 5 network connections, and recent activity log. Clicking "Print / Save as PDF" cleanly formats the page for paper output.
+
+**I should be able to explain:**
+1. **Why does the Reports page need almost no new logic?**
+   Because every analytical insight displayed in the report — timeline events, alibi conflicts, connection scores, custody holders, and case associations — was already modeled and implemented as pure, modular utility functions in earlier steps (`buildTimeline`, `detectTimelineConflicts`, `calculateConnection`, `getCasePeople`, etc.). The Reports module simply acts as an orchestrator, invoking these existing functions and assembling their return values into one consolidated view model.
+
+2. **Name three things the polish pass handles that users only notice when they go wrong:**
+   - *Error recovery (Error Boundaries):* When an unexpected bug occurs, instead of rendering a broken, unresponsive white screen, the app catches the error and provides a clear explanation and a single-click "Reload page" button.
+   - *Graceful navigation handling (404 & Empty States):* When a user visits a mistyped URL or an entity ID that doesn't exist, rather than failing silently or crashing on undefined properties, the system renders a friendly message explaining what is missing and offering a link back to safe ground.
+   - *Legibility and print adaptability:* On screen, navigational chrome and buttons assist usability, but without print stylesheets, printing an investigation dossier produces clipped tables, messy sidebar links, and unreadable tiny fonts. The polish pass ensures printouts are crisp, official documents and screen typography is always at least 13px.
+
+3. **Walk through the demo script and say which learning objective each step shows:**
+   - *Step 1 (Dashboard metrics):* Demonstrates real-time state derivation and operational health visualization.
+   - *Step 2 (License plate search):* Demonstrates fuzzy multi-entity search and cross-relational data enrichment.
+   - *Step 3 (Vehicle profile & linkages):* Demonstrates bidirectional entity-graph navigation.
+   - *Step 4 (Case container 9 tabs):* Demonstrates scoped domain filtering within a master case entity.
+   - *Step 5 (Case timeline):* Demonstrates multi-source chronological event normalization.
+   - *Step 6 (Alibi conflict detection):* Demonstrates algorithmic spatio-temporal validation using travel-time matrices.
+   - *Step 7 (13 STRONG connection score):* Demonstrates weighted multi-factor associative link analysis.
+   - *Step 8 (BFS 5-node pathfinding):* Demonstrates graph traversal discovering indirect relationships between suspects.
+   - *Step 9 (React Flow relationship graph):* Demonstrates interactive physics-based network visualization with algorithmic path highlighting.
+   - *Step 10 (Evidence custody lifecycle):* Demonstrates finite state machine verification of legal handling processes.
+   - *Step 11 (Blocked destroyed evidence):* Demonstrates defensive state integrity enforcement preventing invalid operations.
+   - *Step 12 (Case mutation & audit feed):* Demonstrates reactive immutable state management with automated audit logging.
 
 

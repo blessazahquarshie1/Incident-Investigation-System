@@ -7,7 +7,7 @@ import { searchAll, getResultPath } from '../lib/search'
 import PageHeader from '../components/PageHeader'
 import EntityIcon from '../components/EntityIcon'
 import EmptyState from '../components/EmptyState'
-import { Search } from 'lucide-react'
+import { Search, Briefcase } from 'lucide-react'
 import type { EntityType } from '../types'
 import type { SearchEntityType } from '../lib/search'
 
@@ -113,7 +113,7 @@ export default function SearchPage() {
                       {result.entityType !== 'case' ? (
                         <EntityIcon type={result.entityType as EntityType} className="h-5 w-5" />
                       ) : (
-                        <div className="h-5 w-5 rounded bg-slate-200 flex items-center justify-center text-slate-500 text-[10px] font-bold">C</div>
+                        <Briefcase className="h-5 w-5 text-slate-600" />
                       )}
                     </div>
                     <div className="min-w-0 flex-1">

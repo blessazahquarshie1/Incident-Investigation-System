@@ -96,7 +96,7 @@ export default function ReportsPage() {
           <div className="border-b-2 border-slate-900 pb-5">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <div className="flex items-center gap-2 text-slate-600 text-[12px] font-bold tracking-widest uppercase mb-1">
+                <div className="flex items-center gap-2 text-slate-600 text-[13px] font-bold tracking-widest uppercase mb-1">
                   <Shield className="h-4 w-4 text-blue-700" />
                   <span>Criminal Investigation Department · Intelligence Dossier</span>
                 </div>
@@ -185,7 +185,7 @@ export default function ReportsPage() {
                                 <Link to={`/persons/${p.id}`} className="hover:text-blue-600 print:text-slate-900">
                                   {p.fullName}
                                 </Link>
-                                <span className="font-mono text-[11px] text-slate-400 ml-1">({p.id})</span>
+                                <span className="font-mono text-[13px] text-slate-400 ml-1">({p.id})</span>
                               </td>
                               <td className="p-2.5">
                                 <EntityTypeBadge type={p.type} />
@@ -233,7 +233,7 @@ export default function ReportsPage() {
                           <Link to={`/evidence/${ev.id}`} className="font-semibold text-slate-900 hover:text-blue-600 print:text-slate-900">
                             {ev.title}
                           </Link>
-                          <div className="text-[11px] font-mono text-slate-400">{ev.id}</div>
+                          <div className="text-[13px] font-mono text-slate-400">{ev.id}</div>
                         </td>
                         <td className="p-2.5 capitalize text-slate-700">{ev.type}</td>
                         <td className="p-2.5">
@@ -241,7 +241,7 @@ export default function ReportsPage() {
                         </td>
                         <td className="p-2.5 font-medium text-slate-800">
                           {ev.holderName}
-                          <span className="text-[11px] font-mono text-slate-400 ml-1">({ev.holderId})</span>
+                          <span className="text-[13px] font-mono text-slate-400 ml-1">({ev.holderId})</span>
                         </td>
                         <td className="p-2.5 text-slate-600">{formatDate(ev.collectedAt)}</td>
                         <td className="p-2.5 text-slate-600">{ev.collectedBy}</td>
@@ -266,10 +266,10 @@ export default function ReportsPage() {
               <div className="space-y-1.5 max-h-96 overflow-y-auto print:max-h-none border border-slate-200 rounded-lg p-3 bg-slate-50/50">
                 {report.timelineEvents.map(evt => (
                   <div key={evt.id} className="flex items-baseline gap-3 text-[13px] py-1 border-b border-slate-100 last:border-b-0">
-                    <span className="font-mono text-[12px] font-bold text-slate-600 shrink-0 w-28">
+                    <span className="font-mono text-[13px] font-bold text-slate-600 shrink-0 w-28">
                       {formatDate(evt.timestamp)}, {formatTime(evt.timestamp)}
                     </span>
-                    <span className="rounded bg-slate-200 px-1.5 py-0.5 text-[11px] font-medium text-slate-700 uppercase shrink-0">
+                    <span className="rounded bg-slate-200 px-1.5 py-0.5 text-[13px] font-medium text-slate-700 uppercase shrink-0">
                       {evt.source}
                     </span>
                     <span className="font-semibold text-slate-900 shrink-0">{evt.title}:</span>
@@ -300,7 +300,7 @@ export default function ReportsPage() {
                 {report.conflicts.map(c => (
                   <div key={c.id} className="rounded-lg border border-amber-200 bg-white p-3 text-[13px] space-y-1">
                     <p className="font-semibold text-amber-900">{c.explanation}</p>
-                    <div className="flex gap-4 text-[12px] text-slate-500 font-mono pt-1">
+                    <div className="flex gap-4 text-[13px] text-slate-500 font-mono pt-1">
                       <span>Gap: {c.gapMinutes} min</span>
                       <span>Required travel time: {c.requiredMinutes} min</span>
                     </div>
@@ -327,11 +327,11 @@ export default function ReportsPage() {
                       <span className="font-semibold text-slate-900">
                         {personAName} ↔ {personBName}
                       </span>
-                      <span className="font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded text-[12px]">
+                      <span className="font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded text-[13px]">
                         Score: {pair.score} ({pair.level})
                       </span>
                     </div>
-                    <ul className="text-[12px] font-mono text-slate-600 space-y-0.5">
+                    <ul className="text-[13px] font-mono text-slate-600 space-y-0.5">
                       {breakdown.map((line, idx) => (
                         <li key={idx}>• {line}</li>
                       ))}
@@ -364,11 +364,11 @@ export default function ReportsPage() {
                   <tbody className="divide-y divide-slate-100 bg-white">
                     {report.recentActivity.map(act => (
                       <tr key={act.id}>
-                        <td className="p-2 font-mono text-[12px] text-slate-500 whitespace-nowrap">
+                        <td className="p-2 font-mono text-[13px] text-slate-500 whitespace-nowrap">
                           {formatDateTime(act.timestamp)}
                         </td>
                         <td className="p-2">
-                          <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] font-medium text-slate-700 uppercase">
+                          <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[13px] font-medium text-slate-700 uppercase">
                             {act.action}
                           </span>
                         </td>
