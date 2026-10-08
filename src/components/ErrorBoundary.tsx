@@ -42,7 +42,7 @@ export default class ErrorBoundary extends Component<Props, State> {
                 An unexpected runtime error occurred in the analyst workbench.
               </p>
               {this.state.error && (
-                <pre className="mt-3 overflow-x-auto rounded bg-slate-100 p-2 text-left font-mono text-[12px] text-red-700">
+                <pre className="mt-3 overflow-x-auto rounded bg-slate-100 p-2 text-left font-mono text-[13px] text-red-700">
                   {this.state.error.message}
                 </pre>
               )}

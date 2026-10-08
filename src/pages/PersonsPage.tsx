@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { useSearchParams, useNavigate, Link } from 'react-router-dom'
 import { useInvestigationStore } from '../store/useInvestigationStore'
 import { filterPersons } from '../lib/filters'
@@ -10,6 +10,10 @@ import EntityTypeBadge from '../components/EntityTypeBadge'
 import type { Person } from '../types'
 
 export default function PersonsPage() {
+  useEffect(() => {
+    document.title = 'Persons · Incident Investigation System'
+  }, [])
+
   const data = useInvestigationStore(s => s.data)
   const navigate = useNavigate()
   const [params, setParams] = useSearchParams()
@@ -31,7 +35,7 @@ export default function PersonsPage() {
   
   const columns: Column<Person>[] = [
     { key: 'fullName', header: 'Name', render: r => <Link to={`/persons/${r.id}`} className="text-blue-600 hover:underline">{r.fullName}</Link>, sortable: true, getValue: r => r.fullName },
-    { key: 'type', header: 'Type', render: r => <EntityTypeBadge type={r.type as any} />, sortable: true, getValue: r => r.type },
+    { key: 'type', header: 'Type', render: r => <EntityTypeBadge type={r.type} />, sortable: true, getValue: r => r.type },
     { key: 'phone', header: 'Phone', render: r => r.phone || '—', sortable: true, getValue: r => r.phone || '' },
     { key: 'aliases', header: 'Aliases', render: r => (r.knownAliases || []).join(', ') || '—', sortable: false },
     { key: 'cases', header: 'Related Cases', render: r => r.relatedCases.length, sortable: true, getValue: r => r.relatedCases.length },

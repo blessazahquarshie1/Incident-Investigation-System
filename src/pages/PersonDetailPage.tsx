@@ -44,7 +44,7 @@ export default function PersonDetailPage() {
       <PageHeader title={entity.fullName} description={`Person Profile: ${entity.id}`} />
       <Card title="Details">
         <div className="grid grid-cols-2 gap-4">
-          <div><span className="font-semibold text-slate-500 block">Type</span><EntityTypeBadge type={entity.type as any} /></div>
+          <div><span className="font-semibold text-slate-500 block">Type</span><EntityTypeBadge type={entity.type} /></div>
           <div><span className="font-semibold text-slate-500 block">Phone</span>{entity.phone || '—'}</div>
           <div><span className="font-semibold text-slate-500 block">Address</span>{entity.address || '—'}</div>
           <div><span className="font-semibold text-slate-500 block">Aliases</span>{(entity.knownAliases || []).join(', ') || '—'}</div>

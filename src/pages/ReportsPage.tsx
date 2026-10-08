@@ -24,6 +24,7 @@ import {
 export default function ReportsPage() {
   const data = useInvestigationStore(s => s.data)
   const [selectedCaseId, setSelectedCaseId] = useState('CASE-00123')
+  const [printedAt] = useState(() => formatDateTime(new Date().toISOString()))
 
   const report = useMemo(() => {
     return buildCaseReport(data, selectedCaseId)
@@ -107,9 +108,9 @@ export default function ReportsPage() {
                 </p>
               </div>
 
-              <div className="text-right text-[12px] text-slate-500 space-y-0.5 shrink-0">
+              <div className="text-right text-[13px] text-slate-500 space-y-0.5 shrink-0">
                 <p>CONFIDENTIAL INVESTIGATION</p>
-                <p>Printed: {formatDateTime(new Date().toISOString())}</p>
+                <p>Printed: {printedAt}</p>
                 <div className="flex items-center justify-end gap-2 pt-1">
                   <PriorityBadge priority={report.caseRecord.priority} />
                   <StatusBadge status={report.caseRecord.status} />

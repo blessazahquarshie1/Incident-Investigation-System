@@ -89,7 +89,7 @@ export default function ActivityFeed({
                       <div className="mt-1">
                         <Link
                           to={`/cases/${entry.caseId}`}
-                          className="font-mono text-[12px] text-blue-600 hover:underline"
+                          className="font-mono text-[13px] text-blue-600 hover:underline"
                         >
                           {entry.caseId}
                         </Link>

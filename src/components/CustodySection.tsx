@@ -130,16 +130,16 @@ export default function CustodySection({ evidence }: CustodySectionProps) {
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg bg-slate-50 p-4 border border-slate-200 mb-6">
           <div className="flex items-center gap-3">
             <div>
-              <span className="text-[12px] font-semibold text-slate-500 uppercase tracking-wide block">Current status</span>
+              <span className="text-[13px] font-semibold text-slate-500 uppercase tracking-wide block">Current status</span>
               <div className="mt-1">
                 <StatusBadge status={currentStatus} />
               </div>
             </div>
             <div className="h-8 w-px bg-slate-200 mx-2" />
             <div>
-              <span className="text-[12px] font-semibold text-slate-500 uppercase tracking-wide block">Current custodian</span>
+              <span className="text-[13px] font-semibold text-slate-500 uppercase tracking-wide block">Current custodian</span>
               <span className="text-[14px] font-medium text-slate-900 mt-1 block">
-                {currentHolderName} <span className="font-mono text-slate-400 text-[12px]">({currentHolderId})</span>
+                {currentHolderName} <span className="font-mono text-slate-400 text-[13px]">({currentHolderId})</span>
               </span>
             </div>
           </div>
@@ -162,7 +162,7 @@ export default function CustodySection({ evidence }: CustodySectionProps) {
           <div className="space-y-6 border-l-2 border-slate-200 ml-4 pl-4">
             {Object.entries(groupedHistory).map(([dateStr, entries]) => (
               <div key={dateStr} className="space-y-3">
-                <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wider -ml-8 bg-white pr-2 inline-block">
+                <div className="text-[13px] font-bold text-slate-500 uppercase tracking-wider -ml-8 bg-white pr-2 inline-block">
                   {dateStr}
                 </div>
                 {entries.map(entry => {
@@ -245,7 +245,7 @@ export default function CustodySection({ evidence }: CustodySectionProps) {
                     </button>
                   </div>
                   {disabledReason && (
-                    <p className="text-[12px] text-red-600 font-medium leading-tight">
+                    <p className="text-[13px] text-red-600 font-medium leading-tight">
                       {disabledReason}
                     </p>
                   )}

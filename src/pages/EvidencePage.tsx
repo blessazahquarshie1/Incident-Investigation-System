@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { useSearchParams, useNavigate, Link } from 'react-router-dom'
 import { useInvestigationStore } from '../store/useInvestigationStore'
 import { filterEvidence } from '../lib/filters'
@@ -12,6 +12,10 @@ import { getOfficerName } from '../lib/lookup'
 import type { Evidence } from '../types'
 
 export default function EvidencePage() {
+  useEffect(() => {
+    document.title = 'Evidence · Incident Investigation System'
+  }, [])
+
   const data = useInvestigationStore(s => s.data)
   const navigate = useNavigate()
   const [params, setParams] = useSearchParams()

@@ -79,7 +79,7 @@ function InvestigationCustomNode({ data }: NodeProps<Node<CustomNodeData>>) {
           {label}
         </div>
         {subLabel && (
-          <div className="truncate text-[12px] text-slate-500 capitalize leading-tight mt-0.5">
+          <div className="truncate text-[13px] text-slate-500 capitalize leading-tight mt-0.5">
             {subLabel}
           </div>
         )}
@@ -127,12 +127,13 @@ function GraphViewInner() {
   const fullGraph = useMemo(() => buildGraph(data), [data])
 
   // Reset expanded nodes and path when case changes
-  useEffect(() => {
+  function handleCaseChange(newCase: string) {
+    setSelectedCase(newCase)
     setExpandedNodeIds(new Set())
     setSelectedNodeId(null)
     setComparisonPath(undefined)
     setComparisonScore(undefined)
-  }, [selectedCase])
+  }
 
   // Base nodes for the chosen case
   const baseNodes = useMemo(() => {
@@ -428,7 +429,7 @@ function GraphViewInner() {
           <label className="text-[13px] font-semibold text-slate-600 whitespace-nowrap">Case:</label>
           <select
             value={selectedCase}
-            onChange={e => setSelectedCase(e.target.value)}
+            onChange={e => handleCaseChange(e.target.value)}
             className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-base font-medium text-slate-800 focus:border-blue-500 focus:outline-none"
           >
             <option value="CASE-00123">CASE-00123 (Armed Robbery)</option>
@@ -460,7 +461,7 @@ function GraphViewInner() {
               >
                 <Icon className={`h-3.5 w-3.5 ${isVis ? style.color : 'text-slate-400'}`} />
                 <span>{style.label}</span>
-                <span className="text-[11px] font-mono text-slate-400">({count})</span>
+                <span className="text-[13px] font-mono text-slate-400">({count})</span>
                 {isVis ? <Eye className="h-3 w-3 text-slate-400" /> : <EyeOff className="h-3 w-3 text-slate-400" />}
               </button>
             )
@@ -503,7 +504,7 @@ function GraphViewInner() {
                       <EntityIcon type={result.type} className="h-3.5 w-3.5 shrink-0" />
                       <div className="min-w-0 flex-1 truncate">
                         <p className="text-[13px] font-medium text-slate-800 truncate">{result.label}</p>
-                        <p className="text-[11px] text-slate-400 font-mono">{result.id}</p>
+                        <p className="text-[13px] text-slate-400 font-mono">{result.id}</p>
                       </div>
                     </button>
                   )
@@ -574,7 +575,7 @@ function GraphViewInner() {
             )}
 
             {/* Bottom Legend Overlay */}
-            <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm border border-slate-200 rounded-lg p-2.5 shadow-sm z-10 text-[12px] space-y-2 pointer-events-auto max-w-[340px]">
+            <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm border border-slate-200 rounded-lg p-2.5 shadow-sm z-10 text-[13px] space-y-2 pointer-events-auto max-w-[340px]">
               <div>
                 <p className="font-semibold text-slate-700 mb-1">Entity types</p>
                 <div className="flex flex-wrap gap-2">
@@ -631,7 +632,7 @@ function GraphViewInner() {
                     </h3>
                     <div className="flex items-center gap-2 mt-0.5">
                       <EntityTypeBadge type={selectedNode.type} />
-                      <span className="font-mono text-[12px] text-slate-400">{selectedNode.id}</span>
+                      <span className="font-mono text-[13px] text-slate-400">{selectedNode.id}</span>
                     </div>
                   </div>
                 </div>
@@ -752,7 +753,7 @@ function GraphViewInner() {
                           <EntityIcon type={nb.type} className="h-3.5 w-3.5 shrink-0" />
                           <span className="truncate text-[13px] font-medium text-slate-800">{nb.label}</span>
                         </div>
-                        <span className="shrink-0 text-[11px] font-mono italic text-slate-500">{nb.relationship}</span>
+                        <span className="shrink-0 text-[13px] font-mono italic text-slate-500">{nb.relationship}</span>
                       </button>
                     ))}
                   </div>
@@ -830,7 +831,7 @@ function GraphViewInner() {
                   <p className="text-[14px] font-semibold text-slate-800">
                     Shortest connection path ({comparisonPath.length} step{comparisonPath.length === 1 ? '' : 's'})
                   </p>
-                  <span className="text-[12px] text-blue-600 font-medium">Highlighted on graph above</span>
+                  <span className="text-[13px] text-blue-600 font-medium">Highlighted on graph above</span>
                 </div>
                 <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 overflow-x-auto">
                   <ConnectionPathView path={comparisonPath} />

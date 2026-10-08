@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { useParams, Link, useSearchParams } from 'react-router-dom'
 import { useInvestigationStore } from '../store/useInvestigationStore'
 import { getCasePeople, getCaseEvidence, getCaseIncidents, getCaseDocuments, getCaseNotes, getCaseVehicles, getCaseLocations, getCaseActivity } from '../lib/caseScope'
@@ -14,7 +14,17 @@ import EmptyState from '../components/EmptyState'
 import CaseTimelineTab from '../components/CaseTimelineTab'
 import CaseConnectionsTab from '../components/CaseConnectionsTab'
 import ActivityFeed from '../components/ActivityFeed'
-import type { ActivityLogEntry } from '../types'
+import type {
+  ActivityLogEntry,
+  Case,
+  Incident,
+  CaseDocument,
+  Person,
+  Evidence,
+  Location,
+  Vehicle,
+  Note,
+} from '../types'
 
 export default function CaseDetailPage() {
   const { caseId } = useParams<{ caseId: string }>()
@@ -23,19 +33,23 @@ export default function CaseDetailPage() {
   const activeTab = params.get('tab') || 'overview'
   
   const kase = data.cases.find(c => c.id === caseId)
+
+  useEffect(() => {
+    document.title = kase ? `${kase.id}: ${kase.title} · Incident Investigation System` : 'Case Not Found · IIS'
+  }, [kase])
   
+  const people = useMemo(() => caseId ? getCasePeople(data, caseId) : [], [data, caseId])
+  const evidence = useMemo(() => caseId ? getCaseEvidence(data, caseId) : [], [data, caseId])
+  const incidents = useMemo(() => caseId ? getCaseIncidents(data, caseId) : [], [data, caseId])
+  const documents = useMemo(() => caseId ? getCaseDocuments(data, caseId) : [], [data, caseId])
+  const notes = useMemo(() => caseId ? getCaseNotes(data, caseId) : [], [data, caseId])
+  const vehicles = useMemo(() => caseId ? getCaseVehicles(data, caseId) : [], [data, caseId])
+  const locations = useMemo(() => caseId ? getCaseLocations(data, caseId) : [], [data, caseId])
+  const activity = useMemo(() => caseId ? getCaseActivity(data, caseId) : [], [data, caseId])
+
   if (!kase || !caseId) {
     return <EmptyState title="Not found" description="No case with this id." action={<Link to="/cases">← Back to cases</Link>} />
   }
-
-  const people = useMemo(() => getCasePeople(data, caseId), [data, caseId])
-  const evidence = useMemo(() => getCaseEvidence(data, caseId), [data, caseId])
-  const incidents = useMemo(() => getCaseIncidents(data, caseId), [data, caseId])
-  const documents = useMemo(() => getCaseDocuments(data, caseId), [data, caseId])
-  const notes = useMemo(() => getCaseNotes(data, caseId), [data, caseId])
-  const vehicles = useMemo(() => getCaseVehicles(data, caseId), [data, caseId])
-  const locations = useMemo(() => getCaseLocations(data, caseId), [data, caseId])
-  const activity = useMemo(() => getCaseActivity(data, caseId), [data, caseId])
 
   const tabs = [
     { id: 'overview', label: 'Overview' },
@@ -72,7 +86,7 @@ export default function CaseDetailPage() {
   )
 }
 
-function OverviewTab({ kase, incidents, documents }: any) {
+function OverviewTab({ kase, incidents, documents }: { kase: Case; incidents: Incident[]; documents: CaseDocument[] }) {
   const changePriority = useInvestigationStore(s => s.changeCasePriority)
   const changeStatus = useInvestigationStore(s => s.changeCaseStatus)
   const [showPriMsg, setShowPriMsg] = useState(false)
@@ -96,7 +110,7 @@ function OverviewTab({ kase, incidents, documents }: any) {
             <div>
               <label className="block text-sm font-medium mb-1">Priority</label>
               <div className="flex gap-2 items-center">
-                <select className="border p-2 rounded" value={kase.priority} onChange={e => { changePriority(kase.id, e.target.value as any); setShowPriMsg(true); setTimeout(() => setShowPriMsg(false), 3000) }}>
+                <select className="border p-2 rounded" value={kase.priority} onChange={e => { changePriority(kase.id, e.target.value as Case['priority']); setShowPriMsg(true); setTimeout(() => setShowPriMsg(false), 3000) }}>
                   <option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option><option value="critical">Critical</option>
                 </select>
                 <PriorityBadge priority={kase.priority} />
@@ -106,7 +120,7 @@ function OverviewTab({ kase, incidents, documents }: any) {
             <div>
               <label className="block text-sm font-medium mb-1">Status</label>
               <div className="flex gap-2 items-center">
-                <select className="border p-2 rounded" value={kase.status} onChange={e => { changeStatus(kase.id, e.target.value as any); setShowStatMsg(true); setTimeout(() => setShowStatMsg(false), 3000) }}>
+                <select className="border p-2 rounded" value={kase.status} onChange={e => { changeStatus(kase.id, e.target.value as Case['status']); setShowStatMsg(true); setTimeout(() => setShowStatMsg(false), 3000) }}>
                   <option value="open">Open</option><option value="closed">Closed</option><option value="cold">Cold</option>
                 </select>
                 <StatusBadge status={kase.status} />
@@ -121,12 +135,12 @@ function OverviewTab({ kase, incidents, documents }: any) {
         {incidents.length > 0 ? (
           <DataTable 
             columns={[
-              { key: 'id', header: 'ID', render: (r: any) => <Link to={`/incidents/${r.id}`} className="text-blue-600 hover:underline">{r.id}</Link> },
-              { key: 'title', header: 'Title', render: (r: any) => r.title },
-              { key: 'occurredAt', header: 'Occurred At', render: (r: any) => formatDateTime(r.occurredAt) },
-              { key: 'status', header: 'Status', render: (r: any) => <StatusBadge status={r.status} /> }
+              { key: 'id', header: 'ID', render: (r: Incident) => <Link to={`/incidents/${r.id}`} className="text-blue-600 hover:underline">{r.id}</Link> },
+              { key: 'title', header: 'Title', render: (r: Incident) => r.title },
+              { key: 'occurredAt', header: 'Occurred At', render: (r: Incident) => formatDateTime(r.occurredAt) },
+              { key: 'status', header: 'Status', render: (r: Incident) => <StatusBadge status={r.status} /> }
             ]} 
-            rows={incidents} getRowKey={(r: any) => r.id} 
+            rows={incidents} getRowKey={(r: Incident) => r.id} 
           />
         ) : <EmptyState title="No incidents" description="No incidents recorded for this case." />}
       </Card>
@@ -134,9 +148,9 @@ function OverviewTab({ kase, incidents, documents }: any) {
       <Card title="Documents">
         {documents.length > 0 ? (
           <ul className="divide-y border rounded">
-            {documents.map((d: any) => (
+            {documents.map((d: CaseDocument) => (
               <li key={d.id} className="p-3 flex justify-between items-center">
-                <div><div className="font-medium text-blue-600">{d.title}</div><div className="text-sm text-slate-500">{d.type}</div></div>
+                <div><div className="font-medium text-blue-600">{d.title}</div><div className="text-sm text-slate-500">{d.kind}</div></div>
                 <div className="text-sm text-slate-500">{formatDate(d.uploadedAt)}</div>
               </li>
             ))}
@@ -147,9 +161,9 @@ function OverviewTab({ kase, incidents, documents }: any) {
   )
 }
 
-function PeopleTab({ people }: any) {
-  const byType: Record<string, any[]> = { suspect: [], witness: [], victim: [], 'person-of-interest': [] }
-  people.forEach((p: any) => { if (byType[p.type]) byType[p.type].push(p) })
+function PeopleTab({ people }: { people: Person[] }) {
+  const byType: Record<string, Person[]> = { suspect: [], witness: [], victim: [], 'person-of-interest': [] }
+  people.forEach((p: Person) => { if (byType[p.type]) byType[p.type].push(p) })
 
   return (
     <div className="space-y-6 pt-4">
@@ -158,11 +172,11 @@ function PeopleTab({ people }: any) {
           {list.length > 0 ? (
             <DataTable 
               columns={[
-                { key: 'name', header: 'Name', render: (r: any) => <Link to={`/persons/${r.id}`} className="text-blue-600 hover:underline">{r.fullName}</Link> },
-                { key: 'phone', header: 'Phone', render: (r: any) => r.phone || '—' },
-                { key: 'aliases', header: 'Aliases', render: (r: any) => (r.knownAliases || []).join(', ') || '—' }
+                { key: 'name', header: 'Name', render: (r: Person) => <Link to={`/persons/${r.id}`} className="text-blue-600 hover:underline">{r.fullName}</Link> },
+                { key: 'phone', header: 'Phone', render: (r: Person) => r.phone || '—' },
+                { key: 'aliases', header: 'Aliases', render: (r: Person) => (r.knownAliases || []).join(', ') || '—' }
               ]} 
-              rows={list} getRowKey={(r: any) => r.id} 
+              rows={list} getRowKey={(r: Person) => r.id} 
             />
           ) : <div className="text-slate-500 text-sm">No {type}s recorded.</div>}
         </Card>
@@ -171,28 +185,28 @@ function PeopleTab({ people }: any) {
   )
 }
 
-function EvidenceTab({ evidence }: any) {
+function EvidenceTab({ evidence }: { evidence: Evidence[] }) {
   const data = useInvestigationStore(s => s.data)
   return (
     <div className="space-y-6 pt-4">
       <Card title="Evidence">
         <DataTable 
           columns={[
-            { key: 'id', header: 'ID', render: (r: any) => <Link to={`/evidence/${r.id}`} className="text-blue-600 hover:underline">{r.id}</Link> },
-            { key: 'title', header: 'Title', render: (r: any) => r.title },
-            { key: 'type', header: 'Type', render: (r: any) => r.type },
-            { key: 'collectedAt', header: 'Collected', render: (r: any) => formatDate(r.collectedAt) },
-            { key: 'collectedBy', header: 'Officer', render: (r: any) => getOfficerName(data, r.collectedBy) },
-            { key: 'status', header: 'Status', render: (r: any) => <StatusBadge status={r.status} /> }
+            { key: 'id', header: 'ID', render: (r: Evidence) => <Link to={`/evidence/${r.id}`} className="text-blue-600 hover:underline">{r.id}</Link> },
+            { key: 'title', header: 'Title', render: (r: Evidence) => r.title },
+            { key: 'type', header: 'Type', render: (r: Evidence) => r.type },
+            { key: 'collectedAt', header: 'Collected', render: (r: Evidence) => formatDate(r.collectedAt) },
+            { key: 'collectedBy', header: 'Officer', render: (r: Evidence) => getOfficerName(data, r.collectedBy) },
+            { key: 'status', header: 'Status', render: (r: Evidence) => <StatusBadge status={r.status} /> }
           ]} 
-          rows={evidence} getRowKey={(r: any) => r.id} 
+          rows={evidence} getRowKey={(r: Evidence) => r.id} 
         />
       </Card>
     </div>
   )
 }
 
-function LocationsTab({ kase, locations }: any) {
+function LocationsTab({ kase, locations }: { kase: Case; locations: Location[] }) {
   const data = useInvestigationStore(s => s.data)
   
   function getConnectionReason(locId: string): string {
@@ -210,36 +224,36 @@ function LocationsTab({ kase, locations }: any) {
       <Card title="Locations">
         <DataTable 
           columns={[
-            { key: 'name', header: 'Name', render: (r: any) => <Link to={`/locations/${r.id}`} className="text-blue-600 hover:underline">{r.name}</Link> },
-            { key: 'city', header: 'City', render: (r: any) => r.city },
-            { key: 'reason', header: 'Connected Via', render: (r: any) => getConnectionReason(r.id) }
+            { key: 'name', header: 'Name', render: (r: Location) => <Link to={`/locations/${r.id}`} className="text-blue-600 hover:underline">{r.name}</Link> },
+            { key: 'city', header: 'City', render: (r: Location) => r.city },
+            { key: 'reason', header: 'Connected Via', render: (r: Location) => getConnectionReason(r.id) }
           ]} 
-          rows={locations} getRowKey={(r: any) => r.id} 
+          rows={locations} getRowKey={(r: Location) => r.id} 
         />
       </Card>
     </div>
   )
 }
 
-function VehiclesTab({ vehicles }: any) {
+function VehiclesTab({ vehicles }: { vehicles: Vehicle[] }) {
   const data = useInvestigationStore(s => s.data)
   return (
     <div className="space-y-6 pt-4">
       <Card title="Vehicles">
         <DataTable 
           columns={[
-            { key: 'reg', header: 'Registration', render: (r: any) => <Link to={`/vehicles/${r.id}`} className="text-blue-600 hover:underline">{r.registration}</Link> },
-            { key: 'make', header: 'Make/Model', render: (r: any) => `${r.make} ${r.model}` },
-            { key: 'owner', header: 'Owner', render: (r: any) => r.ownerId ? getPersonName(data, r.ownerId) : 'Unknown' }
+            { key: 'reg', header: 'Registration', render: (r: Vehicle) => <Link to={`/vehicles/${r.id}`} className="text-blue-600 hover:underline">{r.registration}</Link> },
+            { key: 'make', header: 'Make/Model', render: (r: Vehicle) => `${r.make} ${r.model}` },
+            { key: 'owner', header: 'Owner', render: (r: Vehicle) => r.ownerId ? getPersonName(data, r.ownerId) : 'Unknown' }
           ]} 
-          rows={vehicles} getRowKey={(r: any) => r.id} 
+          rows={vehicles} getRowKey={(r: Vehicle) => r.id} 
         />
       </Card>
     </div>
   )
 }
 
-function NotesTab({ kase, notes }: any) {
+function NotesTab({ kase, notes }: { kase: Case; notes: Note[] }) {
   const addNote = useInvestigationStore(s => s.addNote)
   const data = useInvestigationStore(s => s.data)
   const [text, setText] = useState('')

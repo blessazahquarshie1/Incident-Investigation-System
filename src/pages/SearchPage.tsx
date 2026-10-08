@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useInvestigationStore } from '../store/useInvestigationStore'
 import { buildGraph } from '../lib/graph'
@@ -26,6 +26,10 @@ export default function SearchPage() {
   const navigate = useNavigate()
   const query = params.get('q') ?? ''
   const typeFilter = params.get('type') ?? ''
+
+  useEffect(() => {
+    document.title = query ? `Search: "${query}" · Incident Investigation System` : 'Search · Incident Investigation System'
+  }, [query])
 
   const graph = useMemo(() => buildGraph(data), [data])
   const allResults = useMemo(() => searchAll(data, graph, query), [data, graph, query])

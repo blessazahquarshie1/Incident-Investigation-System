@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { useSearchParams, useNavigate, Link } from 'react-router-dom'
 import { useInvestigationStore } from '../store/useInvestigationStore'
 import { filterIncidents } from '../lib/filters'
@@ -12,6 +12,10 @@ import { getLocationName } from '../lib/lookup'
 import type { Incident } from '../types'
 
 export default function IncidentsPage() {
+  useEffect(() => {
+    document.title = 'Incidents · Incident Investigation System'
+  }, [])
+
   const data = useInvestigationStore(s => s.data)
   const navigate = useNavigate()
   const [params, setParams] = useSearchParams()

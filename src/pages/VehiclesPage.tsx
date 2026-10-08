@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { useSearchParams, useNavigate, Link } from 'react-router-dom'
 import { useInvestigationStore } from '../store/useInvestigationStore'
 import { filterVehicles } from '../lib/filters'
@@ -10,6 +10,10 @@ import { getPersonName } from '../lib/lookup'
 import type { Vehicle } from '../types'
 
 export default function VehiclesPage() {
+  useEffect(() => {
+    document.title = 'Vehicles · Incident Investigation System'
+  }, [])
+
   const data = useInvestigationStore(s => s.data)
   const navigate = useNavigate()
   const [params, setParams] = useSearchParams()

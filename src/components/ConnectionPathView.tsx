@@ -17,7 +17,7 @@ export default function ConnectionPathView({ path }: Props) {
         return (
           <React.Fragment key={node.id}>
             {i > 0 && edge && (
-              <div className="flex items-center gap-1 text-[12px] text-slate-400">
+              <div className="flex items-center gap-1 text-[13px] text-slate-400">
                 <ArrowRight className="h-3.5 w-3.5" />
                 <span className="italic">{edge.relationship}</span>
                 <ArrowRight className="h-3.5 w-3.5" />

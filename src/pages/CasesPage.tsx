@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { useSearchParams, useNavigate, Link } from 'react-router-dom'
 import { useInvestigationStore } from '../store/useInvestigationStore'
 import { filterCases } from '../lib/filters'
@@ -14,6 +14,10 @@ import { getOfficerName } from '../lib/lookup'
 import type { Case } from '../types'
 
 export default function CasesPage() {
+  useEffect(() => {
+    document.title = 'Cases · Incident Investigation System'
+  }, [])
+
   const data = useInvestigationStore(s => s.data)
   const createCase = useInvestigationStore(s => s.createCase)
   const navigate = useNavigate()
@@ -87,10 +91,10 @@ export default function CasesPage() {
         <form onSubmit={handleCreate} className="space-y-4">
           <div><label className="block text-sm font-medium">Title</label><input type="text" required value={formTitle} onChange={e => setFormTitle(e.target.value)} className="mt-1 w-full border rounded p-2" /></div>
           <div><label className="block text-sm font-medium">Description</label><textarea required value={formDesc} onChange={e => setFormDesc(e.target.value)} className="mt-1 w-full border rounded p-2" /></div>
-          <div><label className="block text-sm font-medium">Type</label><select value={formType} onChange={e => setFormType(e.target.value as any)} className="mt-1 w-full border rounded p-2">
+          <div><label className="block text-sm font-medium">Type</label><select value={formType} onChange={e => setFormType(e.target.value as Case['type'])} className="mt-1 w-full border rounded p-2">
             <option value="theft">Theft</option><option value="fraud">Fraud</option><option value="assault">Assault</option><option value="cybercrime">Cybercrime</option><option value="other">Other</option>
           </select></div>
-          <div><label className="block text-sm font-medium">Priority</label><select value={formPriority} onChange={e => setFormPriority(e.target.value as any)} className="mt-1 w-full border rounded p-2">
+          <div><label className="block text-sm font-medium">Priority</label><select value={formPriority} onChange={e => setFormPriority(e.target.value as Case['priority'])} className="mt-1 w-full border rounded p-2">
             <option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option><option value="critical">Critical</option>
           </select></div>
           <div><label className="block text-sm font-medium">Lead Investigator</label><select required value={formLead} onChange={e => setFormLead(e.target.value)} className="mt-1 w-full border rounded p-2">

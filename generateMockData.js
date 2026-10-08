@@ -27,7 +27,7 @@ const travelTimes = `export function getTravelMinutes(cityA: string, cityB: stri
 
 writeFile('travelTimes.ts', travelTimes);
 
-const generateArrayCode = (name, type, items) => {
+const _generateArrayCode = (name, type, items) => {
   return `import type { ${type} } from '../types';\n\nexport const ${name}: ${type}[] = ${JSON.stringify(items, null, 2)};`;
 };
 

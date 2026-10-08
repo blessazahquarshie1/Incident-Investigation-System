@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useInvestigationStore } from '../store/useInvestigationStore'
 import { filterOfficers } from '../lib/filters'
@@ -9,6 +9,10 @@ import type { Column } from '../components/DataTable'
 import type { Officer } from '../types'
 
 export default function InvestigatorsPage() {
+  useEffect(() => {
+    document.title = 'Investigators · Incident Investigation System'
+  }, [])
+
   const data = useInvestigationStore(s => s.data)
   const [params, setParams] = useSearchParams()
   

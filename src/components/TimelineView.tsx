@@ -150,17 +150,17 @@ export default function TimelineView({ caseId, showControls = false }: Props) {
                       <p className="mt-0.5 text-[14px] text-slate-600">{ev.description}</p>
                       <div className="mt-1.5 flex flex-wrap gap-2">
                         {ev.personIds.slice(0, 3).map(pid => (
-                          <Link key={pid} to={`/persons/${pid}`} className="rounded-full bg-violet-50 px-2 py-0.5 text-[12px] text-violet-700 hover:bg-violet-100">
+                          <Link key={pid} to={`/persons/${pid}`} className="rounded-full bg-violet-50 px-2 py-0.5 text-[13px] text-violet-700 hover:bg-violet-100">
                             {getPersonName(data, pid)}
                           </Link>
                         ))}
                         {ev.locationId && (
-                          <Link to={`/locations/${ev.locationId}`} className="rounded-full bg-rose-50 px-2 py-0.5 text-[12px] text-rose-700 hover:bg-rose-100">
+                          <Link to={`/locations/${ev.locationId}`} className="rounded-full bg-rose-50 px-2 py-0.5 text-[13px] text-rose-700 hover:bg-rose-100">
                             {getLocationName(data, ev.locationId)}
                           </Link>
                         )}
                         {ev.vehicleId && (
-                          <Link to={`/vehicles/${ev.vehicleId}`} className="rounded-full bg-blue-50 px-2 py-0.5 text-[12px] text-blue-700 hover:bg-blue-100">
+                          <Link to={`/vehicles/${ev.vehicleId}`} className="rounded-full bg-blue-50 px-2 py-0.5 text-[13px] text-blue-700 hover:bg-blue-100">
                             {ev.vehicleId}
                           </Link>
                         )}
