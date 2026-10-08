@@ -176,3 +176,54 @@ We built the "case folder" that gathers everything related to a single investiga
 
 **I should be able to explain:**
 - How immutable state updates ensure React safely re-renders UI elements when new entities or relationships are added to the store.
+
+## Step 06: Algorithms
+
+**What was built:**
+Implemented connection scoring algorithms and shortest path (BFS) algorithms to discover hidden links between individuals across locations, vehicles, incidents, evidence, and phone records. Vitest was integrated for robust unit testing of these logical functions. UI components were built to visualize connection strength and display paths.
+
+**How it works (plain English with an analogy):**
+We built the "detective's corkboard with red string". The system analyzes every entity to find where people's paths cross (scoring strength). If two people don't cross directly, it maps the shortest path of "friends of friends" (or shared vehicles/incidents) to show exactly how they are connected.
+
+**Key concepts:**
+- Graph algorithms (Breadth-First Search).
+- Scoring logic and weighted connections.
+- Unit testing with Vitest.
+
+**Files to open:**
+- src/lib/connections.ts
+- src/lib/pathfinding.ts
+- src/components/CaseConnectionsTab.tsx
+
+**What I should see:**
+- A pathfinding tool in the Connections tab that shows step-by-step links between people.
+- Connection scores (e.g. 13 STRONG) visualizing shared items.
+- Passing unit tests when running `npm test`.
+
+**I should be able to explain:**
+- Why Breadth-First Search (BFS) is the ideal algorithm to find the *shortest* number of degrees of separation between two people.
+
+## Step 07: Timeline and conflicts
+
+**What was built:**
+Created a chronologically sorted global timeline aggregating data from evidence, incidents, locations, witness statements, and sightings. Implemented a timeline conflict detection engine that uses location travel times to flag physically impossible presence claims (e.g., someone spotted in Accra and Takoradi within 5 minutes).
+
+**How it works (plain English with an analogy):**
+We've built an automated "alibi checker". It lines up every single event in chronological order on a master timeline. Then it acts like a detective asking, "If you were seen in City A at 10:10, and someone claims you were in City B at 10:15, but it's a 4-hour drive... you have a conflict!" 
+
+**Key concepts:**
+- Timeline aggregation and sorting across heterogeneous data types.
+- Conflict detection logic evaluating time/distance constraints.
+- Iterating combinations using nested loops (O(n²) comparison per person).
+
+**Files to open:**
+- src/lib/timeline.ts
+- src/lib/conflicts.ts
+- src/components/TimelineView.tsx
+
+**What I should see:**
+- A unified timeline view in the UI showing all events.
+- Conflict banners alerting the user to impossible timelines.
+
+**I should be able to explain:**
+- How grouping events by person before comparing pairs optimizes the conflict detection algorithm, avoiding unnecessary comparisons between completely unrelated events.

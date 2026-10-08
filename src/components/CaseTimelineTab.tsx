@@ -1,6 +1,8 @@
-import EmptyState from './EmptyState'
+import TimelineView from './TimelineView'
 
 interface Props { caseId: string }
-export default function CaseTimelineTab({ caseId: _ }: Props) {
-  return <EmptyState title="Timeline" description="The case timeline is built in Step 07." />
+
+// Shows the full timeline for a single case, scoped to that case's events only
+export default function CaseTimelineTab({ caseId }: Props) {
+  return <TimelineView caseId={caseId} showControls={false} />
 }

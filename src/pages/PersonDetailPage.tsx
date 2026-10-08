@@ -8,6 +8,8 @@ import EmptyState from '../components/EmptyState'
 import EntityIcon from '../components/EntityIcon'
 import EntityTypeBadge from '../components/EntityTypeBadge'
 import type { EntityType } from '../types'
+import { findConnections } from '../lib/connections'
+import ConnectionScoreCard from '../components/ConnectionScoreCard'
 
 export default function PersonDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -74,7 +76,28 @@ export default function PersonDetailPage() {
           })}
         </div>
       </Card>
-      <div id="connections-section"><EmptyState title="Connections" description="Connection analysis is built in Step 06." /></div>
+      <div id="connections-section">
+        <Card title="Connections">
+          {(() => {
+            const result = findConnections(data, entity.id)
+            if (result.connections.length === 0) {
+              return <EmptyState title="No connections" description="This person shares no common links with others." />
+            }
+            return (
+              <div className="space-y-2">
+                {result.connections.map(pair => (
+                  <ConnectionScoreCard
+                    key={`${pair.personAId}-${pair.personBId}`}
+                    pair={pair}
+                    personAName={data.persons.find(p => p.id === pair.personAId)?.fullName ?? pair.personAId}
+                    personBName={data.persons.find(p => p.id === pair.personBId)?.fullName ?? pair.personBId}
+                  />
+                ))}
+              </div>
+            )
+          })()}
+        </Card>
+      </div>
     </div>
   )
 }

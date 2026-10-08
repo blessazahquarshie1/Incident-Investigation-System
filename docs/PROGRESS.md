@@ -7,8 +7,8 @@
 | 03 | Dashboard | done | pass | - | done | pass | — |
 | 04 | Lists, filters, search | done | pass | - | pending | — | — |
 | 05 | Case details (9 tabs) | done | pass | - | pending | — | — |
-| 06 | Algorithms | pending | — | — |
-| 07 | Timeline + conflicts | pending | — | — |
+| 06 | Algorithms | done | pass | pass |
+| 07 | Timeline + conflicts | done | pass | pass |
 | 08 | Relationship graph | pending | — | — |
 | 09 | Custody + activity log | pending | — | — |
 | 10 | Reports + polish | pending | — | — |
