@@ -9,7 +9,7 @@
 | 05 | Case details (9 tabs) | done | pass | - | pending | — | — |
 | 06 | Algorithms | done | pass | pass |
 | 07 | Timeline + conflicts | done | pass | pass |
-| 08 | Relationship graph | pending | — | — |
+| 08 | Relationship graph | done | pass | pass |
 | 09 | Custody + activity log | pending | — | — |
 | 10 | Reports + polish | pending | — | — |
 

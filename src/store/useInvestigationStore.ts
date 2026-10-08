@@ -1,7 +1,9 @@
 import { create } from 'zustand'
 import { mockData } from '../data'
-import type { InvestigationData, ActivityLogEntry, Case, Person, Evidence, Note, InvestigationEdge } from '../types'
+import type { InvestigationData, ActivityLogEntry, Case, Person, Evidence, Note, InvestigationEdge, CustodyAction } from '../types'
 import { nextId } from '../lib/ids'
+import { applyCustodyAction } from '../lib/custody'
+import { getOfficerName } from '../lib/lookup'
 
 interface InvestigationStore {
   data: InvestigationData
@@ -15,6 +17,11 @@ interface InvestigationStore {
   linkVehicleToPerson: (caseId: string, vehicleId: string, personId: string, relationship: 'owns' | 'connected-to') => void
   addEvidence: (caseId: string, input: { title: string; type: Evidence['type']; description: string; locationId?: string; linkedPersons: string[] }) => void
   addNote: (caseId: string, text: string) => void
+  applyEvidenceCustodyAction: (
+    evidenceId: string,
+    action: CustodyAction,
+    options?: { toOfficerId?: string; note?: string }
+  ) => { ok: true } | { ok: false; reason: string }
 }
 
 export const useInvestigationStore = create<InvestigationStore>((set, get) => ({
@@ -197,5 +204,60 @@ export const useInvestigationStore = create<InvestigationStore>((set, get) => ({
     }))
     
     get().addActivity({ caseId, action: 'note-added', description: 'Note added' })
+  },
+
+  applyEvidenceCustodyAction: (evidenceId, action, options) => {
+    const state = get()
+    const evidence = state.data.evidence.find(e => e.id === evidenceId)
+    if (!evidence) {
+      return { ok: false, reason: `Evidence with ID ${evidenceId} not found.` }
+    }
+
+    const now = new Date().toISOString()
+    const officerId = state.currentOfficerId
+
+    const result = applyCustodyAction(evidence, action, {
+      timestamp: now,
+      officerId,
+      toOfficerId: options?.toOfficerId,
+      note: options?.note,
+    })
+
+    if (!result.ok) {
+      return { ok: false, reason: result.reason }
+    }
+
+    const updatedEvidence = result.evidence
+
+    set((s) => ({
+      data: {
+        ...s.data,
+        evidence: s.data.evidence.map(e => e.id === evidenceId ? updatedEvidence : e),
+        cases: s.data.cases.map(c => c.id === evidence.caseId ? { ...c, updatedAt: now } : c),
+      }
+    }))
+
+    const toName = options?.toOfficerId ? getOfficerName(state.data, options.toOfficerId) : ''
+    const actionDesc = action === 'collected'
+      ? `Evidence ${evidence.id} collected`
+      : action === 'transferred'
+        ? `Evidence ${evidence.id} transferred to ${toName || options?.toOfficerId}`
+        : action === 'submitted-to-evidence-room'
+          ? `Evidence ${evidence.id} submitted to evidence room`
+          : action === 'analysis-started'
+            ? `Evidence ${evidence.id} analysis started`
+            : action === 'analysis-completed'
+              ? `Evidence ${evidence.id} analysis completed`
+              : action === 'released'
+                ? `Evidence ${evidence.id} released`
+                : `Evidence ${evidence.id} destroyed`
+
+    get().addActivity({
+      caseId: evidence.caseId,
+      action: 'custody-action',
+      description: actionDesc,
+    })
+
+    return { ok: true }
   }
 }))

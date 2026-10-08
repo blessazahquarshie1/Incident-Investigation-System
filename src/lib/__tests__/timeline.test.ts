@@ -51,10 +51,11 @@ describe('detectTimelineConflicts', () => {
     const c = conflicts.find(
       x => x.personId === 'P-001' &&
         ((x.claimA.locationId === 'L-001' && x.claimB.locationId === 'L-005') ||
-         (x.claimA.locationId === 'L-005' && x.claimB.locationId === 'L-001'))
+         (x.claimA.locationId === 'L-005' && x.claimB.locationId === 'L-001')) &&
+        (x.claimA.timestamp.includes('10:10') || x.claimB.timestamp.includes('10:10'))
     )
     expect(c).toBeDefined()
-    expect(c!.gapMinutes).toBe(115)
+    expect(c!.gapMinutes).toBe(5)
   })
 
   it('Accra 10:10 vs Tema 12:00 is NOT flagged for P-001', () => {

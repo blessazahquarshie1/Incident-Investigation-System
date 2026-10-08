@@ -5,6 +5,7 @@ import { getDashboardStats } from '../lib/dashboard'
 import PageHeader from '../components/PageHeader'
 import StatCard from '../components/StatCard'
 import PriorityBadge from '../components/PriorityBadge'
+import ActivityFeed from '../components/ActivityFeed'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
 import { formatDateTime } from '../lib/dates'
 import { getOfficerName } from '../lib/lookup'
@@ -125,22 +126,7 @@ export default function DashboardPage() {
 
         <div className="bg-white rounded-lg border border-slate-200 p-5 shadow-sm">
           <h2 className="text-base font-semibold text-slate-900 mb-4">Recent activity</h2>
-          <div className="space-y-4">
-            {stats.recentActivity.map(act => (
-              <div key={act.id} className="flex gap-3">
-                <div className="mt-1 w-2 h-2 rounded-full bg-slate-300 shrink-0" />
-                <div>
-                  <p className="text-[13px] text-slate-800">{act.description}</p>
-                  <p className="text-[12px] text-slate-500 mt-0.5">
-                    {formatDateTime(act.timestamp)} • {getOfficerName(data, act.officerId)}
-                  </p>
-                </div>
-              </div>
-            ))}
-            {stats.recentActivity.length === 0 && (
-              <p className="text-[13px] text-slate-500 py-4 text-center">No recent activity.</p>
-            )}
-          </div>
+          <ActivityFeed entries={stats.recentActivity} showCaseLink={true} />
         </div>
       </div>
     </div>

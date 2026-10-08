@@ -227,3 +227,31 @@ We've built an automated "alibi checker". It lines up every single event in chro
 
 **I should be able to explain:**
 - How grouping events by person before comparing pairs optimizes the conflict detection algorithm, avoiding unnecessary comparisons between completely unrelated events.
+
+## Step 08 — Relationship graph
+
+**What was built:**
+An interactive graph visualization canvas powered by React Flow and d3-force. Features custom styled nodes by entity type, distinct relationship edge styles, a case picker, link expansion, node-type visibility toggles, node search with viewport focusing, an entity details side panel, and an integrated "Compare two people" tool that visually highlights shortest paths directly on the graph.
+
+**How it works (plain English):**
+Everything on the graph comes from data, not from drawing by hand: `buildGraph` makes the dots and lines, the **layout** step decides where each dot goes, and **React Flow** only paints them. The layout works like physics: dots push each other away and lines pull their ends together, and the picture settles where those forces balance. **Link expansion** lets an investigator start small and follow a lead outwards instead of staring at everything at once. Highlighting a path on the graph is the BFS result from Step 06 made visible.
+
+**Key concepts:**
+- **d3-force simulation**: synchronous physics calculation for deterministic, collision-free node coordinates.
+- **React Flow (@xyflow/react)**: component-based canvas engine for interactive panning, zooming, minimap, and custom nodes/edges.
+- **Link expansion**: progressively exploring a network from a focal node without overwhelming the investigator.
+- **Path highlighting**: visual graph synchronization with Breadth-First Search algorithms.
+
+**Files to open:**
+- `src/lib/graphLayout.ts` — synchronous d3-force simulation engine.
+- `src/pages/RelationshipGraphPage.tsx` — the full interactive graph workbench.
+- `src/main.tsx` — React Flow global CSS styling integration.
+
+**What I should see:**
+A coloured network of people, vehicles, incidents, evidence, and places for the robbery case. Clicking a node shows its details and direct connections in the side panel. Comparing two people (e.g. Kwame Asante and P-006) draws their 5-node path directly on the graph in blue.
+
+**I should be able to explain:**
+1. Which parts of this page are my own logic and which part is React Flow's job?
+2. What does the force layout do, and why is it computed once instead of animated?
+3. Why do we show a single case first instead of the whole network?
+
