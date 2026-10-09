@@ -4,16 +4,19 @@ import { getCasePeople } from '../lib/caseScope'
 import { calculateConnection } from '../lib/connections'
 import { findShortestConnection } from '../lib/pathfinding'
 import { getPersonName } from '../lib/lookup'
+import { Plus } from 'lucide-react'
 import ConnectionScoreCard from './ConnectionScoreCard'
 import ConnectionPathView from './ConnectionPathView'
 import EmptyState from './EmptyState'
 import Card from './Card'
+import AddConnectionModal from './AddConnectionModal'
 
 interface Props { caseId: string }
 
 export default function CaseConnectionsTab({ caseId }: Props) {
   const data = useInvestigationStore(s => s.data)
   const people = useMemo(() => getCasePeople(data, caseId), [data, caseId])
+  const [isAddOpen, setIsAddOpen] = useState(false)
 
   // All pairs with score > 0
   const pairs = useMemo(() => {
@@ -43,6 +46,27 @@ export default function CaseConnectionsTab({ caseId }: Props) {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-[20px] font-semibold text-slate-900">Connections</h2>
+          <p className="text-[14px] text-slate-500">Analyze links, scoring, and paths between people connected to this case.</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsAddOpen(true)}
+          className="rounded-lg bg-blue-600 px-4 py-2 text-[14px] font-medium text-white hover:bg-blue-700 flex items-center gap-1.5"
+        >
+          <Plus className="h-4 w-4" />
+          Add connection
+        </button>
+      </div>
+
+      <AddConnectionModal
+        isOpen={isAddOpen}
+        onClose={() => setIsAddOpen(false)}
+        caseId={caseId}
+      />
+
       {/* Pair table */}
       <Card title="Connection pairs">
         {pairs.length === 0 ? (

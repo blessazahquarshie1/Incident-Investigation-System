@@ -13,6 +13,12 @@ import {
   ShieldAlert,
   StickyNote,
   SlidersHorizontal,
+  AlertTriangle,
+  MapPin,
+  FileText,
+  Network,
+  UserCheck,
+  Clock,
 } from 'lucide-react'
 
 const ACTION_ICONS: Record<string, React.FC<{ className?: string }>> = {
@@ -24,6 +30,13 @@ const ACTION_ICONS: Record<string, React.FC<{ className?: string }>> = {
   'evidence-uploaded': FileSearch,
   'custody-action': ShieldAlert,
   'note-added': StickyNote,
+  'incident-added': AlertTriangle,
+  'location-added': MapPin,
+  'vehicle-added': Car,
+  'document-added': FileText,
+  'link-added': Network,
+  'lead-changed': UserCheck,
+  'timeline-record-added': Clock,
 }
 
 interface ActivityFeedProps {

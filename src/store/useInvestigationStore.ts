@@ -1,9 +1,26 @@
 import { create } from 'zustand'
 import { mockData } from '../data'
-import type { InvestigationData, ActivityLogEntry, Case, Person, Evidence, Note, InvestigationEdge, CustodyAction } from '../types'
+import type {
+  InvestigationData,
+  ActivityLogEntry,
+  Case,
+  Person,
+  Evidence,
+  Note,
+  InvestigationEdge,
+  CustodyAction,
+  Incident,
+  Location,
+  Vehicle,
+  CaseDocument,
+  WitnessStatement,
+  Sighting,
+  PhoneRecord,
+} from '../types'
 import { nextId } from '../lib/ids'
 import { applyCustodyAction } from '../lib/custody'
-import { getOfficerName } from '../lib/lookup'
+import { getOfficerName, getPersonName, getLocationName, getEntityLabel } from '../lib/lookup'
+import { findExistingLocation } from '../lib/validation'
 
 interface InvestigationStore {
   data: InvestigationData
@@ -22,6 +39,64 @@ interface InvestigationStore {
     action: CustodyAction,
     options?: { toOfficerId?: string; note?: string }
   ) => { ok: true } | { ok: false; reason: string }
+  addIncidentToCase: (
+    caseId: string,
+    input: {
+      title: string
+      description: string
+      type: Incident['type']
+      locationId: string
+      occurredAt: string
+      status: Incident['status']
+    }
+  ) => Incident
+  addDocumentToCase: (
+    caseId: string,
+    input: { title: string; kind: CaseDocument['kind'] }
+  ) => CaseDocument
+  changeLeadInvestigator: (caseId: string, officerId: string) => void
+  createLocation: (input: { name: string; city: string; region: string }) => Location
+  addVisitedLocation: (caseId: string, locationId: string, personId: string) => void
+  createVehicle: (
+    caseId: string,
+    input: { registration: string; make: string; model: string; color: string },
+    connections: Array<{ targetId: string; relationship: 'owns' | 'connected-to' | 'involved-in' }>
+  ) => Vehicle
+  addConnection: (caseId: string, edge: InvestigationEdge) => void
+  addWitnessStatement: (
+    caseId: string,
+    input: {
+      witnessId: string
+      subjectPersonId: string
+      locationId: string
+      claimedTime: string
+      recordedAt: string
+      text: string
+    }
+  ) => WitnessStatement
+  addSighting: (
+    caseId: string,
+    input: {
+      source: Sighting['source']
+      action: Sighting['action']
+      locationId: string
+      timestamp: string
+      vehicleId?: string
+      personId?: string
+      description: string
+    }
+  ) => Sighting
+  addPhoneRecord: (
+    caseId: string,
+    input: {
+      personId: string
+      phoneNumber: string
+      kind: PhoneRecord['kind']
+      timestamp: string
+      locationId?: string
+      otherNumber?: string
+    }
+  ) => PhoneRecord
 }
 
 export const useInvestigationStore = create<InvestigationStore>((set, get) => ({
@@ -259,5 +334,232 @@ export const useInvestigationStore = create<InvestigationStore>((set, get) => ({
     })
 
     return { ok: true }
+  },
+
+  addIncidentToCase: (caseId, input) => {
+    const state = get()
+    const id = nextId('I', state.data.incidents.map(i => i.id))
+    const now = new Date().toISOString()
+    const newIncident: Incident = { ...input, id, caseId }
+    set((s) => ({
+      data: {
+        ...s.data,
+        incidents: [...s.data.incidents, newIncident],
+        cases: s.data.cases.map(c => c.id === caseId ? { ...c, updatedAt: now } : c)
+      }
+    }))
+    get().addActivity({ caseId, action: 'incident-added', description: `Incident ${id} added: ${input.title}` })
+    return newIncident
+  },
+
+  addDocumentToCase: (caseId, input) => {
+    const state = get()
+    const id = nextId('D', state.data.documents.map(d => d.id))
+    const now = new Date().toISOString()
+    const newDoc: CaseDocument = {
+      ...input,
+      id,
+      caseId,
+      uploadedAt: now,
+      uploadedBy: state.currentOfficerId,
+    }
+    set((s) => ({
+      data: {
+        ...s.data,
+        documents: [...s.data.documents, newDoc],
+        cases: s.data.cases.map(c => c.id === caseId ? { ...c, updatedAt: now } : c)
+      }
+    }))
+    get().addActivity({ caseId, action: 'document-added', description: `Document "${input.title}" added` })
+    return newDoc
+  },
+
+  changeLeadInvestigator: (caseId, officerId) => {
+    const state = get()
+    const targetCase = state.data.cases.find(c => c.id === caseId)
+    if (!targetCase) return
+    const oldOfficerName = getOfficerName(state.data, targetCase.leadInvestigator)
+    const newOfficerName = getOfficerName(state.data, officerId)
+    const now = new Date().toISOString()
+    set((s) => ({
+      data: {
+        ...s.data,
+        cases: s.data.cases.map(c => c.id === caseId ? { ...c, leadInvestigator: officerId, updatedAt: now } : c)
+      }
+    }))
+    get().addActivity({
+      caseId,
+      action: 'lead-changed',
+      description: `Lead investigator changed: ${oldOfficerName} → ${newOfficerName}`
+    })
+  },
+
+  createLocation: (input) => {
+    const state = get()
+    const existing = findExistingLocation(state.data, input.name, input.city)
+    if (existing) {
+      return existing
+    }
+    const id = nextId('L', state.data.locations.map(l => l.id))
+    const newLoc: Location = { ...input, id }
+    set((s) => ({
+      data: {
+        ...s.data,
+        locations: [...s.data.locations, newLoc]
+      }
+    }))
+    get().addActivity({
+      caseId: '',
+      action: 'location-added',
+      description: `Location ${input.name} added`
+    })
+    return newLoc
+  },
+
+  addVisitedLocation: (caseId, locationId, personId) => {
+    const state = get()
+    const exists = state.data.relationships.some(
+      r => r.source === personId && r.target === locationId && r.relationship === 'visited'
+    )
+    const now = new Date().toISOString()
+    const personName = getPersonName(state.data, personId)
+    const locationName = getLocationName(state.data, locationId)
+
+    if (!exists) {
+      const edge: InvestigationEdge = { source: personId, target: locationId, relationship: 'visited' }
+      set((s) => ({
+        data: {
+          ...s.data,
+          relationships: [...s.data.relationships, edge],
+          cases: s.data.cases.map(c => c.id === caseId ? { ...c, updatedAt: now } : c)
+        }
+      }))
+    }
+    get().addActivity({
+      caseId,
+      action: 'location-added',
+      description: `${personName} linked to ${locationName}: visited`
+    })
+  },
+
+  createVehicle: (caseId, input, connections) => {
+    const state = get()
+    const id = nextId('V', state.data.vehicles.map(v => v.id))
+    const now = new Date().toISOString()
+    const ownerConn = connections.find(c => c.relationship === 'owns')
+    const ownerId = ownerConn ? ownerConn.targetId : undefined
+    const newVehicle: Vehicle = { ...input, id, ownerId }
+
+    const newEdges: InvestigationEdge[] = connections.map(conn => {
+      if (conn.relationship === 'involved-in') {
+        return { source: id, target: conn.targetId, relationship: 'involved-in' }
+      }
+      return { source: conn.targetId, target: id, relationship: conn.relationship }
+    })
+
+    const uniqueNewEdges = newEdges.filter(
+      ne => !state.data.relationships.some(r => r.source === ne.source && r.target === ne.target && r.relationship === ne.relationship)
+    )
+
+    set((s) => ({
+      data: {
+        ...s.data,
+        vehicles: [...s.data.vehicles, newVehicle],
+        relationships: [...s.data.relationships, ...uniqueNewEdges],
+        cases: s.data.cases.map(c => c.id === caseId ? { ...c, updatedAt: now } : c)
+      }
+    }))
+
+    get().addActivity({
+      caseId,
+      action: 'vehicle-added',
+      description: `Vehicle ${input.registration} added`
+    })
+    return newVehicle
+  },
+
+  addConnection: (caseId, edge) => {
+    const state = get()
+    const exists = state.data.relationships.some(
+      r => r.source === edge.source && r.target === edge.target && r.relationship === edge.relationship
+    )
+    if (exists) return
+    const now = new Date().toISOString()
+    const sourceLabel = getEntityLabel(state.data, edge.source)
+    const targetLabel = getEntityLabel(state.data, edge.target)
+
+    set((s) => ({
+      data: {
+        ...s.data,
+        relationships: [...s.data.relationships, edge],
+        cases: s.data.cases.map(c => c.id === caseId ? { ...c, updatedAt: now } : c)
+      }
+    }))
+
+    get().addActivity({
+      caseId,
+      action: 'link-added',
+      description: `${sourceLabel} linked to ${targetLabel}: ${edge.relationship}`
+    })
+  },
+
+  addWitnessStatement: (caseId, input) => {
+    const state = get()
+    const id = nextId('WS', state.data.witnessStatements.map(ws => ws.id))
+    const now = new Date().toISOString()
+    const newWs: WitnessStatement = { ...input, id, caseId }
+    set((s) => ({
+      data: {
+        ...s.data,
+        witnessStatements: [...s.data.witnessStatements, newWs],
+        cases: s.data.cases.map(c => c.id === caseId ? { ...c, updatedAt: now } : c)
+      }
+    }))
+    get().addActivity({
+      caseId,
+      action: 'timeline-record-added',
+      description: `Witness statement ${id} recorded`
+    })
+    return newWs
+  },
+
+  addSighting: (caseId, input) => {
+    const state = get()
+    const id = nextId('SG', state.data.sightings.map(s => s.id))
+    const now = new Date().toISOString()
+    const newSg: Sighting = { ...input, id, caseId }
+    set((s) => ({
+      data: {
+        ...s.data,
+        sightings: [...s.data.sightings, newSg],
+        cases: s.data.cases.map(c => c.id === caseId ? { ...c, updatedAt: now } : c)
+      }
+    }))
+    get().addActivity({
+      caseId,
+      action: 'timeline-record-added',
+      description: `Sighting ${id} recorded`
+    })
+    return newSg
+  },
+
+  addPhoneRecord: (caseId, input) => {
+    const state = get()
+    const id = nextId('PR', state.data.phoneRecords.map(pr => pr.id))
+    const now = new Date().toISOString()
+    const newPr: PhoneRecord = { ...input, id, caseId }
+    set((s) => ({
+      data: {
+        ...s.data,
+        phoneRecords: [...s.data.phoneRecords, newPr],
+        cases: s.data.cases.map(c => c.id === caseId ? { ...c, updatedAt: now } : c)
+      }
+    }))
+    get().addActivity({
+      caseId,
+      action: 'timeline-record-added',
+      description: `Phone record ${id} recorded`
+    })
+    return newPr
   }
 }))

@@ -7,6 +7,7 @@
 - [Step 03 — Dashboard](#step-03--dashboard)
 - [Step 04 — Lists, filters, search](#step-04--lists-filters-search)
 - [Step 05 — Case details (9 tabs)](#step-05--case-details-9-tabs)
+- [Step 05b — Add everything to a case](#step-05b--add-everything-to-a-case)
 - [Step 06 — Algorithms](#step-06--algorithms)
 - [Step 07 — Timeline and conflicts](#step-07--timeline-and-conflicts)
 - [Step 08 — Relationship graph](#step-08--relationship-graph)
@@ -173,6 +174,36 @@ We built the "case folder" that gathers everything related to a single investiga
 
 **I should be able to explain:**
 - How immutable state updates ensure React safely re-renders UI elements when new entities or relationships are added to the store.
+
+## Step 05b — Add everything to a case
+
+**What was built:**
+Created all missing investigation intake forms and modal dialogues across the Case Details tabs, enabling investigators to build an entire investigation from scratch. Built reusable `FormField` and `EntityPicker` components alongside a comprehensive pure validation library (`src/lib/validation.ts`) with UTC date parsing and duplicate prevention. Integrated full reactive store actions for incidents, documents, lead investigator reassignment, visited locations, connected vehicles, entity links, witness statements, sightings, and phone records.
+
+**How it works (plain English):**
+Adding information is the first half of an investigation tool: the second half is what the computer does with it. Think of the Zustand store as a central whiteboard in a police precinct room: every form writes one small fact or sticky note onto that central board. Every other analyst tool in the building (the timeline board, the relationship pin-board, the suspect dossier, and the search catalog) is continuously watching that same central whiteboard. The moment a new sticky note is pinned, all the charts and scores update automatically without needing any special wires between the individual tools. **Validation** is like a sharp gatekeeper at the door who inspects every sticky note before it touches the board, checking that dates aren't in the future, license plates aren't registered twice, and required details aren't left blank. We also strictly **only add and never delete**, because a genuine police investigation ledger must preserve an unbroken audit trail of everything that was ever done or observed.
+
+**Key concepts:**
+- **Single Source of Truth**: When forms mutate central Zustand state, all derived views (graph, timeline, scoring, search) recompute reactively without bespoke glue code.
+- **Pure Function Validation**: All validation logic lives in side-effect-free pure functions in `src/lib/validation.ts` that return field error maps, making them trivial to unit test.
+- **Audit Integrity (Append-Only Architecture)**: Investigative records are added but never deleted or destructively mutated, preserving legal chain of custody and accountability.
+- **UTC Time Standardization**: Date and time values are normalized to UTC (`:00Z`), reflecting standard Ghanaian time and preventing client-side timezone discrepancies.
+
+**Files to open:**
+- `src/lib/validation.ts` — pure validation rules for vehicle plates, duplicate locations, UTC timestamps, and all modal form payloads.
+- `src/components/FormField.tsx` & `src/components/EntityPicker.tsx` — reusable form components with accessible labels, errors, and entity search dropdowns.
+- `src/store/useInvestigationStore.ts` — store actions executing immutable append operations and generating chronological activity log entries.
+- `src/pages/CaseDetailPage.tsx` — integration of all creation modals across Overview, People, Evidence, Locations, and Vehicles tabs.
+- `src/components/CaseTimelineTab.tsx` — timeline creation controls for witness statements, CCTV/patrol sightings, and call/cell-tower phone records.
+- `src/lib/__tests__/acceptanceStep05b.test.ts` — automated end-to-end acceptance test proving the full 7-step scenario.
+
+**What I should see:**
+A new case that I can fill with incidents, vehicles, locations, documents and timeline records, and that immediately gets scores, graph nodes, timeline events and conflict warnings from what I typed. All 56 tests pass with `npm test`, `npm run lint` reports 0 warnings, and `npm run build` bundles with 0 errors.
+
+**I should be able to explain:**
+1. Why do the graph, search and scores update by themselves when I add a vehicle?
+2. Why must a new vehicle be connected to a person or an incident of the case?
+3. Why can a user add records but not delete them?
 
 ## Step 06: Algorithms
 
