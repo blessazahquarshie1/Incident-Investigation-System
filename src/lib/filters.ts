@@ -34,8 +34,9 @@ export function filterPersons(persons: Person[], f: PersonFilters): Person[] {
       const q = f.text.toLowerCase()
       const inName = p.fullName.toLowerCase().includes(q)
       const inPhone = p.phone?.toLowerCase().includes(q) ?? false
+      const inAddress = p.address?.toLowerCase().includes(q) ?? false
       const inAlias = p.knownAliases?.some(a => a.toLowerCase().includes(q)) ?? false
-      if (!inName && !inPhone && !inAlias) return false
+      if (!inName && !inPhone && !inAddress && !inAlias) return false
     }
     if (f.type && f.type !== '' && p.type !== f.type) return false
     return true

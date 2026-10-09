@@ -417,6 +417,7 @@ function PeopleTab({ kase, people }: { kase: Case; people: Person[] }) {
                     ),
                   },
                   { key: 'phone', header: 'Phone', render: (r: Person) => r.phone || '—' },
+                  { key: 'address', header: 'Address', render: (r: Person) => r.address || '—' },
                   {
                     key: 'aliases',
                     header: 'Aliases',

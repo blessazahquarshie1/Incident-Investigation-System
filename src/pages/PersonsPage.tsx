@@ -37,6 +37,7 @@ export default function PersonsPage() {
     { key: 'fullName', header: 'Name', render: r => <Link to={`/persons/${r.id}`} className="text-blue-600 hover:underline">{r.fullName}</Link>, sortable: true, getValue: r => r.fullName },
     { key: 'type', header: 'Type', render: r => <EntityTypeBadge type={r.type} />, sortable: true, getValue: r => r.type },
     { key: 'phone', header: 'Phone', render: r => r.phone || '—', sortable: true, getValue: r => r.phone || '' },
+    { key: 'address', header: 'Address', render: r => r.address || '—', sortable: true, getValue: r => r.address || '' },
     { key: 'aliases', header: 'Aliases', render: r => (r.knownAliases || []).join(', ') || '—', sortable: false },
     { key: 'cases', header: 'Related Cases', render: r => r.relatedCases.length, sortable: true, getValue: r => r.relatedCases.length },
   ]

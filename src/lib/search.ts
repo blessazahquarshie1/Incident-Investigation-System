@@ -51,6 +51,7 @@ export function searchAll(
     const score = best([
       rankText(p.fullName, query),
       p.phone ? rankText(p.phone, query) : 0,
+      p.address ? rankText(p.address, query) : 0,
       ...(p.knownAliases ?? []).map(a => rankText(a, query)),
     ])
     if (score > 0) {
@@ -69,7 +70,13 @@ export function searchAll(
         title: p.fullName,
         subtitle: `${p.type} — ${p.relatedCases.length} case(s)`,
         score,
-        enrichment: { type: p.type, relatedCases: linkedCases, linkedVehicles, phone: p.phone ?? null },
+        enrichment: {
+          type: p.type,
+          relatedCases: linkedCases,
+          linkedVehicles,
+          phone: p.phone ?? null,
+          address: p.address ?? null,
+        },
       })
     }
   }
