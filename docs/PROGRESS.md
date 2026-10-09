@@ -36,7 +36,7 @@ Automated end-to-end verification executed via Vitest test suite (`src/lib/__tes
 - **Relationship Graph:** New nodes and connecting edges populated in `buildGraph()`.
 - **Plate Search:** Querying `ER-8877-26` (and `er887726`) instantly returns the vehicle in `searchAll()`.
 - **Activity Log:** All 8 case actions recorded in chronological sequence in `activityLog`.
-- **Quality Gates:** `npm run build` exits 0, `npm run lint` (`oxlint`) reports 0 warnings and 0 errors across 115 files, and all 56 Vitest unit tests pass.
+- **Quality Gates:** `npm run build` exits 0, `npm run lint` (`oxlint`) reports 0 warnings and 0 errors across 116 files, and all 60 Vitest unit tests pass.
 
 ---
 
@@ -55,6 +55,7 @@ Automated end-to-end verification executed via Vitest test suite (`src/lib/__tes
 11. **Vehicle Ownership in Creation:** When creating a vehicle with multiple case links, any person assigned the `owns` relationship is recorded as the primary `Vehicle.ownerId`.
 12. **Duplicate Location Safeguard:** Duplicate locations with identical name and city (case-insensitive) are intercepted; user is informed and the existing location entity is selected without creating duplicate records.
 13. **Audit Trail Immutability:** Records are added append-only without delete/edit mutations to ensure complete chronological investigative integrity.
+14. **Timestamp Precision & Automatic Real-Time Clock:** Last Updated and Created At timestamps across the Cases table and Case Details Overview render exact date and 12-hour time (e.g. `15 Sep 2026 at 5:30pm`). All case creations and edits automatically capture `new Date().toISOString()` in real time with zero external API dependencies.
 
 ---
 

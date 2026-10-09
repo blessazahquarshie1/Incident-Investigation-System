@@ -146,12 +146,12 @@ function OverviewTab({
                 <span className="text-[15px]">{kase.type}</span>
               </div>
               <div>
-                <span className="font-semibold text-slate-500 block text-[13px]">Created</span>
-                <span className="text-[15px]">{formatDate(kase.createdAt)}</span>
+                <span className="font-semibold text-slate-500 block text-[13px]">Created At</span>
+                <span className="text-[15px]">{formatDateTime(kase.createdAt)}</span>
               </div>
               <div>
-                <span className="font-semibold text-slate-500 block text-[13px]">Updated</span>
-                <span className="text-[15px]">{formatDate(kase.updatedAt)}</span>
+                <span className="font-semibold text-slate-500 block text-[13px]">Last Updated</span>
+                <span className="text-[15px]">{formatDateTime(kase.updatedAt)}</span>
               </div>
               <div>
                 <span className="font-semibold text-slate-500 block text-[13px]">Lead Investigator</span>

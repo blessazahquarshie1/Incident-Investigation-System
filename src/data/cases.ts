@@ -10,7 +10,7 @@ export const cases: Case[] = [
     "status": "investigating",
     "leadInvestigator": "O-001",
     "createdAt": "2026-09-14T08:31:00Z",
-    "updatedAt": "2026-09-15T08:31:00Z"
+    "updatedAt": "2026-09-15T17:30:00Z"
   },
   {
     "id": "CASE-00022",

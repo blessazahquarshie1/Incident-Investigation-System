@@ -9,7 +9,7 @@ import type { Column } from '../components/DataTable'
 import PriorityBadge from '../components/PriorityBadge'
 import StatusBadge from '../components/StatusBadge'
 import Modal from '../components/Modal'
-import { formatDate } from '../lib/dates'
+import { formatDateTime } from '../lib/dates'
 import { getOfficerName } from '../lib/lookup'
 import type { Case } from '../types'
 
@@ -48,7 +48,7 @@ export default function CasesPage() {
     { key: 'priority', header: 'Priority', render: r => <PriorityBadge priority={r.priority} />, sortable: true, getValue: r => r.priority },
     { key: 'status', header: 'Status', render: r => <StatusBadge status={r.status} />, sortable: true, getValue: r => r.status },
     { key: 'lead', header: 'Lead Investigator', render: r => getOfficerName(data, r.leadInvestigator), sortable: true, getValue: r => getOfficerName(data, r.leadInvestigator) },
-    { key: 'updatedAt', header: 'Last Updated', render: r => formatDate(r.updatedAt), sortable: true, getValue: r => r.updatedAt },
+    { key: 'updatedAt', header: 'Last Updated', render: r => <span className="whitespace-nowrap">{formatDateTime(r.updatedAt)}</span>, sortable: true, getValue: r => r.updatedAt },
   ]
 
   // Form State
