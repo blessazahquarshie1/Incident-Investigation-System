@@ -12,11 +12,15 @@ export const persons: Person[] = [
   },
   {
     "id": "P-002",
-    "fullName": "Kofi Mensah",
+    "fullName": "Kofi Boateng",
     "type": "suspect",
     "address": "Plot 8, Heavy Industrial Area, Tema",
+    "knownAliases": [
+      "Kojo B"
+    ],
     "relatedCases": [
-      "CASE-00123"
+      "CASE-00123",
+      "CASE-00201"
     ]
   },
   {
@@ -187,5 +191,98 @@ export const persons: Person[] = [
     "type": "witness",
     "address": "14 Giffard Road, East Cantonments, Accra",
     "relatedCases": []
+  },
+  {
+    "id": "P-027",
+    "fullName": "Kweku Baah",
+    "type": "victim",
+    "address": "Opposite Kasoa New Market, Kasoa",
+    "relatedCases": [
+      "CASE-00201"
+    ]
+  },
+  {
+    "id": "P-028",
+    "fullName": "Emmanuel Tetteh",
+    "type": "witness",
+    "address": "Ofankor Barrier, Greater Accra",
+    "relatedCases": [
+      "CASE-00201"
+    ]
+  },
+  {
+    "id": "P-029",
+    "fullName": "Selorm Agbenu",
+    "type": "victim",
+    "address": "12 Volta Street, Dzorwulu, Accra",
+    "relatedCases": [
+      "CASE-00202"
+    ]
+  },
+  {
+    "id": "P-030",
+    "fullName": "Fafali Dogbe",
+    "type": "witness",
+    "address": "Apenkwa, Achimota, Accra",
+    "relatedCases": [
+      "CASE-00202"
+    ]
+  },
+  {
+    "id": "P-031",
+    "fullName": "Kwame Asante",
+    "type": "suspect",
+    "address": "Osu RE, Accra",
+    "relatedCases": [
+      "CASE-00203"
+    ]
+  },
+  {
+    "id": "P-032",
+    "fullName": "Esi Asante",
+    "type": "person-of-interest",
+    "address": "Ringway Estate, Osu, Accra",
+    "relatedCases": [
+      "CASE-00203"
+    ]
+  },
+  {
+    "id": "P-033",
+    "fullName": "Daniel Cudjoe",
+    "type": "suspect",
+    "address": "Salvation Army St, Osu, Accra",
+    "knownAliases": [
+      "Kojo B"
+    ],
+    "relatedCases": [
+      "CASE-00203"
+    ]
+  },
+  {
+    "id": "P-034",
+    "fullName": "Akua Agyemang",
+    "type": "victim",
+    "address": "Oxford Street Commercial strip, Osu, Accra",
+    "relatedCases": [
+      "CASE-00203"
+    ]
+  },
+  {
+    "id": "P-035",
+    "fullName": "Fiifi Quaye",
+    "type": "suspect",
+    "address": "New Takoradi, Takoradi",
+    "relatedCases": [
+      "CASE-00204"
+    ]
+  },
+  {
+    "id": "P-036",
+    "fullName": "Araba Hanson",
+    "type": "victim",
+    "address": "Market Circle Commercial Block, Takoradi",
+    "relatedCases": [
+      "CASE-00204"
+    ]
   }
 ];

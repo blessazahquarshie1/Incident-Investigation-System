@@ -97,3 +97,24 @@ This script provides a step-by-step walkthrough covering every key capability of
 - **What appears:** A consolidated 7-section intelligence report complete with CID masthead, executive metadata, subject classifications, evidence inventory, chronological event timeline, conflict audit, top network associations, and administrative audit entries. Clicking "Print / Save as PDF" opens the browser print dialog formatted with clean paper margins and hidden navigational chrome.
 - **Learning Objective:** Demonstrates automated dossier compilation aggregating all investigative engines into an official printable intelligence artifact.
 
+---
+
+### Step 13: Case-to-Case Connections & Cross-Case Intelligence
+- **What to do:** Open `CASE-00123` and click the **Connections** tab (`/cases/CASE-00123?tab=connections`).
+- **What appears:** 
+  1. **Related Cases Section:** At the top of the tab, an automated ranked list of linked cases is displayed:
+     - `CASE-00201` (Kasoa Fuel Station Robbery): **Past**, **STRONG**, sharing vehicle `V-001`, person `P-002`, and evidence tag `grey-balaclava`.
+     - `CASE-00203` (Osu Mobile Money Fraud): **Current**, **STRONG**, sharing phone number `0241111111` and 3 name/alias matches.
+     - `CASE-00204` (Takoradi Market Theft - 2024): **Past**, **MODERATE**, sharing MO evidence tag `crowbar-pry-marks`.
+     - `CASE-00202` (Accra Mall Parking Vehicle Theft): **Current**, **WEAK**, sharing location `L-001` (Accra Mall).
+  2. **Side-by-Side Comparison (`/cases/CASE-00123/compare/CASE-00201`):** Click the "Compare" button on `CASE-00201`. The compare view displays:
+     - Side-by-side header with large numerical score, confidence level badge, and mathematical breakdown.
+     - **Where to look:** Prominent prioritized investigative leads instructing officers to cross-reference Hilux `GT-4521-23` and suspect Kofi Boateng, with direct entity chips.
+     - **What they share:** Categorized cards for shared people, vehicles, locations, phone numbers, and evidence tags.
+     - **Possible same person:** Side-by-side comparison with the calm advisory notice: *"These are different records. Check whether they are the same person."*
+     - **Side-by-side timelines:** Chronological event streams for both cases side by side, highlighting shared locations.
+  3. **Case Network Graph (`/graph`):** Switch the top toggle from **Entities** to **Cases**. Case nodes appear colored blue (current) or grey (past). Links indicate connection scores with line thickness reflecting confidence level (WEAK to VERY STRONG). Clicking an edge or node reveals connection details and a direct Compare button.
+  4. **Fuzzy & Alias Name Search (`/search?q=asante`):** Search `asante` to view all matching individuals with case affiliations; search `kojo b` to match aliases; search `ashante` to demonstrate 1-letter typo tolerance labelled with the `similar spelling` badge.
+  5. **Live Reactive Updates:** Create a new case, add a person with surname "Asante", and link vehicle `GT-4521-23`. Navigating to the new case's Connections tab immediately surfaces `CASE-00123` with zero manual refreshes.
+- **Learning Objective:** Demonstrates automated case fingerprinting, multi-factor cross-case comparison scoring, prioritized operational lead generation, and dynamic graph-driven investigative intelligence.
+

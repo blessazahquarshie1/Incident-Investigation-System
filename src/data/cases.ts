@@ -132,5 +132,49 @@ export const cases: Case[] = [
     "leadInvestigator": "O-004",
     "createdAt": "2026-01-01T00:00:00Z",
     "updatedAt": "2026-01-01T00:00:00Z"
+  },
+  {
+    "id": "CASE-00201",
+    "title": "Kasoa Fuel Station Robbery",
+    "description": "Armed robbery at Total fuel station in Kasoa",
+    "type": "theft",
+    "priority": "high",
+    "status": "closed",
+    "leadInvestigator": "O-002",
+    "createdAt": "2026-03-12T08:50:00Z",
+    "updatedAt": "2026-03-20T16:00:00Z"
+  },
+  {
+    "id": "CASE-00202",
+    "title": "Accra Mall Parking Vehicle Theft",
+    "description": "Unattended saloon vehicle stolen from Accra Mall parking lot",
+    "type": "theft",
+    "priority": "low",
+    "status": "investigating",
+    "leadInvestigator": "O-004",
+    "createdAt": "2026-09-18T14:00:00Z",
+    "updatedAt": "2026-09-19T10:00:00Z"
+  },
+  {
+    "id": "CASE-00203",
+    "title": "Osu Mobile Money Fraud",
+    "description": "SIM swap and illicit wallet transfer targeting mobile money vendor",
+    "type": "fraud",
+    "priority": "medium",
+    "status": "investigating",
+    "leadInvestigator": "O-006",
+    "createdAt": "2026-10-01T11:00:00Z",
+    "updatedAt": "2026-10-02T15:00:00Z"
+  },
+  {
+    "id": "CASE-00204",
+    "title": "Takoradi Market Theft (2024)",
+    "description": "Night-time break-in of hardware stalls at Market Circle",
+    "type": "theft",
+    "priority": "medium",
+    "status": "closed",
+    "leadInvestigator": "O-004",
+    "createdAt": "2024-05-10T09:00:00Z",
+    "updatedAt": "2024-05-20T17:00:00Z"
   }
 ];

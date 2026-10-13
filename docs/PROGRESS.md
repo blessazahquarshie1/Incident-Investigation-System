@@ -15,10 +15,44 @@
 | 08 | Relationship graph | done | pass | pass |
 | 09 | Custody + activity log | done | pass | pass |
 | 10 | Reports + polish | done | pass | pass |
+| 11 | More cases mock data | done | pass | pass |
+| 12 | Case comparison engine | done | pass | pass |
+| 13 | Related cases screens | done | pass | pass |
 
 ---
 
-## Step 05b Acceptance Test Verification
+## Step 13 Acceptance Test Verification
+
+Automated end-to-end verification executed via Vitest test suite (`src/lib/__tests__/acceptanceStep13.test.ts`):
+1. **CASE-00123 Related Cases Workspace:**
+   - Navigating to `CASE-00123` Connections tab surfaces all four new cases:
+     - `CASE-00201` (Kasoa Fuel Station Robbery): **Past** (`closed`), **STRONG**, sharing vehicle `V-001`, suspect `P-002` (Kofi Boateng), and evidence tag `"grey-balaclava"`.
+     - `CASE-00203` (Osu Mobile Money Fraud): **Current**, **STRONG**, sharing phone number `0241111111` with 3 speculative name/alias matches.
+     - `CASE-00204` (Takoradi Market Theft - 2024): **Past** (`closed`), **MODERATE**, sharing MO evidence tag `"crowbar-pry-marks"`.
+     - `CASE-00202` (Accra Mall Parking Vehicle Theft): **Current**, **WEAK**, sharing location `L-001` (Accra Mall).
+2. **Side-by-Side Compare Page (`/cases/CASE-00123/compare/CASE-00201`):**
+   - High-level score and level badge with exact breakdown: `1 vehicle × 5 = 5`, `1 person × 5 = 5`, `1 evidence tag × 4 = 4`, `similar time of day = 1`, `same case type = 1`.
+   - Actionable **Where to look** block generates high-priority leads referencing Hilux `GT-4521-23` and suspect Kofi Boateng with direct clickable profile chips.
+   - Categorized shared entity lists (people, vehicles, locations, phone numbers, evidence tags).
+   - Side-by-side synchronized event streams highlighting events at shared locations in UTC.
+3. **Fuzzy, Typo-Tolerant & Alias Name Search:**
+   - Query `asante`: surfaces both Kwame Asante records (`P-001` in `CASE-00123` and `P-031` in `CASE-00203`), as well as Esi Asante (`P-032`).
+   - Query `kwame`: returns Kwame Asante records matching first name.
+   - Query `kojo b`: resolves via alias for Kofi Boateng (`P-002`) and Daniel Cudjoe (`P-033`).
+   - Query `ashante`: matches Kwame Asante with the explicit badge `"similar spelling"` via 1-letter Levenshtein edit distance.
+4. **Case Network Graph (`/graph` Cases Mode):**
+   - Renders all cases as blue (current) or grey (past) nodes.
+   - Edges labeled with scores, with stroke width dynamically scaled by confidence tier (WEAK: 1.5px, MODERATE: 2.5px, STRONG: 4px, VERY STRONG: 6px).
+   - Clicking an edge or node reveals connection details and direct "Compare cases" action.
+5. **Live Dynamic Reactivity:**
+   - Dynamically created a new case in the store, added a new person with surname "Asante", and linked vehicle `GT-4521-23` (`V-001`).
+   - The comparison engine recalculated immediately: `CASE-00123` appeared as a related case with score >= 7 (shared vehicle + surname match) with zero page reloads.
+6. **Dashboard Strongest Case Links:**
+   - Dashboard cleanly renders the top 5 case links from `findAllCaseLinks(data, 4)` with Current/Past badges, scores, and Compare links.
+7. **Quality Gates:**
+   - `npm run build` exits with code 0 (`tsc -b && vite build`).
+   - `npm run lint` (`oxlint`) reports 0 warnings and 0 errors across 128 files.
+   - `npm test` runs 87 passing unit and acceptance tests across 12 test suites.
 
 Automated end-to-end verification executed via Vitest test suite (`src/lib/__tests__/acceptanceStep05b.test.ts`):
 1. **Case & People Creation:** Created new case with lead `O-001` and added two suspects ("Acceptance Suspect Alpha" and "Acceptance Suspect Beta").
@@ -36,7 +70,7 @@ Automated end-to-end verification executed via Vitest test suite (`src/lib/__tes
 - **Relationship Graph:** New nodes and connecting edges populated in `buildGraph()`.
 - **Plate Search:** Querying `ER-8877-26` (and `er887726`) instantly returns the vehicle in `searchAll()`.
 - **Activity Log:** All 8 case actions recorded in chronological sequence in `activityLog`.
-- **Quality Gates:** `npm run build` exits 0, `npm run lint` (`oxlint`) reports 0 warnings and 0 errors across 117 files, and all 63 Vitest unit tests pass.
+- **Quality Gates:** `npm run build` exits 0, `npm run lint` (`oxlint`) reports 0 warnings and 0 errors across 120 files, and all 67 Vitest unit tests across 9 test suites pass.
 
 ---
 
@@ -57,6 +91,21 @@ Automated end-to-end verification executed via Vitest test suite (`src/lib/__tes
 13. **Audit Trail Immutability:** Records are added append-only without delete/edit mutations to ensure complete chronological investigative integrity.
 14. **Timestamp Precision & Automatic Real-Time Clock:** Last Updated and Created At timestamps across the Cases table and Case Details Overview render exact date and 12-hour time (e.g. `15 Sep 2026 at 5:30pm`). All case creations and edits automatically capture `new Date().toISOString()` in real time with zero external API dependencies.
 15. **Person Address Visibility:** Added an Address column to the Persons directory (`/persons`) and Case Details People tab with sortable columns, full-text address search/filtering support, and realistic addresses for all mock person profiles.
+16. **Case-Scoped Dropdowns & Empty Initial Selection:** The "Link Existing Vehicle to Person" form starts with empty dropdown fields (`Select a vehicle…` / `Select a person…`) and restricts available options exclusively to vehicles and people associated with the active case.
+17. **In-App Confirmation Dialog & Backdrop Auto-Cancel:** Entity removals (Persons, Locations, Vehicles) use an in-app modal ([`ConfirmDeleteModal.tsx`](file:///c:/Users/engho/incident-investigation-system/src/components/ConfirmDeleteModal.tsx)) with a warning message, Cancel, and red Confirm action. Clicking the backdrop or empty space outside the modal automatically cancels and dismisses it.
+18. **Person Editing & Case Entity Removals:** Added inline `Edit` action and red `Remove` action beside persons on the People tab, locations on the Locations tab, and vehicles on the Vehicles tab, accompanied by complete audit logging and relationship pruning in [`useInvestigationStore.ts`](file:///c:/Users/engho/incident-investigation-system/src/store/useInvestigationStore.ts).
+19. **Step 11 Mock Data Expansion (Connected Cases):**
+    - **CASE-00201 (Kasoa Fuel Station Robbery):** `closed` (past, March 2026), type `theft`, lead `O-002`. Shares vehicle `V-001` (Hilux `GT-4521-23` seen leaving in sighting `SG-021`), suspect `P-002` (Kofi Boateng), and evidence tag `"grey-balaclava"` (`E-032`). Incident `I-024` at `L-003` at 08:50 UTC (~same time of day as `CASE-00123`). People: `P-002`, `P-027` (Kweku Baah, victim), `P-028` (Emmanuel Tetteh, witness).
+    - **CASE-00202 (Accra Mall Parking Vehicle Theft):** `investigating`, type `theft`, lead `O-004`. Shares only location `L-001` (Accra Mall, incident `I-025`). Zero shared people, vehicles, or phone numbers. Zero name or alias overlap with `CASE-00123`. People: `P-029` (Selorm Agbenu), `P-030` (Fafali Dogbe). Vehicle `V-011` (Hyundai Elantra `GS-3311-24`). Evidence `E-033` tagged `"broken-glass"`.
+    - **CASE-00203 (Osu Mobile Money Fraud):** `investigating`, type `fraud`, lead `O-006`. Phone record `PR-017` shares phone number `0241111111` with `P-004`. Contains 3 name match archetypes: exact name `P-031` ("Kwame Asante"), surname-only `P-032` ("Esi Asante"), and shared alias `P-033` ("Daniel Cudjoe", alias `"Kojo B"` matching `P-002`). Incident `I-026` at `L-007`. Evidence `E-034` tagged `"burner-phone"`.
+    - **CASE-00204 (Takoradi Market Theft - 2024):** `closed` (past, 2024), type `theft`, lead `O-004`. Shares only method tag `"crowbar-pry-marks"` via evidence `E-035`. Incident `I-027` at `L-005`. People: `P-035` (Fiifi Quaye), `P-036` (Araba Hanson). Zero shared entities.
+    - Added tags `"grey-balaclava"` (`E-029`) and `"crowbar-pry-marks"` (`E-030`) to `CASE-00123`.
+    - Maintained existing `CASE-00022` and `CASE-00031` links to `V-001`.
+20. **Step 12 Case Comparison Engine & Name Search:**
+    - Fingerprints (`caseFingerprint.ts`) extract all operational traces (normalized phone numbers, evidence tags, locations, vehicles, persons, incident minutes of day).
+    - Symmetric pairwise comparison (`caseComparison.ts`) computes weighted link scores: shared phones (6), persons/vehicles (5), evidence tags (4), locations (2), time/type (1), with speculative name matches capped at 5 points.
+    - Generates actionable investigative leads (`leads.ts`) sorted strictly by priority (`high` -> `medium` -> `low`).
+    - Name search engine (`nameSearch.ts`) supports multi-word prefix matching, alias searching, 1-letter edit distance typo tolerance on words >= 5 characters, and full-text mention scanning across case descriptions, incidents, notes, witness statements, and evidence.
 
 ---
 

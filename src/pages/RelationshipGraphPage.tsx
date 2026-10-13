@@ -25,6 +25,7 @@ import {
 import { computeLayout } from '../lib/graphLayout'
 import { findShortestConnection, type ConnectionPath } from '../lib/pathfinding'
 import { calculateConnection, type PairConnection } from '../lib/connections'
+import { findAllCaseLinks, type CaseComparison, type ComparisonLevel } from '../lib/caseComparison'
 import { ENTITY_STYLE } from '../lib/entityStyle'
 import { getPersonName, getLocationName, getOfficerName } from '../lib/lookup'
 import { formatDate, formatDateTime } from '../lib/dates'
@@ -36,7 +37,14 @@ import EntityTypeBadge from '../components/EntityTypeBadge'
 import ConnectionPathView from '../components/ConnectionPathView'
 import ConnectionScoreCard from '../components/ConnectionScoreCard'
 import type { EntityType } from '../types'
-import { Search, RotateCcw, Plus, X, Users, Compass, Eye, EyeOff } from 'lucide-react'
+import {
+  Search, RotateCcw, Plus, X, Users, Compass, Eye, EyeOff,
+  Briefcase, Network, GitCompare,
+} from 'lucide-react'
+
+// ==========================================
+// ENTITY GRAPH CUSTOM NODE & CONFIG
+// ==========================================
 
 interface CustomNodeData extends Record<string, unknown> {
   id: string
@@ -88,7 +96,7 @@ function InvestigationCustomNode({ data }: NodeProps<Node<CustomNodeData>>) {
   )
 }
 
-const nodeTypes = {
+const entityNodeTypes = {
   investigationNode: InvestigationCustomNode,
 }
 
@@ -100,7 +108,74 @@ const RELATIONSHIP_CONFIGS: Record<string, { stroke: string; strokeWidth: number
   'connected-to': { stroke: '#64748b', strokeWidth: 2, strokeDasharray: '8,4' },
 }
 
-function GraphViewInner() {
+// ==========================================
+// CASE NETWORK CUSTOM NODE
+// ==========================================
+
+interface CaseNodeData extends Record<string, unknown> {
+  id: string
+  title: string
+  isPast: boolean
+  isDimmed: boolean
+  isHighlighted: boolean
+  onClick: (id: string) => void
+}
+
+function CaseCustomNode({ data }: NodeProps<Node<CaseNodeData>>) {
+  const { id, title, isPast, isDimmed, isHighlighted, onClick } = data
+
+  return (
+    <div
+      onClick={() => onClick(id)}
+      className={`rounded-xl border shadow-sm p-3 min-w-[160px] max-w-[220px] flex items-center gap-2.5 cursor-pointer select-none transition-all duration-150 ${
+        isHighlighted
+          ? 'ring-2 ring-blue-600 bg-white border-blue-500 scale-105 z-30 shadow-md'
+          : isDimmed
+            ? 'opacity-25 bg-white/70 border-slate-200'
+            : isPast
+              ? 'border-slate-300 bg-slate-50 hover:border-slate-400 hover:shadow'
+              : 'border-blue-300 bg-blue-50/60 hover:border-blue-400 hover:shadow'
+      }`}
+    >
+      <Handle type="target" position={Position.Top} className="!opacity-0 !w-1 !h-1" />
+      <Handle type="source" position={Position.Bottom} className="!opacity-0 !w-1 !h-1" />
+
+      <div
+        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
+          isPast ? 'bg-slate-200 text-slate-600' : 'bg-blue-600 text-white'
+        }`}
+      >
+        <Briefcase className="h-5 w-5" />
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center justify-between gap-1">
+          <span className="font-mono text-[13px] font-bold text-slate-900">{id}</span>
+          <span
+            className={`rounded px-1.5 py-0.2 text-[13px] font-medium ${
+              isPast ? 'bg-slate-200 text-slate-700' : 'bg-blue-100 text-blue-800'
+            }`}
+          >
+            {isPast ? 'Past' : 'Current'}
+          </span>
+        </div>
+        <div className="truncate text-[13px] text-slate-600 font-medium leading-tight mt-0.5" title={title}>
+          {title}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const caseNodeTypes = {
+  caseNode: CaseCustomNode,
+}
+
+// ==========================================
+// 1. ENTITY GRAPH VIEW (EXISTING VIEW)
+// ==========================================
+
+function EntityGraphView() {
   const data = useInvestigationStore(s => s.data)
   const reactFlowInstance = useReactFlow()
 
@@ -126,7 +201,6 @@ function GraphViewInner() {
 
   const fullGraph = useMemo(() => buildGraph(data), [data])
 
-  // Reset expanded nodes and path when case changes
   function handleCaseChange(newCase: string) {
     setSelectedCase(newCase)
     setExpandedNodeIds(new Set())
@@ -135,7 +209,6 @@ function GraphViewInner() {
     setComparisonScore(undefined)
   }
 
-  // Base nodes for the chosen case
   const baseNodes = useMemo(() => {
     if (selectedCase === 'all') {
       return fullGraph.nodes
@@ -158,16 +231,13 @@ function GraphViewInner() {
     return fullGraph.nodes.filter(n => baseIds.has(n.id))
   }, [data, selectedCase, fullGraph])
 
-  // Nodes to display (base + expanded + comparison path nodes)
   const activeNodes = useMemo(() => {
     const includedIds = new Set(baseNodes.map(n => n.id))
 
-    // Include expanded nodes
     for (const id of expandedNodeIds) {
       includedIds.add(id)
     }
 
-    // Include comparison path nodes if active
     if (comparisonPath && comparisonPath.nodes) {
       for (const node of comparisonPath.nodes) {
         includedIds.add(node.id)
@@ -176,13 +246,11 @@ function GraphViewInner() {
 
     return fullGraph.nodes.filter(n => {
       if (!includedIds.has(n.id)) return false
-      // If node is in comparison path, always keep visible
       if (comparisonPath?.nodes.some(pn => pn.id === n.id)) return true
       return visibleTypes.has(n.type)
     })
   }, [baseNodes, expandedNodeIds, comparisonPath, fullGraph, visibleTypes])
 
-  // Edges among active nodes
   const activeEdges = useMemo(() => {
     const activeNodeIds = new Set(activeNodes.map(n => n.id))
     return fullGraph.edges.filter(
@@ -190,12 +258,10 @@ function GraphViewInner() {
     )
   }, [fullGraph.edges, activeNodes])
 
-  // Synchronous force layout
   const layoutPositions = useMemo(() => {
     return computeLayout(activeNodes, activeEdges)
   }, [activeNodes, activeEdges])
 
-  // Active path highlight sets
   const pathNodeIds = useMemo(() => {
     return new Set(comparisonPath?.nodes.map(n => n.id) ?? [])
   }, [comparisonPath])
@@ -211,14 +277,12 @@ function GraphViewInner() {
     return set
   }, [comparisonPath])
 
-  // Focus node highlighting (selected or hovered)
   const activeFocusId = selectedNodeId || hoveredNodeId
   const directNeighborIds = useMemo(() => {
     if (!activeFocusId) return new Set<string>()
     return new Set(getNeighbors(fullGraph, activeFocusId))
   }, [activeFocusId, fullGraph])
 
-  // React Flow Nodes
   const rfNodes: Node<CustomNodeData>[] = useMemo(() => {
     return activeNodes.map(node => {
       const pos = layoutPositions[node.id] ?? { x: 400, y: 300 }
@@ -233,7 +297,6 @@ function GraphViewInner() {
         isDimmed = !isFocus && !isNeighbor
       }
 
-      // Sub-label for person type, vehicle info, etc.
       let subLabel: string | undefined
       if (node.type === 'person') {
         const p = data.persons.find(x => x.id === node.id)
@@ -270,7 +333,6 @@ function GraphViewInner() {
     })
   }, [activeNodes, layoutPositions, pathNodeIds, activeFocusId, directNeighborIds, data])
 
-  // React Flow Edges
   const rfEdges: Edge[] = useMemo(() => {
     return activeEdges.map((e, idx) => {
       const config = RELATIONSHIP_CONFIGS[e.relationship] ?? { stroke: '#94a3b8', strokeWidth: 1.5 }
@@ -316,7 +378,6 @@ function GraphViewInner() {
     })
   }, [activeEdges, pathEdgeKeys, pathNodeIds, activeFocusId])
 
-  // Helper: toggle entity type
   function toggleType(type: EntityType) {
     setVisibleTypes(prev => {
       const next = new Set(prev)
@@ -329,7 +390,6 @@ function GraphViewInner() {
     })
   }
 
-  // Expand connections for selected node
   function handleExpandSelected() {
     if (!selectedNodeId) return
     const neighbors = getNeighbors(fullGraph, selectedNodeId)
@@ -340,7 +400,6 @@ function GraphViewInner() {
     })
   }
 
-  // Reset view to original case view
   function handleResetView() {
     setExpandedNodeIds(new Set())
     setSelectedNodeId(null)
@@ -354,7 +413,6 @@ function GraphViewInner() {
     }, 50)
   }
 
-  // Center on node
   function focusOnNode(nodeId: string) {
     setSelectedNodeId(nodeId)
     const pos = layoutPositions[nodeId]
@@ -365,7 +423,6 @@ function GraphViewInner() {
     setSearchOpen(false)
   }
 
-  // Compare two people runner
   function handleCompare() {
     if (!comparePersonA || !comparePersonB) return
     const path = findShortestConnection(data, comparePersonA, comparePersonB)
@@ -373,7 +430,6 @@ function GraphViewInner() {
     setComparisonPath(path)
     setComparisonScore(score)
 
-    // Ensure all path nodes are expanded so they are visible
     if (path) {
       setExpandedNodeIds(prev => {
         const next = new Set(prev)
@@ -390,14 +446,12 @@ function GraphViewInner() {
     setComparePersonB('')
   }
 
-  // Matching nodes for search
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return []
     const q = searchQuery.toLowerCase().trim()
     return activeNodes.filter(n => n.label.toLowerCase().includes(q) || n.id.toLowerCase().includes(q)).slice(0, 8)
   }, [searchQuery, activeNodes])
 
-  // Selected node entity details
   const selectedNode = useMemo(() => {
     if (!selectedNodeId) return null
     return fullGraph.nodes.find(n => n.id === selectedNodeId) ?? null
@@ -470,7 +524,6 @@ function GraphViewInner() {
 
         {/* Find on graph + Reset View */}
         <div className="flex items-center gap-2">
-          {/* Find on graph input */}
           <div className="relative" ref={searchRef}>
             <div className="flex items-center rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 focus-within:border-blue-500 focus-within:bg-white">
               <Search className="h-4 w-4 text-slate-400 mr-2" />
@@ -494,21 +547,19 @@ function GraphViewInner() {
 
             {searchOpen && searchResults.length > 0 && (
               <div className="absolute right-0 top-full mt-1 w-64 rounded-lg border border-slate-200 bg-white py-1 shadow-lg z-50 max-h-60 overflow-y-auto">
-                {searchResults.map(result => {
-                  return (
-                    <button
-                      key={result.id}
-                      onClick={() => focusOnNode(result.id)}
-                      className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-slate-50 transition-colors"
-                    >
-                      <EntityIcon type={result.type} className="h-3.5 w-3.5 shrink-0" />
-                      <div className="min-w-0 flex-1 truncate">
-                        <p className="text-[13px] font-medium text-slate-800 truncate">{result.label}</p>
-                        <p className="text-[13px] text-slate-400 font-mono">{result.id}</p>
-                      </div>
-                    </button>
-                  )
-                })}
+                {searchResults.map(result => (
+                  <button
+                    key={result.id}
+                    onClick={() => focusOnNode(result.id)}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-slate-50 transition-colors"
+                  >
+                    <EntityIcon type={result.type} className="h-3.5 w-3.5 shrink-0" />
+                    <div className="min-w-0 flex-1 truncate">
+                      <p className="text-[13px] font-medium text-slate-800 truncate">{result.label}</p>
+                      <p className="text-[13px] text-slate-400 font-mono">{result.id}</p>
+                    </div>
+                  </button>
+                ))}
               </div>
             )}
           </div>
@@ -526,7 +577,6 @@ function GraphViewInner() {
 
       {/* Main Graph Grid with Side Panel */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* React Flow Canvas */}
         <div className={`${selectedNode ? 'lg:col-span-8 xl:col-span-9' : 'lg:col-span-12'} transition-all duration-200`}>
           <div className="relative h-[650px] w-full rounded-xl border border-slate-200 bg-slate-50 overflow-hidden shadow-sm">
             {activeNodes.length === 0 ? (
@@ -545,7 +595,7 @@ function GraphViewInner() {
               <ReactFlow
                 nodes={rfNodes}
                 edges={rfEdges}
-                nodeTypes={nodeTypes}
+                nodeTypes={entityNodeTypes}
                 onNodeClick={(_, node) => setSelectedNodeId(node.id)}
                 onNodeMouseEnter={(_, node) => setHoveredNodeId(node.id)}
                 onNodeMouseLeave={() => setHoveredNodeId(null)}
@@ -620,7 +670,6 @@ function GraphViewInner() {
         {selectedNode && (
           <div className="lg:col-span-4 xl:col-span-3">
             <Card className="h-full max-h-[650px] overflow-y-auto space-y-4">
-              {/* Header */}
               <div className="flex items-start justify-between gap-2 border-b border-slate-100 pb-3">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100">
@@ -644,7 +693,6 @@ function GraphViewInner() {
                 </button>
               </div>
 
-              {/* Actions: Expand Connections & View Details */}
               <div className="flex gap-2">
                 <button
                   onClick={handleExpandSelected}
@@ -663,7 +711,6 @@ function GraphViewInner() {
                 </Link>
               </div>
 
-              {/* Entity Specific Details */}
               <div className="rounded-lg bg-slate-50 p-3 text-[13px] space-y-1.5">
                 <p className="font-semibold text-slate-600 mb-1">Entity attributes</p>
                 {selectedNode.type === 'person' && (() => {
@@ -734,7 +781,6 @@ function GraphViewInner() {
                 })()}
               </div>
 
-              {/* Connected Neighbors */}
               <div className="space-y-2">
                 <p className="text-[13px] font-semibold text-slate-700">
                   Direct connections ({selectedNodeNeighbors.length})
@@ -818,7 +864,6 @@ function GraphViewInner() {
           )}
         </div>
 
-        {/* Results */}
         {comparisonPath !== undefined && (
           <div className="mt-4 space-y-4 border-t border-slate-100 pt-4">
             {comparisonPath === null ? (
@@ -856,19 +901,505 @@ function GraphViewInner() {
   )
 }
 
+// ==========================================
+// 2. CASE NETWORK VIEW (STEP 13 CASES MODE)
+// ==========================================
+
+function CaseGraphView() {
+  const data = useInvestigationStore(s => s.data)
+  const reactFlowInstance = useReactFlow()
+
+  const [showWeakLinks, setShowWeakLinks] = useState(false)
+  const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null)
+  const [selectedEdgeData, setSelectedEdgeData] = useState<CaseComparison | null>(null)
+
+  // Compute all case links based on checkbox
+  const caseLinks = useMemo(() => {
+    return findAllCaseLinks(data, showWeakLinks ? 1 : 4)
+  }, [data, showWeakLinks])
+
+  // Map cases to nodes
+  const allCases = data.cases
+  const caseNodesData = useMemo(() => {
+    return allCases.map(c => ({
+      id: c.id,
+      title: c.title,
+      isPast: c.status === 'closed',
+    }))
+  }, [allCases])
+
+  // Simulation layout
+  const layoutPositions = useMemo(() => {
+    const simNodes = allCases.map(c => ({
+      id: c.id,
+      type: 'incident' as EntityType,
+      label: c.id,
+    }))
+    const simEdges = caseLinks.map(l => ({
+      source: l.caseAId,
+      target: l.caseBId,
+      relationship: 'connected-to' as const,
+    }))
+    return computeLayout(simNodes, simEdges)
+  }, [allCases, caseLinks])
+
+  // Connected neighbors for active selection
+  const connectedCaseIds = useMemo(() => {
+    if (!selectedCaseId) return new Set<string>()
+    const set = new Set<string>()
+    for (const l of caseLinks) {
+      if (l.caseAId === selectedCaseId) set.add(l.caseBId)
+      if (l.caseBId === selectedCaseId) set.add(l.caseAId)
+    }
+    return set
+  }, [selectedCaseId, caseLinks])
+
+  // Edge stroke widths per level
+  const edgeStrokeWidth = (level: ComparisonLevel) => {
+    if (level === 'VERY STRONG') return 6
+    if (level === 'STRONG') return 4
+    if (level === 'MODERATE') return 2.5
+    return 1.5
+  }
+
+  // React Flow Nodes
+  const rfNodes: Node<CaseNodeData>[] = useMemo(() => {
+    return caseNodesData.map(c => {
+      const pos = layoutPositions[c.id] ?? { x: 400, y: 300 }
+      const isSelected = selectedCaseId === c.id
+      const isNeighbor = selectedCaseId ? connectedCaseIds.has(c.id) : false
+
+      let isDimmed = false
+      if (selectedCaseId) {
+        isDimmed = !isSelected && !isNeighbor
+      }
+
+      return {
+        id: c.id,
+        type: 'caseNode',
+        position: pos,
+        data: {
+          id: c.id,
+          title: c.title,
+          isPast: c.isPast,
+          isDimmed,
+          isHighlighted: isSelected || isNeighbor,
+          onClick: (id: string) => {
+            setSelectedCaseId(id)
+            setSelectedEdgeData(null)
+          },
+        },
+      }
+    })
+  }, [caseNodesData, layoutPositions, selectedCaseId, connectedCaseIds])
+
+  // React Flow Edges
+  const rfEdges: Edge[] = useMemo(() => {
+    return caseLinks.map((link, idx) => {
+      const isConnectedToSelected = selectedCaseId
+        ? link.caseAId === selectedCaseId || link.caseBId === selectedCaseId
+        : false
+
+      let opacity = 1
+      if (selectedCaseId) {
+        opacity = isConnectedToSelected ? 1 : 0.15
+      }
+
+      const width = edgeStrokeWidth(link.level)
+
+      return {
+        id: `case-edge-${link.caseAId}-${link.caseBId}-${idx}`,
+        source: link.caseAId,
+        target: link.caseBId,
+        label: `${link.score}`,
+        style: {
+          stroke: isConnectedToSelected ? '#2563eb' : '#64748b',
+          strokeWidth: isConnectedToSelected ? width + 1.5 : width,
+          opacity,
+        },
+        labelStyle: {
+          fill: isConnectedToSelected ? '#1e40af' : '#334155',
+          fontSize: 13,
+          fontWeight: 700,
+        },
+        labelBgStyle: {
+          fill: '#ffffff',
+          fillOpacity: 0.95,
+        },
+        labelBgPadding: [6, 2],
+        labelBgBorderRadius: 4,
+        data: link as unknown as Record<string, unknown>,
+      }
+    })
+  }, [caseLinks, selectedCaseId])
+
+  function handleReset() {
+    setSelectedCaseId(null)
+    setSelectedEdgeData(null)
+    setTimeout(() => {
+      reactFlowInstance.fitView({ padding: 0.2, duration: 400 })
+    }, 50)
+  }
+
+  // Active selected case entity
+  const selectedCaseEntity = useMemo(() => {
+    if (!selectedCaseId) return null
+    return data.cases.find(c => c.id === selectedCaseId) ?? null
+  }, [selectedCaseId, data.cases])
+
+  // Active selected case's links
+  const selectedCaseLinks = useMemo(() => {
+    if (!selectedCaseId) return []
+    return caseLinks.filter(
+      l => l.caseAId === selectedCaseId || l.caseBId === selectedCaseId
+    )
+  }, [selectedCaseId, caseLinks])
+
+  function getSharedSummary(link: CaseComparison): string {
+    const parts: string[] = []
+    if (link.sharedPersonIds.length > 0) parts.push(`${link.sharedPersonIds.length} person${link.sharedPersonIds.length > 1 ? 's' : ''}`)
+    if (link.sharedVehicleIds.length > 0) parts.push(`${link.sharedVehicleIds.length} vehicle${link.sharedVehicleIds.length > 1 ? 's' : ''}`)
+    if (link.sharedLocationIds.length > 0) parts.push(`${link.sharedLocationIds.length} location${link.sharedLocationIds.length > 1 ? 's' : ''}`)
+    if (link.sharedPhoneNumbers.length > 0) parts.push(`${link.sharedPhoneNumbers.length} phone${link.sharedPhoneNumbers.length > 1 ? 's' : ''}`)
+    if (link.sharedEvidenceTags.length > 0) parts.push(`${link.sharedEvidenceTags.length} evidence tag${link.sharedEvidenceTags.length > 1 ? 's' : ''}`)
+    if (link.nameMatches.length > 0) parts.push(`${link.nameMatches.length} name match${link.nameMatches.length > 1 ? 'es' : ''}`)
+    return parts.length > 0 ? parts.join(', ') : 'Time & type overlap'
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Top Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+        <div className="flex items-center gap-4">
+          <label className="flex items-center gap-2 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={showWeakLinks}
+              onChange={e => setShowWeakLinks(e.target.checked)}
+              className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span className="text-[14px] font-medium text-slate-700">
+              Show weak links (scores 1–3)
+            </span>
+          </label>
+          <span className="text-[13px] text-slate-500 font-mono">
+            {caseLinks.length} connection{caseLinks.length === 1 ? '' : 's'} displayed
+          </span>
+        </div>
+
+        <button
+          onClick={handleReset}
+          className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[13px] font-medium text-slate-700 hover:bg-slate-50"
+        >
+          <RotateCcw className="h-3.5 w-3.5" />
+          <span>Reset view</span>
+        </button>
+      </div>
+
+      {/* Main Flow Canvas with Side Panel */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div
+          className={`${
+            selectedCaseEntity || selectedEdgeData
+              ? 'lg:col-span-8 xl:col-span-9'
+              : 'lg:col-span-12'
+          } transition-all duration-200`}
+        >
+          <div className="relative h-[650px] w-full rounded-xl border border-slate-200 bg-slate-50 overflow-hidden shadow-sm">
+            <ReactFlow
+              nodes={rfNodes}
+              edges={rfEdges}
+              nodeTypes={caseNodeTypes}
+              onNodeClick={(_, node) => {
+                setSelectedCaseId(node.id)
+                setSelectedEdgeData(null)
+              }}
+              onEdgeClick={(_, edge) => {
+                const comp = edge.data as unknown as CaseComparison
+                if (comp) {
+                  setSelectedEdgeData(comp)
+                  setSelectedCaseId(null)
+                }
+              }}
+              onPaneClick={() => {
+                setSelectedCaseId(null)
+                setSelectedEdgeData(null)
+              }}
+              fitView
+              fitViewOptions={{ padding: 0.15 }}
+              minZoom={0.2}
+              maxZoom={2.5}
+            >
+              <Background color="#cbd5e1" gap={20} size={1} />
+              <Controls className="!bg-white !border-slate-200 !shadow-sm !rounded-lg" />
+              <MiniMap
+                className="!border-slate-200 !rounded-lg !bg-white/90"
+                nodeColor={n => {
+                  const isPast = (n.data as unknown as CaseNodeData)?.isPast
+                  return isPast ? '#94a3b8' : '#2563eb'
+                }}
+                zoomable
+                pannable
+              />
+            </ReactFlow>
+
+            {/* Cases Mode Legend Overlay */}
+            <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm border border-slate-200 rounded-lg p-3 shadow-sm z-10 text-[13px] space-y-2 pointer-events-auto max-w-[340px]">
+              <div>
+                <p className="font-semibold text-slate-800 mb-1">Case status</p>
+                <div className="flex items-center gap-4 text-slate-700">
+                  <div className="flex items-center gap-1.5">
+                    <span className="inline-block h-3.5 w-3.5 rounded bg-blue-600"></span>
+                    <span>Current case</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="inline-block h-3.5 w-3.5 rounded bg-slate-300"></span>
+                    <span>Past case (closed)</span>
+                  </div>
+                </div>
+              </div>
+              <div className="border-t border-slate-100 pt-1.5">
+                <p className="font-semibold text-slate-800 mb-1">Connection strength (line thickness)</p>
+                <div className="grid grid-cols-2 gap-x-2 gap-y-1.5 text-slate-600">
+                  <div className="flex items-center gap-1.5">
+                    <span className="inline-block w-4 h-[1.5px] bg-slate-500"></span>
+                    <span>WEAK (thin)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="inline-block w-4 h-[2.5px] bg-slate-600"></span>
+                    <span>MODERATE (med)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="inline-block w-4 h-[4px] bg-blue-600"></span>
+                    <span>STRONG (thick)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="inline-block w-4 h-[6px] bg-blue-800"></span>
+                    <span>VERY STRONG</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Side Panel: Selected Case */}
+        {selectedCaseEntity && (
+          <div className="lg:col-span-4 xl:col-span-3">
+            <Card className="h-full max-h-[650px] overflow-y-auto space-y-4">
+              <div className="flex items-start justify-between gap-2 border-b border-slate-100 pb-3">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-[17px] text-blue-600">{selectedCaseEntity.id}</h3>
+                    <span
+                      className={`rounded px-1.5 py-0.5 text-[13px] font-medium ${
+                        selectedCaseEntity.status === 'closed'
+                          ? 'bg-slate-100 text-slate-600'
+                          : 'bg-emerald-100 text-emerald-800'
+                      }`}
+                    >
+                      {selectedCaseEntity.status === 'closed' ? 'Past' : 'Current'}
+                    </span>
+                  </div>
+                  <p className="text-[15px] font-semibold text-slate-900 mt-0.5">{selectedCaseEntity.title}</p>
+                </div>
+                <button
+                  onClick={() => setSelectedCaseId(null)}
+                  className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              <div className="space-y-1 text-[13px] text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Status:</span>
+                  <span className="font-medium capitalize">{selectedCaseEntity.status}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Type:</span>
+                  <span className="font-medium capitalize">{selectedCaseEntity.type}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Priority:</span>
+                  <span className="font-medium capitalize">{selectedCaseEntity.priority}</span>
+                </div>
+              </div>
+
+              {/* Connected Cases List */}
+              <div className="space-y-2">
+                <p className="text-[14px] font-bold text-slate-800">
+                  Connected cases ({selectedCaseLinks.length})
+                </p>
+                {selectedCaseLinks.length === 0 ? (
+                  <p className="text-[13px] text-slate-500">
+                    No connections meet the current threshold.
+                  </p>
+                ) : (
+                  <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+                    {selectedCaseLinks.map((link, idx) => {
+                      const otherId = link.caseAId === selectedCaseEntity.id ? link.caseBId : link.caseAId
+                      const other = data.cases.find(c => c.id === otherId)
+                      const isPast = other?.status === 'closed'
+
+                      return (
+                        <div
+                          key={idx}
+                          className="rounded-lg border border-slate-200 bg-white p-3 space-y-2 hover:border-blue-300 transition-colors shadow-xs"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-mono text-[14px] font-bold text-slate-900">{otherId}</span>
+                                <span className={`text-[13px] px-1.5 py-0.2 rounded font-medium ${isPast ? 'bg-slate-100 text-slate-600' : 'bg-blue-50 text-blue-700'}`}>
+                                  {isPast ? 'Past' : 'Current'}
+                                </span>
+                              </div>
+                              <p className="text-[13px] text-slate-600 font-medium truncate max-w-[170px]">{other?.title}</p>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <span className="font-bold text-[16px] text-slate-900">{link.score}</span>
+                              <div className="text-[13px] font-semibold text-slate-500">{link.level}</div>
+                            </div>
+                          </div>
+
+                          <p className="text-[13px] text-slate-500 italic">
+                            {getSharedSummary(link)}
+                          </p>
+
+                          <Link
+                            to={`/cases/${selectedCaseEntity.id}/compare/${otherId}`}
+                            className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-blue-50 py-1.5 text-[13px] font-semibold text-blue-700 hover:bg-blue-100 transition-colors"
+                          >
+                            <GitCompare className="h-3.5 w-3.5" />
+                            <span>Compare cases</span>
+                          </Link>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* Side Panel: Selected Edge */}
+        {selectedEdgeData && !selectedCaseEntity && (
+          <div className="lg:col-span-4 xl:col-span-3">
+            <Card className="h-full max-h-[650px] overflow-y-auto space-y-4">
+              <div className="flex items-start justify-between gap-2 border-b border-slate-100 pb-3">
+                <div>
+                  <h3 className="font-bold text-[16px] text-slate-900">Case link details</h3>
+                  <p className="text-[13px] text-slate-500">Cross-case operational link</p>
+                </div>
+                <button
+                  onClick={() => setSelectedEdgeData(null)}
+                  className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              <div className="rounded-lg bg-slate-50 border border-slate-200 p-3.5 text-center space-y-1">
+                <span className="text-[13px] font-semibold text-slate-500 uppercase tracking-wider">Connection score</span>
+                <div className="text-3xl font-extrabold text-slate-900">{selectedEdgeData.score}</div>
+                <span className="inline-block rounded-full bg-blue-100 text-blue-800 px-2.5 py-0.5 text-[13px] font-bold">
+                  {selectedEdgeData.level}
+                </span>
+              </div>
+
+              <div className="space-y-2 text-[14px]">
+                <div className="rounded-lg border border-slate-200 p-2.5">
+                  <p className="font-mono font-bold text-blue-600 text-[14px]">{selectedEdgeData.caseAId}</p>
+                  <p className="text-[13px] text-slate-700">{data.cases.find(c => c.id === selectedEdgeData.caseAId)?.title}</p>
+                </div>
+                <div className="flex justify-center text-slate-400">
+                  <GitCompare className="h-4 w-4" />
+                </div>
+                <div className="rounded-lg border border-slate-200 p-2.5">
+                  <p className="font-mono font-bold text-blue-600 text-[14px]">{selectedEdgeData.caseBId}</p>
+                  <p className="text-[13px] text-slate-700">{data.cases.find(c => c.id === selectedEdgeData.caseBId)?.title}</p>
+                </div>
+              </div>
+
+              <div className="space-y-1.5 border-t border-slate-100 pt-3">
+                <p className="text-[13px] font-semibold text-slate-700">Shared summary:</p>
+                <p className="text-[13px] text-slate-600">{getSharedSummary(selectedEdgeData)}</p>
+                {selectedEdgeData.breakdown.length > 0 && (
+                  <div className="mt-2 space-y-1 font-mono text-[13px] text-slate-500">
+                    {selectedEdgeData.breakdown.map((line, idx) => (
+                      <p key={idx}>{line}</p>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <Link
+                to={`/cases/${selectedEdgeData.caseAId}/compare/${selectedEdgeData.caseBId}`}
+                className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-blue-600 py-2 text-[14px] font-semibold text-white hover:bg-blue-700 transition-colors"
+              >
+                <GitCompare className="h-4 w-4" />
+                <span>Compare</span>
+              </Link>
+            </Card>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ==========================================
+// MAIN PAGE COMPONENT WITH MODE TOGGLE
+// ==========================================
+
 export default function RelationshipGraphPage() {
+  const [graphMode, setGraphMode] = useState<'entities' | 'cases'>('entities')
+
   useEffect(() => {
     document.title = 'Relationship Graph · Incident Investigation System'
   }, [])
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Relationship graph"
-        description="Interactive investigation network linking persons of interest, evidence, vehicles, locations, and incidents."
-      />
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <PageHeader
+          title="Relationship graph"
+          description="Interactive investigation network linking entities and case-to-case investigative links."
+        />
+
+        {/* Toggle Mode: Entities vs Cases */}
+        <div className="flex items-center rounded-xl border border-slate-300 bg-white p-1 shadow-xs">
+          <button
+            type="button"
+            onClick={() => setGraphMode('entities')}
+            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-[14px] font-semibold transition-all ${
+              graphMode === 'entities'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+            }`}
+          >
+            <Network className="h-4 w-4" />
+            <span>Entities</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setGraphMode('cases')}
+            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-[14px] font-semibold transition-all ${
+              graphMode === 'cases'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+            }`}
+          >
+            <Briefcase className="h-4 w-4" />
+            <span>Cases</span>
+          </button>
+        </div>
+      </div>
+
       <ReactFlowProvider>
-        <GraphViewInner />
+        {graphMode === 'entities' ? <EntityGraphView /> : <CaseGraphView />}
       </ReactFlowProvider>
     </div>
   )

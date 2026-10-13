@@ -24,4 +24,5 @@ export interface Evidence {
   title: string;
   status: EvidenceStatus;
   custodyHistory: CustodyEntry[];
+  tags?: string[];
 }

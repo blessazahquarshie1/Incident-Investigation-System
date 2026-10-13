@@ -71,5 +71,13 @@ export const vehicles: Vehicle[] = [
     "make": "Ford",
     "model": "Focus",
     "color": "Blue"
+  },
+  {
+    "id": "V-011",
+    "registration": "GS-3311-24",
+    "make": "Hyundai",
+    "model": "Elantra",
+    "color": "Silver",
+    "ownerId": "P-029"
   }
 ];

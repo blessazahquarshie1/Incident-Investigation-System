@@ -229,3 +229,65 @@ All features are tested, verified, and operational with zero TypeScript errors a
     - Investigator notes
   - Formatted into day-grouped audit cards with relative time and direct case links.
 
+---
+
+## 15. Cross-Case Comparison Engine & Lead Generation
+
+- [x] **Case Fingerprinting & Symmetric Pairwise Scoring**
+  - **Location:** `src/lib/caseFingerprint.ts`, `src/lib/caseComparison.ts`, `src/lib/leads.ts`
+  - Extracts case operational fingerprints (normalized phones, lowercase evidence tags, locations, vehicles, persons, incident minutes of day).
+  - Implements exact signal weights:
+    - Shared phone number: **6 pts**
+    - Shared person: **5 pts**
+    - Shared vehicle: **5 pts**
+    - Shared evidence tag: **4 pts**
+    - Shared location: **2 pts**
+    - Similar time of day (within 90 min): **1 pt**
+    - Same case type: **1 pt**
+    - Speculative name matches (exact name: 3, shared alias: 3, surname: 1): capped at **5 pts**
+  - Classifies comparison score into tiers: `0–3`: **WEAK**, `4–9`: **MODERATE**, `10–17`: **STRONG**, `18+`: **VERY STRONG**.
+  - Generates prioritized investigative leads (`high` -> `medium` -> `low`) with clickable entity links.
+  - **Test Coverage:** `src/lib/__tests__/caseComparison.test.ts` (9 tests passing).
+
+---
+
+## 16. Related Cases Workspace & Side-by-Side Comparison
+
+- [x] **Case Details Related Cases Section**
+  - **Location:** `src/components/CaseConnectionsTab.tsx`
+  - Organised into two clear sections: **Related cases** (top) and **People in this case** (Step 06 content).
+  - Related cases table displays case ID/title, Current/Past badge (`closed` = Past), score, level badge, shared item chips (`people`, `vehicles`, `phones`, `evidence tags`, `places`, `possible name match`), and a Compare button.
+  - Interactive filter: "All / Current only / Past only".
+- [x] **Side-by-Side Compare Page (`/cases/:caseId/compare/:otherCaseId`)**
+  - **Location:** `src/pages/CaseComparePage.tsx`
+  - Side-by-side header with large numerical score, level badge, and mathematical breakdown.
+  - **Where to look:** Prominent prioritized investigative leads with direct entity links.
+  - **What they share:** Categorized cards for shared people, vehicles, locations, phones, and evidence tags.
+  - **Possible same person:** Side-by-side records with `Exact name`, `Shared alias`, or `Surname only` labels and careful notice: *"These are different records. Check whether they are the same person."*
+  - **Side-by-side timelines:** Chronological event streams for both cases highlighting events at shared locations in UTC.
+  - Handles self-comparison redirects and missing case error states.
+
+---
+
+## 17. Case Network Map & Intelligent Name Search
+
+- [x] **Case Network on Relationship Graph Page**
+  - **Location:** `src/pages/RelationshipGraphPage.tsx`
+  - Two-option top toggle: **Entities** (Step 08 view) vs **Cases**.
+  - Cases mode: each case is a node colored blue (current) or grey (past). Edges from `findAllCaseLinks` labeled with score.
+  - Stroke width reflects level: WEAK (1.5px), MODERATE (2.5px), STRONG (4px), VERY STRONG (6px).
+  - "Show weak links" checkbox (default off).
+  - Clicking node or edge opens side drawer with score, level, shared summary, and Compare button.
+  - Dual-mode legend explains current/past status and line thickness.
+- [x] **Fuzzy, Typo-Tolerant & Full-Text Name Search**
+  - **Location:** `src/lib/nameSearch.ts`, `src/pages/SearchPage.tsx`, `src/components/AppShell.tsx`, `src/pages/PersonDetailPage.tsx`
+  - Matches first names, surnames, aliases, and 1-letter edit distance typos on words >= 5 characters (`similar spelling`).
+  - Search page features dedicated **"People matching '<query>'"** and **"Cases where this name appears"** sections with snippets.
+  - Person detail page features **"Appears in cases"** and **"Possible same person in other records"** cards.
+  - Live search bar in AppShell merges name search matches with typo tolerance.
+- [x] **Dashboard Strongest Case Links**
+  - **Location:** `src/pages/DashboardPage.tsx`
+  - Top 5 strongest case links displayed with Current/Past badges, scores, and Compare buttons.
+- [x] **Automated Acceptance Verification:**
+  - `src/lib/__tests__/acceptanceStep13.test.ts` (6 automated tests verifying all criteria).
+

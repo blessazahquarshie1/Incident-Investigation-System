@@ -365,4 +365,107 @@ A printable case report, no broken pages, and a ticked spec checklist. When visi
    - *Step 11 (Blocked destroyed evidence):* Demonstrates defensive state integrity enforcement preventing invalid operations.
    - *Step 12 (Case mutation & audit feed):* Demonstrates reactive immutable state management with automated audit logging.
 
+---
+
+## Step 11 — More cases that connect to the Accra Mall robbery
+
+**What was built:**
+Expanded the mock database with four new realistic investigation cases (`CASE-00201` to `CASE-00204`), ten new persons (`P-027` to `P-036`), new incidents, vehicles, phone records, evidence items, and activity log entries. Added an optional `tags` array to `Evidence` for matching methods and physical objects across cases. Tagged evidence in `CASE-00123` with `"grey-balaclava"` and `"crowbar-pry-marks"`.
+
+**How it works (plain English):**
+A system that finds links needs something to find. We are adding cases on purpose: one that shares a **car and a suspect** (strong), one that shares only a **place** (weak), one that shares a **phone number and similar names** (partly strong, partly unsure), and one **old closed case** that shares only the **method** (moderate). Real investigations look the same: sometimes the link is obvious, sometimes it is one small detail. **Tags** let evidence describe itself in a way that can be matched, like "pry marks from a crowbar".
+
+**Key concepts:**
+- **Evidence tags**: short descriptive labels (e.g., `"grey-balaclava"`, `"crowbar-pry-marks"`) allowing cross-case methodology matching.
+- **Varying link strengths**: intentionally structuring data with varied overlap degrees (strong vehicle+person, weak location-only, alias/phone matches, and historical modus operandi).
+- **Relational integrity**: ensuring all new records have consistent IDs, valid references, and updated activity logs without breaking prior tests.
+
+**Files to open:**
+- `src/types/evidence.ts` — updated `Evidence` type with `tags?: string[]`.
+- `src/data/cases.ts` — four new case records (`CASE-00201` through `CASE-00204`).
+- `src/data/evidence.ts` — tagged evidence items across current and past investigations.
+- `src/data/persons.ts` — new persons with varied name overlaps and aliases.
+- `src/data/relationships.ts` — graph edges connecting people, vehicles, locations, and incidents.
+
+**What I should see:**
+Four new cases in the Cases list, two of them closed (`CASE-00201` and `CASE-00204`), and the vehicle search for `GT-4521-23` showing `CASE-00201` in its linked cases. All existing tests pass.
+
+**I should be able to explain:**
+1. Why did we add a case that only shares a place with the main case?
+2. What is an evidence tag and why does it help find links?
+3. Why is the old closed case still useful to an investigator?
+
+---
+
+## Step 12 — The case comparison engine and the name search
+
+**What was built:**
+Implemented pure algorithmic engine functions in `src/lib/` to compare cases and detect cross-investigative links: `getCaseFingerprint` (extracting traces of people, vehicles, locations, phone numbers, evidence tags, and incident time of day), `compareCases` (evaluating weighted signal overlap with symmetric scoring and confidence levels), `generateLeads` (translating statistical matches into prioritized action instructions), `findRelatedCases`, `findAllCaseLinks`, and `searchByName` (fuzzy multi-entity search with Levenshtein typo tolerance and text mentions across all case materials).
+
+**How it works (plain English):**
+Each case leaves **traces**: people, cars, places, phone numbers, evidence, a time of day. The **fingerprint** is the list of those traces. To compare two cases, the computer lays the two lists side by side and counts what matches, with more points for traces that are harder to match by accident (a shared phone number is worth more than a shared place, because lots of cases happen in the same city). A **name match** between different records is only a *possibility*, so it gets few points and is labelled that way. The **leads** turn the numbers into sentences an investigator can act on. The **name search** matches the start of any word in a name or alias, forgives a one-letter typo, and also looks inside written text, so the name is found wherever it appears.
+
+**Key concepts:**
+- **Case fingerprinting**: consolidating heterogeneous entity IDs, normalized phone digits, tags, and minute-of-day offsets into a single queryable signature.
+- **Weighted cross-case scoring**: assigning calibrated point weights (phones = 6, people/vehicles = 5, evidence tags = 4, locations = 2, time/type = 1) reflecting evidentiary rarity.
+- **Speculative name matching**: detecting exact name, shared alias, and surname-only matches between separate records while capping influence to 5 points.
+- **Investigative lead generation**: transforming mathematical intersections into actionable instructions with priority rankings.
+- **Fuzzy name & text mention search**: tokenized prefix matching with Levenshtein distance fallback for typo-tolerant cross-case indexing.
+
+**Files to open:**
+- `src/lib/caseFingerprint.ts` — extracts case signatures from current state.
+- `src/lib/caseComparison.ts` — comparison engine, symmetric scoring, and link finders.
+- `src/lib/leads.ts` — prioritized investigative lead generator.
+- `src/lib/nameSearch.ts` — fuzzy name search and document text mention scanner.
+- `src/lib/__tests__/caseComparison.test.ts` — unit test suite for case comparisons.
+- `src/lib/__tests__/nameSearch.test.ts` — unit test suite for name matching.
+
+**What I should see:**
+All 81 tests passing with `npm test`, zero linter errors, and clean builds. No visual screen changes yet (UI is built in Step 13).
+
+**I should be able to explain:**
+1. What is a case fingerprint?
+2. Why is a shared phone number worth more points than a shared location?
+3. Why does a name-only match get few points and a "possible" label?
+
+---
+
+## Step 13 — The screens for related cases and name search
+
+**What was built:**
+Implemented comprehensive UI screens and views connecting cases and individuals:
+1. **Case Details Connections Tab (`src/components/CaseConnectionsTab.tsx`):** Organised into two clear sections: "Related cases" (at the top) displaying other cases with Current/Past badges, confidence score & level badges, shared entity chips with icons, and a Compare action; followed by "People in this case" preserving the pair connection scoring and BFS pathfinding tool.
+2. **Side-by-Side Compare Page (`src/pages/CaseComparePage.tsx`):** Route `/cases/:caseId/compare/:otherCaseId` presenting both cases side by side with score and signal breakdown, prominent prioritized investigative leads ("Where to look") with direct entity links, categorized shared entity cards, side-by-side possible same person comparisons with calm advisory text, and synchronized side-by-side event timelines with shared location highlighting in UTC.
+3. **Case Network Graph Mode (`src/pages/RelationshipGraphPage.tsx`):** Added a top-level toggle between "Entities" and "Cases". Cases mode renders every case as a node (blue for current, grey for past), links with score labels and thickness growing from WEAK (1.5px) to VERY STRONG (6px), a "Show weak links" toggle, interactive side panel with connection details, and dual-mode legend.
+4. **Intelligent Name Search Screens (`src/pages/SearchPage.tsx`, `src/components/AppShell.tsx`, `src/pages/PersonDetailPage.tsx`):** Global search surfaces dedicated "People matching '<query>'" and "Cases where this name appears" sections with match reasons (`full name`, `first name`, `surname`, `alias`, `similar spelling`) and text snippets. Person detail page includes "Appears in cases" and "Possible same person in other records" cards.
+5. **Dashboard Strongest Case Links (`src/pages/DashboardPage.tsx`):** Integrated top 5 strongest case links directly into the dashboard with links to their Compare pages.
+
+**How it works (plain English):**
+This is the main idea of the whole project. Instead of staring at one case, the investigator opens a case and sees a **ranked list of other cases that look similar**, with the reason written next to each. The **compare page** is a side-by-side table of two cases: what they share, what to check first, and the two timelines next to each other. The **case network** is the same information drawn as a map, where each dot is a case and a thick line means a strong link. The **name search** finds a person wherever the name shows up, even in a different spelling or only as an alias, and lists every case involved. All of it is **derived**: nothing is stored, so when the data changes, the links change.
+
+**Key concepts:**
+- **Dynamic Derived Intelligence:** No relational links or scores are permanently stored in the database. When the investigator adds a vehicle or a person to a case, the comparison engine recomputes fingerprints live, immediately surfacing links across the entire app.
+- **Action-Oriented Investigative Leads:** Raw mathematical scores are translated into clear, prioritized instructions ("Where to look") highlighting specific shared vehicles, locations, or alibi check requirements.
+- **Calm, Speculative Identity Management:** Distinguishing between confirmed identity links and speculative matches (e.g. matching surname or shared alias) with neutral wording: *"These are different records. Check whether they are the same person."*
+- **Visual Network Hierarchy:** Dual-mode graph canvas allowing investigators to seamlessly toggle between microscopic entity relationships and macroscopic inter-case operational networks.
+
+**Files to open:**
+- `src/components/CaseConnectionsTab.tsx` — Related cases list and people connections.
+- `src/pages/CaseComparePage.tsx` — Full side-by-side case comparison and timeline view.
+- `src/pages/RelationshipGraphPage.tsx` — Entities vs Cases dual-mode network graph.
+- `src/pages/SearchPage.tsx` — Specialized name search and case text mention results.
+- `src/pages/PersonDetailPage.tsx` — Person profile with case affiliations and speculative identity check.
+- `src/pages/DashboardPage.tsx` — Executive dashboard featuring strongest case links.
+- `src/lib/__tests__/acceptanceStep13.test.ts` — Automated verification of all acceptance criteria.
+
+**What I should see:**
+Related cases listed on a case, a compare page with "where to look" leads, a map of linked cases, and a name search that lists every case a name appears in. All 87 unit and acceptance tests passing, 0 linter errors, and clean production builds.
+
+**I should be able to explain:**
+1. In one sentence, what does the system do for an investigator?
+   *It automatically discovers, scores, and maps hidden connections between crimes, suspects, vehicles, and evidence across the entire department, showing investigators exactly where to look next.*
+2. Why are the related cases calculated instead of stored?
+   *Because investigation data is living and continuously changing; deriving links on-the-fly guarantees that the moment a detective links a new vehicle, logs a phone number, or adds a suspect, every related case updates instantly with zero stale data or manual re-indexing.*
+3. Why does a name match say "check whether they are the same person" instead of "this is the same person"?
+   *Because two records sharing a name, alias, or surname could be two different individuals (e.g. family members or unrelated namesakes); prematurely asserting they are identical could cause wrongful arrests or tainted evidence, so the system responsibly guides the human investigator to verify.*
 

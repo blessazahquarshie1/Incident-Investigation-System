@@ -187,5 +187,25 @@ export const sightings: Sighting[] = [
     "locationId": "L-001",
     "timestamp": "2026-09-14T00:00:00Z",
     "description": "Sight"
+  },
+  {
+    "id": "SG-021",
+    "caseId": "CASE-00201",
+    "source": "cctv",
+    "action": "left",
+    "locationId": "L-003",
+    "timestamp": "2026-03-12T08:55:00Z",
+    "description": "Toyota Hilux GT-4521-23 observed speeding out of fuel station forecourt",
+    "vehicleId": "V-001"
+  },
+  {
+    "id": "SG-022",
+    "caseId": "CASE-00202",
+    "source": "cctv",
+    "action": "left",
+    "locationId": "L-001",
+    "timestamp": "2026-09-18T15:00:00Z",
+    "description": "Silver Elantra seen exiting parking gate without permit",
+    "vehicleId": "V-011"
   }
 ];

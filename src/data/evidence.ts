@@ -574,5 +574,155 @@ export const evidence: Evidence[] = [
         "officerId": "O-001"
       }
     ]
+  },
+  {
+    "id": "E-029",
+    "caseId": "CASE-00123",
+    "type": "photo",
+    "title": "CCTV Footwear and Mask Frame",
+    "description": "Surveillance camera still showing grey balaclava worn by perpetrator",
+    "collectedAt": "2026-09-14T11:00:00Z",
+    "collectedBy": "O-001",
+    "locationId": "L-001",
+    "linkedPersons": [],
+    "status": "collected",
+    "tags": ["grey-balaclava"],
+    "custodyHistory": [
+      {
+        "id": "CE-029-1",
+        "action": "collected",
+        "timestamp": "2026-09-14T11:00:00Z",
+        "officerId": "O-001"
+      }
+    ]
+  },
+  {
+    "id": "E-030",
+    "caseId": "CASE-00123",
+    "type": "photo",
+    "title": "Service Door Toolmark Impressions",
+    "description": "Photographs of crowbar pry marks on the cash office entrance",
+    "collectedAt": "2026-09-14T11:30:00Z",
+    "collectedBy": "O-001",
+    "locationId": "L-001",
+    "linkedPersons": [],
+    "status": "collected",
+    "tags": ["crowbar-pry-marks"],
+    "custodyHistory": [
+      {
+        "id": "CE-030-1",
+        "action": "collected",
+        "timestamp": "2026-09-14T11:30:00Z",
+        "officerId": "O-001"
+      }
+    ]
+  },
+  {
+    "id": "E-032",
+    "caseId": "CASE-00201",
+    "type": "photo",
+    "title": "Recovered Balaclava",
+    "description": "Grey woolen balaclava dropped behind fuel station generator house",
+    "collectedAt": "2026-03-12T09:30:00Z",
+    "collectedBy": "O-002",
+    "locationId": "L-003",
+    "linkedPersons": [
+      "P-002"
+    ],
+    "status": "in-evidence-room",
+    "tags": ["grey-balaclava"],
+    "custodyHistory": [
+      {
+        "id": "CE-032-1",
+        "action": "collected",
+        "timestamp": "2026-03-12T09:30:00Z",
+        "officerId": "O-002"
+      },
+      {
+        "id": "CE-032-2",
+        "action": "submitted-to-evidence-room",
+        "timestamp": "2026-03-12T11:00:00Z",
+        "officerId": "O-002"
+      }
+    ]
+  },
+  {
+    "id": "E-033",
+    "caseId": "CASE-00202",
+    "type": "photo",
+    "title": "Shattered Quarter Glass",
+    "description": "Glass fragments collected from parking stall B12",
+    "collectedAt": "2026-09-18T15:30:00Z",
+    "collectedBy": "O-004",
+    "locationId": "L-001",
+    "linkedPersons": [],
+    "status": "collected",
+    "tags": ["broken-glass"],
+    "custodyHistory": [
+      {
+        "id": "CE-033-1",
+        "action": "collected",
+        "timestamp": "2026-09-18T15:30:00Z",
+        "officerId": "O-004"
+      }
+    ]
+  },
+  {
+    "id": "E-034",
+    "caseId": "CASE-00203",
+    "type": "device",
+    "title": "Burner Mobile Handset",
+    "description": "Infinix keypad phone used to initiate SIM clone verification SMS",
+    "collectedAt": "2026-10-01T11:45:00Z",
+    "collectedBy": "O-006",
+    "locationId": "L-007",
+    "linkedPersons": [
+      "P-031"
+    ],
+    "status": "under-analysis",
+    "tags": ["burner-phone"],
+    "custodyHistory": [
+      {
+        "id": "CE-034-1",
+        "action": "collected",
+        "timestamp": "2026-10-01T11:45:00Z",
+        "officerId": "O-006"
+      },
+      {
+        "id": "CE-034-2",
+        "action": "analysis-started",
+        "timestamp": "2026-10-01T14:00:00Z",
+        "officerId": "O-006"
+      }
+    ]
+  },
+  {
+    "id": "E-035",
+    "caseId": "CASE-00204",
+    "type": "photo",
+    "title": "Pry Mark Impressions on Padlock",
+    "description": "Striations and deformation on steel hasp from crowbar",
+    "collectedAt": "2024-05-10T09:30:00Z",
+    "collectedBy": "O-004",
+    "locationId": "L-005",
+    "linkedPersons": [
+      "P-035"
+    ],
+    "status": "in-evidence-room",
+    "tags": ["crowbar-pry-marks"],
+    "custodyHistory": [
+      {
+        "id": "CE-035-1",
+        "action": "collected",
+        "timestamp": "2024-05-10T09:30:00Z",
+        "officerId": "O-004"
+      },
+      {
+        "id": "CE-035-2",
+        "action": "submitted-to-evidence-room",
+        "timestamp": "2024-05-10T12:00:00Z",
+        "officerId": "O-004"
+      }
+    ]
   }
 ];

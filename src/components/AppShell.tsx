@@ -8,6 +8,7 @@ import {
 import { useInvestigationStore } from '../store/useInvestigationStore'
 import { buildGraph } from '../lib/graph'
 import { searchAll, getResultPath } from '../lib/search'
+import { searchByName } from '../lib/nameSearch'
 import EntityIcon from './EntityIcon'
 import type { SearchResult } from '../lib/search'
 import type { EntityType } from '../types'
@@ -45,8 +46,27 @@ export default function AppShell() {
       debounceRef.current = setTimeout(() => {
         if (q.trim().length >= 2) {
           const graph = buildGraph(data)
-          const results = searchAll(data, graph, q).slice(0, 6)
-          setSearchResults(results)
+          const nameMatches = searchByName(data, q)
+          const nameResults: SearchResult[] = nameMatches.people.map(pm => ({
+            entityType: 'person' as const,
+            id: pm.person.id,
+            title: pm.person.fullName,
+            subtitle: `${pm.person.type} (${pm.matchedOn}) — ${pm.caseIds.length} case(s)`,
+            score: 95,
+            enrichment: { relatedCases: pm.caseIds, phone: pm.person.phone },
+          }))
+          const generalResults = searchAll(data, graph, q)
+          // Merge deduplicated
+          const seen = new Set<string>()
+          const merged: SearchResult[] = []
+          for (const item of [...nameResults, ...generalResults]) {
+            const key = `${item.entityType}-${item.id}`
+            if (!seen.has(key)) {
+              seen.add(key)
+              merged.push(item)
+            }
+          }
+          setSearchResults(merged.slice(0, 6))
           setShowDropdown(true)
         } else {
           setSearchResults([])

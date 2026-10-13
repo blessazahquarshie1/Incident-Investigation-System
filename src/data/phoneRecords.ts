@@ -130,5 +130,14 @@ export const phoneRecords: PhoneRecord[] = [
     "phoneNumber": "12345",
     "kind": "call",
     "timestamp": "2026-09-14T00:00:00Z"
+  },
+  {
+    "id": "PR-017",
+    "caseId": "CASE-00203",
+    "personId": "P-031",
+    "phoneNumber": "0241111111",
+    "kind": "call",
+    "timestamp": "2026-10-01T10:20:00Z",
+    "otherNumber": "0209988776"
   }
 ];

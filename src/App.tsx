@@ -4,6 +4,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 import DashboardPage from './pages/DashboardPage'
 import CasesPage from './pages/CasesPage'
 import CaseDetailPage from './pages/CaseDetailPage'
+import CaseComparePage from './pages/CaseComparePage'
 import IncidentsPage from './pages/IncidentsPage'
 import PersonsPage from './pages/PersonsPage'
 import PersonDetailPage from './pages/PersonDetailPage'
@@ -30,6 +31,7 @@ export default function App() {
             <Route index element={<DashboardPage />} />
             <Route path="cases" element={<CasesPage />} />
             <Route path="cases/:caseId" element={<CaseDetailPage />} />
+            <Route path="cases/:caseId/compare/:otherCaseId" element={<CaseComparePage />} />
             <Route path="incidents" element={<IncidentsPage />} />
             <Route path="incidents/:id" element={<IncidentDetailPage />} />
             <Route path="persons" element={<PersonsPage />} />

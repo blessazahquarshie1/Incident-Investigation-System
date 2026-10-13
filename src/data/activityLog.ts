@@ -240,5 +240,101 @@ export const activityLog: ActivityLogEntry[] = [
     "timestamp": "2026-09-14T00:00:00Z",
     "action": "note-added",
     "description": "Log"
+  },
+  {
+    "id": "A-031",
+    "caseId": "CASE-00201",
+    "officerId": "O-002",
+    "timestamp": "2026-03-12T08:50:00Z",
+    "action": "case-created",
+    "description": "Case CASE-00201 created: Kasoa Fuel Station Robbery"
+  },
+  {
+    "id": "A-032",
+    "caseId": "CASE-00201",
+    "officerId": "O-002",
+    "timestamp": "2026-03-12T09:15:00Z",
+    "action": "person-added",
+    "description": "Added Kofi Boateng to the case"
+  },
+  {
+    "id": "A-033",
+    "caseId": "CASE-00201",
+    "officerId": "O-002",
+    "timestamp": "2026-03-12T09:30:00Z",
+    "action": "evidence-uploaded",
+    "description": "Evidence E-032 uploaded: Recovered Balaclava"
+  },
+  {
+    "id": "A-034",
+    "caseId": "CASE-00201",
+    "officerId": "O-002",
+    "timestamp": "2026-03-20T16:00:00Z",
+    "action": "status-changed",
+    "description": "Case status changed: INVESTIGATING → CLOSED"
+  },
+  {
+    "id": "A-035",
+    "caseId": "CASE-00202",
+    "officerId": "O-004",
+    "timestamp": "2026-09-18T14:00:00Z",
+    "action": "case-created",
+    "description": "Case CASE-00202 created: Accra Mall Parking Vehicle Theft"
+  },
+  {
+    "id": "A-036",
+    "caseId": "CASE-00202",
+    "officerId": "O-004",
+    "timestamp": "2026-09-18T15:30:00Z",
+    "action": "evidence-uploaded",
+    "description": "Evidence E-033 uploaded: Shattered Quarter Glass"
+  },
+  {
+    "id": "A-037",
+    "caseId": "CASE-00203",
+    "officerId": "O-006",
+    "timestamp": "2026-10-01T11:00:00Z",
+    "action": "case-created",
+    "description": "Case CASE-00203 created: Osu Mobile Money Fraud"
+  },
+  {
+    "id": "A-038",
+    "caseId": "CASE-00203",
+    "officerId": "O-006",
+    "timestamp": "2026-10-01T11:45:00Z",
+    "action": "evidence-uploaded",
+    "description": "Evidence E-034 uploaded: Burner Mobile Handset"
+  },
+  {
+    "id": "A-039",
+    "caseId": "CASE-00203",
+    "officerId": "O-006",
+    "timestamp": "2026-10-01T12:00:00Z",
+    "action": "status-changed",
+    "description": "Linked phone records added to analysis queue"
+  },
+  {
+    "id": "A-040",
+    "caseId": "CASE-00204",
+    "officerId": "O-004",
+    "timestamp": "2024-05-10T09:00:00Z",
+    "action": "case-created",
+    "description": "Case CASE-00204 created: Takoradi Market Theft (2024)"
+  },
+  {
+    "id": "A-041",
+    "caseId": "CASE-00204",
+    "officerId": "O-004",
+    "timestamp": "2024-05-10T09:30:00Z",
+    "action": "evidence-uploaded",
+    "description": "Evidence E-035 uploaded: Pry Mark Impressions on Padlock"
+  },
+  {
+    "id": "A-042",
+    "caseId": "CASE-00204",
+    "officerId": "O-004",
+    "timestamp": "2024-05-20T17:00:00Z",
+    "action": "status-changed",
+    "description": "Case status changed: INVESTIGATING → CLOSED"
   }
 ];

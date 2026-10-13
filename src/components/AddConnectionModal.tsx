@@ -4,7 +4,7 @@ import FormField from './FormField'
 import EntityPicker from './EntityPicker'
 import { useInvestigationStore } from '../store/useInvestigationStore'
 import { validateConnectionInput } from '../lib/validation'
-import { getCasePeople } from '../lib/caseScope'
+import { getCasePeople, getCaseLocations, getCaseIncidents, getCaseVehicles } from '../lib/caseScope'
 import type { InvestigationEdge } from '../types'
 
 interface AddConnectionModalProps {
@@ -54,7 +54,9 @@ export default function AddConnectionModal({
   // Options for Target EntityPicker based on relationship
   const targetOptions = useMemo(() => {
     if (relationship === 'visited') {
-      return data.locations.map(loc => ({
+      const caseLocations = getCaseLocations(data, caseId)
+      const list = caseLocations.length > 0 ? caseLocations : data.locations
+      return list.map(loc => ({
         id: loc.id,
         label: `${loc.name} (${loc.city})`,
         subLabel: loc.region,
@@ -62,7 +64,9 @@ export default function AddConnectionModal({
       }))
     }
     if (relationship === 'involved-in' || relationship === 'witnessed') {
-      return data.incidents.map(inc => ({
+      const caseIncidents = getCaseIncidents(data, caseId)
+      const list = caseIncidents.length > 0 ? caseIncidents : data.incidents
+      return list.map(inc => ({
         id: inc.id,
         label: inc.title,
         subLabel: `${inc.id} · ${inc.status}`,
@@ -70,7 +74,9 @@ export default function AddConnectionModal({
       }))
     }
     if (relationship === 'owns' || relationship === 'connected-to') {
-      return data.vehicles.map(v => ({
+      const caseVehicles = getCaseVehicles(data, caseId)
+      const list = caseVehicles.length > 0 ? caseVehicles : data.vehicles
+      return list.map(v => ({
         id: v.id,
         label: `${v.registration} — ${v.make} ${v.model}`,
         subLabel: v.color,
@@ -78,7 +84,7 @@ export default function AddConnectionModal({
       }))
     }
     return []
-  }, [relationship, data])
+  }, [relationship, data, caseId])
 
   const personOptions = useMemo(() => {
     return casePeople.map(p => ({

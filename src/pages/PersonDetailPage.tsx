@@ -1,34 +1,131 @@
+import { useMemo, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { useEffect } from 'react'
 import { useInvestigationStore } from '../store/useInvestigationStore'
 import { buildGraph, getNeighbors, getNodeType, getNodeEdges } from '../lib/graph'
+import { findConnections } from '../lib/connections'
+import { normaliseWords } from '../lib/caseComparison'
 import PageHeader from '../components/PageHeader'
 import Card from '../components/Card'
 import EmptyState from '../components/EmptyState'
 import EntityIcon from '../components/EntityIcon'
 import EntityTypeBadge from '../components/EntityTypeBadge'
-import type { EntityType } from '../types'
-import { findConnections } from '../lib/connections'
+import PriorityBadge from '../components/PriorityBadge'
+import StatusBadge from '../components/StatusBadge'
 import ConnectionScoreCard from '../components/ConnectionScoreCard'
+import type { EntityType, Person } from '../types'
+import { Briefcase, Info } from 'lucide-react'
+
+function CurrentPastBadge({ isPast }: { isPast: boolean }) {
+  return isPast ? (
+    <span className="inline-flex items-center rounded-full bg-slate-100 border border-slate-200 px-2 py-0.5 text-[13px] font-medium text-slate-600">
+      Past
+    </span>
+  ) : (
+    <span className="inline-flex items-center rounded-full bg-emerald-100 border border-emerald-200 px-2 py-0.5 text-[13px] font-medium text-emerald-800">
+      Current
+    </span>
+  )
+}
+
+interface SimilarPersonMatch {
+  person: Person
+  kind: 'Exact name' | 'Shared alias' | 'Surname only' | 'Similar spelling'
+  term: string
+}
 
 export default function PersonDetailPage() {
   const { id } = useParams<{ id: string }>()
   const data = useInvestigationStore(s => s.data)
   const entity = data.persons.find(x => x.id === id)
-  
+
   useEffect(() => {
     document.title = entity ? `${entity.fullName} · Incident Investigation System` : 'Not Found · IIS'
   }, [entity])
-  
+
+  const graph = useMemo(() => buildGraph(data), [data])
+
+  // Possible same person matches across other records
+  const possibleSamePersonMatches = useMemo(() => {
+    if (!entity) return []
+    const wordsA = normaliseWords(entity.fullName)
+    const aliasesA = (entity.knownAliases ?? []).map(a => normaliseWords(a).join(' '))
+    const strA = wordsA.join(' ')
+
+    const matches: SimilarPersonMatch[] = []
+
+    for (const other of data.persons) {
+      if (other.id === entity.id) continue
+
+      const wordsB = normaliseWords(other.fullName)
+      const aliasesB = (other.knownAliases ?? []).map(b => normaliseWords(b).join(' '))
+      const strB = wordsB.join(' ')
+
+      // 1. Exact name match
+      if (
+        wordsA.length === wordsB.length &&
+        wordsA.length > 0 &&
+        [...wordsA].sort().join(' ') === [...wordsB].sort().join(' ')
+      ) {
+        matches.push({ person: other, kind: 'Exact name', term: other.fullName })
+        continue
+      }
+
+      // 2. Shared alias
+      let matchedAlias: string | null = null
+      for (const a of aliasesA) {
+        if (!a) continue
+        if (aliasesB.includes(a) || a === strB) {
+          matchedAlias = a
+          break
+        }
+      }
+      if (!matchedAlias) {
+        for (const b of aliasesB) {
+          if (!b) continue
+          if (aliasesA.includes(b) || b === strA) {
+            matchedAlias = b
+            break
+          }
+        }
+      }
+
+      if (matchedAlias) {
+        matches.push({ person: other, kind: 'Shared alias', term: matchedAlias })
+        continue
+      }
+
+      // 3. Surname only (same last word, first words differ)
+      const commonWords = wordsA.filter(w => wordsB.includes(w))
+      const isFirstWordA = wordsA[0] !== undefined
+      const isFirstWordB = wordsB[0] !== undefined
+      const firstNameMatch = isFirstWordA && isFirstWordB && wordsA[0] === wordsB[0]
+
+      if (commonWords.length === 1 && !firstNameMatch) {
+        const sharedWord = commonWords[0]
+        if (sharedWord.length >= 4) {
+          matches.push({ person: other, kind: 'Surname only', term: sharedWord })
+          continue
+        }
+      }
+    }
+
+    return matches
+  }, [entity, data.persons])
+
   if (!entity) {
-    return <EmptyState title="Not found" description="No record with this id." action={<Link to="/persons" className="text-blue-600 hover:underline">← Back to list</Link>} />
+    return (
+      <EmptyState
+        title="Not found"
+        description="No record with this id."
+        action={<Link to="/persons" className="text-blue-600 hover:underline">← Back to list</Link>}
+      />
+    )
   }
-  
-  const graph = buildGraph(data)
+
   const neighborIds = getNeighbors(graph, entity.id)
   const nodeEdges = getNodeEdges(graph, entity.id)
-  
-  const neighborsByType: Record<EntityType, Array<{id: string, label: string, relationship: string}>> = {
+
+  const neighborsByType: Record<EntityType, Array<{ id: string; label: string; relationship: string }>> = {
     person: [], incident: [], vehicle: [], evidence: [], location: []
   }
   for (const nid of neighborIds) {
@@ -38,21 +135,142 @@ export default function PersonDetailPage() {
     const label = graph.nodes.find(n => n.id === nid)?.label ?? nid
     neighborsByType[ntype].push({ id: nid, label, relationship: edge?.relationship ?? 'connected-to' })
   }
-  
+
   return (
     <div className="space-y-6">
       <PageHeader title={entity.fullName} description={`Person Profile: ${entity.id}`} />
+
+      {/* Details Card */}
       <Card title="Details">
-        <div className="grid grid-cols-2 gap-4">
-          <div><span className="font-semibold text-slate-500 block">Type</span><EntityTypeBadge type={entity.type} /></div>
-          <div><span className="font-semibold text-slate-500 block">Phone</span>{entity.phone || '—'}</div>
-          <div><span className="font-semibold text-slate-500 block">Address</span>{entity.address || '—'}</div>
-          <div><span className="font-semibold text-slate-500 block">Aliases</span>{(entity.knownAliases || []).join(', ') || '—'}</div>
-          <div><span className="font-semibold text-slate-500 block">Related Cases</span>
-            {entity.relatedCases.map(cid => <div key={cid}><Link to={`/cases/${cid}`} className="text-blue-600 hover:underline">{cid}</Link></div>)}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div>
+            <span className="font-semibold text-slate-500 block text-[13px]">Type</span>
+            <EntityTypeBadge type={entity.type} />
+          </div>
+          <div>
+            <span className="font-semibold text-slate-500 block text-[13px]">Phone</span>
+            <span className="text-[15px] font-mono">{entity.phone || '—'}</span>
+          </div>
+          <div>
+            <span className="font-semibold text-slate-500 block text-[13px]">Address</span>
+            <span className="text-[15px]">{entity.address || '—'}</span>
+          </div>
+          <div>
+            <span className="font-semibold text-slate-500 block text-[13px]">Aliases</span>
+            <span className="text-[15px]">{(entity.knownAliases || []).join(', ') || '—'}</span>
           </div>
         </div>
       </Card>
+
+      {/* NEW SECTION 1: APPEARS IN CASES */}
+      <Card title={`Appears in cases (${entity.relatedCases.length})`}>
+        {entity.relatedCases.length === 0 ? (
+          <p className="text-[14px] text-slate-500">This individual is not assigned to any case records.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {entity.relatedCases.map(cid => {
+              const kase = data.cases.find(c => c.id === cid)
+              const isPast = kase?.status === 'closed'
+
+              return (
+                <div
+                  key={cid}
+                  className="rounded-lg border border-slate-200 bg-white p-3.5 space-y-2 hover:border-blue-300 transition-colors shadow-xs"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <Link to={`/cases/${cid}`} className="font-mono text-[15px] font-bold text-blue-600 hover:underline">
+                          {cid}
+                        </Link>
+                        <CurrentPastBadge isPast={isPast} />
+                      </div>
+                      <p className="text-[14px] font-semibold text-slate-900 mt-0.5">{kase?.title ?? cid}</p>
+                    </div>
+                    {kase && <PriorityBadge priority={kase.priority} />}
+                  </div>
+
+                  {kase && (
+                    <div className="flex items-center justify-between text-[13px] text-slate-500 pt-1 border-t border-slate-100">
+                      <span className="capitalize">Type: {kase.type}</span>
+                      <StatusBadge status={kase.status} />
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </Card>
+
+      {/* NEW SECTION 2: POSSIBLE SAME PERSON IN OTHER RECORDS */}
+      <Card title="Possible same person in other records">
+        <div className="space-y-4">
+          <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 flex items-start gap-2.5">
+            <Info className="h-4 w-4 text-slate-500 shrink-0 mt-0.5" />
+            <p className="text-[14px] text-slate-700">
+              These are different records. Check whether they are the same person.
+            </p>
+          </div>
+
+          {possibleSamePersonMatches.length === 0 ? (
+            <p className="text-[14px] text-slate-500">
+              No other person records match this name or alias.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {possibleSamePersonMatches.map((m, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-xl border border-slate-200 bg-white p-4 space-y-2.5 shadow-sm"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Link
+                        to={`/persons/${m.person.id}`}
+                        className="text-[16px] font-bold text-blue-600 hover:underline"
+                      >
+                        {m.person.fullName}
+                      </Link>
+                      <span className="font-mono text-[13px] text-slate-400">{m.person.id}</span>
+                      <EntityTypeBadge type={m.person.type} />
+                    </div>
+                    <span className="inline-flex items-center rounded-full bg-purple-100 border border-purple-200 px-2.5 py-0.5 text-[13px] font-bold text-purple-800">
+                      {m.kind}: &ldquo;{m.term}&rdquo;
+                    </span>
+                  </div>
+
+                  {m.person.knownAliases && m.person.knownAliases.length > 0 && (
+                    <p className="text-[13px] text-slate-500">
+                      Aliases: {m.person.knownAliases.join(', ')}
+                    </p>
+                  )}
+
+                  <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100">
+                    <span className="text-[13px] font-semibold text-slate-600">Cases involved:</span>
+                    {m.person.relatedCases.map(cid => {
+                      const kase = data.cases.find(c => c.id === cid)
+                      return (
+                        <Link
+                          key={cid}
+                          to={`/cases/${cid}`}
+                          className="inline-flex items-center gap-1.5 rounded border border-slate-200 bg-slate-50 px-2 py-0.5 text-[13px] font-medium text-slate-700 hover:bg-slate-100"
+                        >
+                          <Briefcase className="h-3 w-3 text-slate-400" />
+                          <span className="font-mono">{cid}</span>
+                          <CurrentPastBadge isPast={kase?.status === 'closed'} />
+                        </Link>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </Card>
+
+      {/* Linked to Card */}
       <Card title="Linked to">
         <div className="space-y-4">
           {Object.entries(neighborsByType).map(([type, items]) => {
@@ -76,6 +294,8 @@ export default function PersonDetailPage() {
           })}
         </div>
       </Card>
+
+      {/* Connections Card */}
       <div id="connections-section">
         <Card title="Connections">
           {(() => {

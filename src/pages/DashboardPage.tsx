@@ -2,13 +2,14 @@ import { useMemo, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useInvestigationStore } from '../store/useInvestigationStore'
 import { getDashboardStats } from '../lib/dashboard'
+import { findAllCaseLinks, type ComparisonLevel } from '../lib/caseComparison'
 import PageHeader from '../components/PageHeader'
 import StatCard from '../components/StatCard'
 import PriorityBadge from '../components/PriorityBadge'
 import ActivityFeed from '../components/ActivityFeed'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
 import { getOfficerName } from '../lib/lookup'
-import { Briefcase, AlertTriangle, Users, FileSearch, Search } from 'lucide-react'
+import { Briefcase, AlertTriangle, Users, FileSearch, Search, GitCompare, ArrowRight } from 'lucide-react'
 
 const STATUS_COLORS: Record<string, string> = {
   open: '#0d9488', // teal
@@ -19,6 +20,32 @@ const STATUS_COLORS: Record<string, string> = {
 
 const TYPE_COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316', '#eab308', '#22c55e', '#14b8a6']
 
+function ComparisonBadge({ level }: { level: ComparisonLevel }) {
+  const colors: Record<ComparisonLevel, string> = {
+    'WEAK': 'bg-slate-100 text-slate-700 border-slate-200',
+    'MODERATE': 'bg-blue-100 text-blue-800 border-blue-200',
+    'STRONG': 'bg-orange-100 text-orange-800 border-orange-200',
+    'VERY STRONG': 'bg-red-100 text-red-800 border-red-200',
+  }
+  return (
+    <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[13px] font-semibold ${colors[level]}`}>
+      {level}
+    </span>
+  )
+}
+
+function CurrentPastBadge({ isPast }: { isPast: boolean }) {
+  return isPast ? (
+    <span className="inline-flex items-center rounded-full bg-slate-100 border border-slate-200 px-2 py-0.5 text-[13px] font-medium text-slate-600">
+      Past
+    </span>
+  ) : (
+    <span className="inline-flex items-center rounded-full bg-emerald-100 border border-emerald-200 px-2 py-0.5 text-[13px] font-medium text-emerald-800">
+      Current
+    </span>
+  )
+}
+
 export default function DashboardPage() {
   useEffect(() => {
     document.title = 'Dashboard · Incident Investigation System'
@@ -26,6 +53,11 @@ export default function DashboardPage() {
 
   const data = useInvestigationStore(s => s.data)
   const stats = useMemo(() => getDashboardStats(data), [data])
+
+  // Step 13: Top 5 strongest case links
+  const topCaseLinks = useMemo(() => {
+    return findAllCaseLinks(data, 4).slice(0, 5)
+  }, [data])
 
   const statusData = Object.entries(stats.casesByStatus).map(([name, value]) => ({
     name: name.charAt(0).toUpperCase() + name.slice(1),
@@ -99,6 +131,99 @@ export default function DashboardPage() {
             </ResponsiveContainer>
           </div>
         </div>
+      </div>
+
+      {/* STEP 13: STRONGEST CASE LINKS */}
+      <div className="bg-white rounded-lg border border-slate-200 p-5 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-[17px] font-bold text-slate-900 flex items-center gap-2">
+              <GitCompare className="h-5 w-5 text-blue-600" />
+              <span>Strongest case links</span>
+            </h2>
+            <p className="text-[13px] text-slate-500">
+              Highest scoring cross-case relationships detected across shared subjects, vehicles, phones, and evidence.
+            </p>
+          </div>
+          <Link
+            to="/graph"
+            className="text-[13px] font-semibold text-blue-600 hover:underline flex items-center gap-1"
+          >
+            <span>View case network</span>
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+
+        {topCaseLinks.length === 0 ? (
+          <p className="text-[14px] text-slate-500 py-3 text-center">No strong case links detected.</p>
+        ) : (
+          <div className="divide-y divide-slate-100">
+            {topCaseLinks.map((link, idx) => {
+              const caseA = data.cases.find(c => c.id === link.caseAId)
+              const caseB = data.cases.find(c => c.id === link.caseBId)
+              const isPastA = caseA?.status === 'closed'
+              const isPastB = caseB?.status === 'closed'
+
+              return (
+                <div
+                  key={idx}
+                  className="flex flex-wrap items-center justify-between gap-4 py-3 first:pt-0 last:pb-0"
+                >
+                  {/* Case A */}
+                  <div className="flex-1 min-w-[200px]">
+                    <div className="flex items-center gap-2">
+                      <Link
+                        to={`/cases/${link.caseAId}`}
+                        className="font-mono text-[14px] font-bold text-blue-600 hover:underline"
+                      >
+                        {link.caseAId}
+                      </Link>
+                      <CurrentPastBadge isPast={isPastA} />
+                    </div>
+                    <p className="text-[13px] text-slate-700 font-medium truncate max-w-[240px]">
+                      {caseA?.title}
+                    </p>
+                  </div>
+
+                  {/* Score & Badges */}
+                  <div className="flex flex-col items-center justify-center text-center px-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[18px] font-extrabold text-slate-900">{link.score}</span>
+                      <ComparisonBadge level={link.level} />
+                    </div>
+                  </div>
+
+                  {/* Case B */}
+                  <div className="flex-1 min-w-[200px]">
+                    <div className="flex items-center gap-2">
+                      <Link
+                        to={`/cases/${link.caseBId}`}
+                        className="font-mono text-[14px] font-bold text-blue-600 hover:underline"
+                      >
+                        {link.caseBId}
+                      </Link>
+                      <CurrentPastBadge isPast={isPastB} />
+                    </div>
+                    <p className="text-[13px] text-slate-700 font-medium truncate max-w-[240px]">
+                      {caseB?.title}
+                    </p>
+                  </div>
+
+                  {/* Compare Action */}
+                  <div className="shrink-0">
+                    <Link
+                      to={`/cases/${link.caseAId}/compare/${link.caseBId}`}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-3 py-1.5 text-[13px] font-semibold text-blue-700 hover:bg-blue-100 transition-colors"
+                    >
+                      <GitCompare className="h-3.5 w-3.5" />
+                      <span>Compare</span>
+                    </Link>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -32,6 +32,8 @@ import AddConnectionModal from '../components/AddConnectionModal'
 import UploadEvidenceModal from '../components/UploadEvidenceModal'
 import AddLocationToCaseModal from '../components/AddLocationToCaseModal'
 import AddNewVehicleModal from '../components/AddNewVehicleModal'
+import ConfirmDeleteModal from '../components/ConfirmDeleteModal'
+import EditPersonModal from '../components/EditPersonModal'
 import type {
   ActivityLogEntry,
   Case,
@@ -357,8 +359,11 @@ function OverviewTab({
 }
 
 function PeopleTab({ kase, people }: { kase: Case; people: Person[] }) {
+  const removePersonFromCase = useInvestigationStore(s => s.removePersonFromCase)
   const [isAddPersonOpen, setIsAddPersonOpen] = useState(false)
   const [connectionPersonId, setConnectionPersonId] = useState<string | null>(null)
+  const [editingPerson, setEditingPerson] = useState<Person | null>(null)
+  const [removingPerson, setRemovingPerson] = useState<Person | null>(null)
 
   const byType: Record<string, Person[]> = {
     suspect: [],
@@ -427,16 +432,38 @@ function PeopleTab({ kase, people }: { kase: Case; people: Person[] }) {
                     key: 'actions',
                     header: '',
                     render: (r: Person) => (
-                      <button
-                        type="button"
-                        onClick={e => {
-                          e.stopPropagation()
-                          setConnectionPersonId(r.id)
-                        }}
-                        className="text-[13px] text-blue-600 hover:text-blue-800 hover:underline font-medium"
-                      >
-                        + Add connection
-                      </button>
+                      <div className="flex items-center gap-3 justify-end">
+                        <button
+                          type="button"
+                          onClick={e => {
+                            e.stopPropagation()
+                            setEditingPerson(r)
+                          }}
+                          className="text-[13px] text-slate-600 hover:text-slate-900 hover:underline font-medium"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={e => {
+                            e.stopPropagation()
+                            setConnectionPersonId(r.id)
+                          }}
+                          className="text-[13px] text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                        >
+                          + Add connection
+                        </button>
+                        <button
+                          type="button"
+                          onClick={e => {
+                            e.stopPropagation()
+                            setRemovingPerson(r)
+                          }}
+                          className="text-[13px] text-red-600 hover:text-red-800 hover:underline font-medium"
+                        >
+                          Remove
+                        </button>
+                      </div>
                     ),
                   },
                 ]}
@@ -454,6 +481,27 @@ function PeopleTab({ kase, people }: { kase: Case; people: Person[] }) {
         isOpen={isAddPersonOpen}
         onClose={() => setIsAddPersonOpen(false)}
         caseId={kase.id}
+      />
+
+      <EditPersonModal
+        isOpen={Boolean(editingPerson)}
+        onClose={() => setEditingPerson(null)}
+        person={editingPerson}
+        caseId={kase.id}
+      />
+
+      <ConfirmDeleteModal
+        isOpen={Boolean(removingPerson)}
+        onClose={() => setRemovingPerson(null)}
+        onConfirm={() => {
+          if (removingPerson) {
+            removePersonFromCase(kase.id, removingPerson.id)
+          }
+        }}
+        title="Remove Person from Case"
+        message="Are you sure you want to remove this person from the case? This will disconnect the person from this investigation."
+        entityName={removingPerson ? `${removingPerson.fullName} (${removingPerson.type})` : undefined}
+        confirmText="Remove from Case"
       />
 
       <AddConnectionModal
@@ -541,7 +589,9 @@ function EvidenceTab({ kase, evidence }: { kase: Case; evidence: Evidence[] }) {
 
 function LocationsTab({ kase, locations }: { kase: Case; locations: Location[] }) {
   const data = useInvestigationStore(s => s.data)
+  const removeLocationFromCase = useInvestigationStore(s => s.removeLocationFromCase)
   const [isAddLocationOpen, setIsAddLocationOpen] = useState(false)
+  const [removingLocation, setRemovingLocation] = useState<Location | null>(null)
 
   function getConnectionReason(locId: string): string {
     const reasons = []
@@ -591,6 +641,24 @@ function LocationsTab({ kase, locations }: { kase: Case; locations: Location[] }
               },
               { key: 'city', header: 'City', render: (r: Location) => r.city },
               { key: 'reason', header: 'Connected Via', render: (r: Location) => getConnectionReason(r.id) },
+              {
+                key: 'actions',
+                header: '',
+                render: (r: Location) => (
+                  <div className="text-right">
+                    <button
+                      type="button"
+                      onClick={e => {
+                        e.stopPropagation()
+                        setRemovingLocation(r)
+                      }}
+                      className="text-[13px] text-red-600 hover:text-red-800 hover:underline font-medium"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ),
+              },
             ]}
             rows={locations}
             getRowKey={(r: Location) => r.id}
@@ -617,6 +685,20 @@ function LocationsTab({ kase, locations }: { kase: Case; locations: Location[] }
         onClose={() => setIsAddLocationOpen(false)}
         caseId={kase.id}
       />
+
+      <ConfirmDeleteModal
+        isOpen={Boolean(removingLocation)}
+        onClose={() => setRemovingLocation(null)}
+        onConfirm={() => {
+          if (removingLocation) {
+            removeLocationFromCase(kase.id, removingLocation.id)
+          }
+        }}
+        title="Remove Location from Case"
+        message="Are you sure you want to remove this location from the case? This will disconnect visits, sightings, and related traces for this investigation."
+        entityName={removingLocation ? `${removingLocation.name} (${removingLocation.city})` : undefined}
+        confirmText="Remove from Case"
+      />
     </div>
   )
 }
@@ -624,23 +706,27 @@ function LocationsTab({ kase, locations }: { kase: Case; locations: Location[] }
 function VehiclesTab({ kase, vehicles }: { kase: Case; vehicles: Vehicle[] }) {
   const data = useInvestigationStore(s => s.data)
   const linkVehicleToPerson = useInvestigationStore(s => s.linkVehicleToPerson)
+  const removeVehicleFromCase = useInvestigationStore(s => s.removeVehicleFromCase)
 
   const [isAddVehicleOpen, setIsAddVehicleOpen] = useState(false)
+  const [removingVehicle, setRemovingVehicle] = useState<Vehicle | null>(null)
   const casePeople = useMemo(() => getCasePeople(data, kase.id), [data, kase.id])
 
-  const [linkVehId, setLinkVehId] = useState(data.vehicles[0]?.id || '')
+  const [linkVehId, setLinkVehId] = useState('')
   const [linkPersonId, setLinkPersonId] = useState('')
   const [linkRel, setLinkRel] = useState<'owns' | 'connected-to'>('connected-to')
   const [linkSuccess, setLinkSuccess] = useState('')
 
-  const effectivePersonId = linkPersonId || casePeople[0]?.id || ''
-
   function handleLinkSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!linkVehId || !effectivePersonId) return
-    linkVehicleToPerson(kase.id, linkVehId, effectivePersonId, linkRel)
-    setLinkSuccess('Vehicle linked to person successfully.')
-    setTimeout(() => setLinkSuccess(''), 3000)
+    if (!linkVehId || !linkPersonId) return
+    linkVehicleToPerson(kase.id, linkVehId, linkPersonId, linkRel)
+    const veh = vehicles.find(v => v.id === linkVehId)
+    const person = casePeople.find(p => p.id === linkPersonId)
+    setLinkSuccess(`Linked ${veh?.registration ?? linkVehId} to ${person?.fullName ?? linkPersonId} as "${linkRel}".`)
+    setLinkVehId('')
+    setLinkPersonId('')
+    setTimeout(() => setLinkSuccess(''), 4000)
   }
 
   return (
@@ -678,6 +764,24 @@ function VehiclesTab({ kase, vehicles }: { kase: Case; vehicles: Vehicle[] }) {
                 key: 'owner',
                 header: 'Owner',
                 render: (r: Vehicle) => (r.ownerId ? getPersonName(data, r.ownerId) : 'Unknown'),
+              },
+              {
+                key: 'actions',
+                header: '',
+                render: (r: Vehicle) => (
+                  <div className="text-right">
+                    <button
+                      type="button"
+                      onClick={e => {
+                        e.stopPropagation()
+                        setRemovingVehicle(r)
+                      }}
+                      className="text-[13px] text-red-600 hover:text-red-800 hover:underline font-medium"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ),
               },
             ]}
             rows={vehicles}
@@ -717,9 +821,10 @@ function VehiclesTab({ kase, vehicles }: { kase: Case; vehicles: Vehicle[] }) {
                 <select
                   value={linkVehId}
                   onChange={e => setLinkVehId(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-base focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-blue-500 focus:outline-none"
                 >
-                  {data.vehicles.map(v => (
+                  <option value="">Select a vehicle…</option>
+                  {vehicles.map(v => (
                     <option key={v.id} value={v.id}>
                       {v.registration} — {v.make} {v.model}
                     </option>
@@ -732,10 +837,11 @@ function VehiclesTab({ kase, vehicles }: { kase: Case; vehicles: Vehicle[] }) {
                   Case Person
                 </label>
                 <select
-                  value={effectivePersonId}
+                  value={linkPersonId}
                   onChange={e => setLinkPersonId(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-base focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-blue-500 focus:outline-none"
                 >
+                  <option value="">Select a person…</option>
                   {casePeople.map(p => (
                     <option key={p.id} value={p.id}>
                       {p.fullName} ({p.type})
@@ -751,7 +857,7 @@ function VehiclesTab({ kase, vehicles }: { kase: Case; vehicles: Vehicle[] }) {
                 <select
                   value={linkRel}
                   onChange={e => setLinkRel(e.target.value as 'owns' | 'connected-to')}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-base focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-blue-500 focus:outline-none"
                 >
                   <option value="connected-to">connected-to</option>
                   <option value="owns">owns</option>
@@ -762,7 +868,8 @@ function VehiclesTab({ kase, vehicles }: { kase: Case; vehicles: Vehicle[] }) {
             <div className="flex justify-end">
               <button
                 type="submit"
-                className="rounded-lg bg-blue-600 px-4 py-2 text-[14px] font-medium text-white hover:bg-blue-700"
+                disabled={!linkVehId || !linkPersonId}
+                className="rounded-lg bg-blue-600 px-4 py-2 text-[14px] font-medium text-white hover:bg-blue-700 disabled:opacity-50"
               >
                 Link Vehicle
               </button>
@@ -775,6 +882,20 @@ function VehiclesTab({ kase, vehicles }: { kase: Case; vehicles: Vehicle[] }) {
         isOpen={isAddVehicleOpen}
         onClose={() => setIsAddVehicleOpen(false)}
         caseId={kase.id}
+      />
+
+      <ConfirmDeleteModal
+        isOpen={Boolean(removingVehicle)}
+        onClose={() => setRemovingVehicle(null)}
+        onConfirm={() => {
+          if (removingVehicle) {
+            removeVehicleFromCase(kase.id, removingVehicle.id)
+          }
+        }}
+        title="Remove Vehicle from Case"
+        message="Are you sure you want to remove this vehicle from the case? This will disconnect the vehicle from this case's people and incidents."
+        entityName={removingVehicle ? `${removingVehicle.registration} (${removingVehicle.make} ${removingVehicle.model})` : undefined}
+        confirmText="Remove from Case"
       />
     </div>
   )

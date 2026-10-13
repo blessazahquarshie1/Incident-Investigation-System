@@ -130,5 +130,45 @@ export const incidents: Incident[] = [
     "locationId": "L-004",
     "occurredAt": "2026-01-01T00:00:00Z",
     "status": "resolved"
+  },
+  {
+    "id": "I-024",
+    "caseId": "CASE-00201",
+    "title": "Kasoa Fuel Station Cash Robbery",
+    "description": "Armed robbery at cash counter during morning shift handover",
+    "type": "theft",
+    "locationId": "L-003",
+    "occurredAt": "2026-03-12T08:50:00Z",
+    "status": "resolved"
+  },
+  {
+    "id": "I-025",
+    "caseId": "CASE-00202",
+    "title": "Basement Parking Car Break-in",
+    "description": "Saloon car broken into and driven out of the parking structure",
+    "type": "theft",
+    "locationId": "L-001",
+    "occurredAt": "2026-09-18T14:45:00Z",
+    "status": "unresolved"
+  },
+  {
+    "id": "I-026",
+    "caseId": "CASE-00203",
+    "title": "Mobile Money Kiosk Transfer Fraud",
+    "description": "Unauthorised transfer of funds using cloned SIM credentials",
+    "type": "fraud",
+    "locationId": "L-007",
+    "occurredAt": "2026-10-01T10:30:00Z",
+    "status": "unresolved"
+  },
+  {
+    "id": "I-027",
+    "caseId": "CASE-00204",
+    "title": "Hardware Warehouse Forcible Entry",
+    "description": "Padlocks pried open and copper fittings removed",
+    "type": "theft",
+    "locationId": "L-005",
+    "occurredAt": "2024-05-10T02:15:00Z",
+    "status": "resolved"
   }
 ];

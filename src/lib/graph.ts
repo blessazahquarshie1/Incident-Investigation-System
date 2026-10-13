@@ -110,5 +110,16 @@ export function getLinkedCaseIds(data: InvestigationData, graph: Graph, nodeId: 
     }
   }
   
+  // Direct relationships to case nodes (e.g. vehicle linked to case)
+  for (const r of data.relationships) {
+    if (r.source === nodeId && r.target.startsWith('CASE-')) caseIds.add(r.target)
+    if (r.target === nodeId && r.source.startsWith('CASE-')) caseIds.add(r.source)
+  }
+
+  // Sightings linked to this node
+  for (const s of data.sightings) {
+    if (s.vehicleId === nodeId || s.personId === nodeId) caseIds.add(s.caseId)
+  }
+
   return Array.from(caseIds).filter(Boolean)
 }

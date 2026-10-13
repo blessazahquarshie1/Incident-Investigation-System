@@ -21,6 +21,7 @@ import { nextId } from '../lib/ids'
 import { applyCustodyAction } from '../lib/custody'
 import { getOfficerName, getPersonName, getLocationName, getEntityLabel } from '../lib/lookup'
 import { findExistingLocation } from '../lib/validation'
+import { getCasePeople, getCaseIncidents, getCaseEvidence } from '../lib/caseScope'
 
 interface InvestigationStore {
   data: InvestigationData
@@ -60,7 +61,7 @@ interface InvestigationStore {
   createVehicle: (
     caseId: string,
     input: { registration: string; make: string; model: string; color: string },
-    connections: Array<{ targetId: string; relationship: 'owns' | 'connected-to' | 'involved-in' }>
+    connections?: Array<{ targetId: string; relationship: 'owns' | 'connected-to' | 'involved-in' }>
   ) => Vehicle
   addConnection: (caseId: string, edge: InvestigationEdge) => void
   addWitnessStatement: (
@@ -97,6 +98,19 @@ interface InvestigationStore {
       otherNumber?: string
     }
   ) => PhoneRecord
+  removePersonFromCase: (caseId: string, personId: string) => void
+  removeVehicleFromCase: (caseId: string, vehicleId: string) => void
+  removeLocationFromCase: (caseId: string, locationId: string) => void
+  updatePerson: (
+    personId: string,
+    input: {
+      fullName: string
+      type: Person['type']
+      phone?: string
+      address?: string
+      knownAliases?: string[]
+    }
+  ) => void
 }
 
 export const useInvestigationStore = create<InvestigationStore>((set, get) => ({
@@ -442,7 +456,7 @@ export const useInvestigationStore = create<InvestigationStore>((set, get) => ({
     })
   },
 
-  createVehicle: (caseId, input, connections) => {
+  createVehicle: (caseId, input, connections = []) => {
     const state = get()
     const id = nextId('V', state.data.vehicles.map(v => v.id))
     const now = new Date().toISOString()
@@ -561,5 +575,180 @@ export const useInvestigationStore = create<InvestigationStore>((set, get) => ({
       description: `Phone record ${id} recorded`
     })
     return newPr
+  },
+
+  removePersonFromCase: (caseId, personId) => {
+    const state = get()
+    const person = state.data.persons.find(p => p.id === personId)
+    if (!person) return
+
+    const now = new Date().toISOString()
+    const caseIncidents = new Set(getCaseIncidents(state.data, caseId).map(i => i.id))
+    const caseEvidence = new Set(getCaseEvidence(state.data, caseId).map(e => e.id))
+
+    // 1. Remove caseId from person.relatedCases
+    const persons = state.data.persons.map(p =>
+      p.id === personId ? { ...p, relatedCases: p.relatedCases.filter(c => c !== caseId) } : p
+    )
+
+    // 2. Remove relationships between this person and this case's incidents or evidence
+    const relationships = state.data.relationships.filter(r => {
+      if (r.source === personId && (caseIncidents.has(r.target) || caseEvidence.has(r.target))) return false
+      if (r.target === personId && (caseIncidents.has(r.source) || caseEvidence.has(r.source))) return false
+      return true
+    })
+
+    // 3. Remove person from linkedPersons on this case's evidence
+    const evidence = state.data.evidence.map(e =>
+      e.caseId === caseId && e.linkedPersons.includes(personId)
+        ? { ...e, linkedPersons: e.linkedPersons.filter(id => id !== personId) }
+        : e
+    )
+
+    set((s) => ({
+      data: {
+        ...s.data,
+        persons,
+        relationships,
+        evidence,
+        cases: s.data.cases.map(c => c.id === caseId ? { ...c, updatedAt: now } : c),
+      }
+    }))
+
+    get().addActivity({
+      caseId,
+      action: 'status-changed',
+      description: `Removed person ${person.fullName} from case`,
+    })
+  },
+
+  removeVehicleFromCase: (caseId, vehicleId) => {
+    const state = get()
+    const vehicle = state.data.vehicles.find(v => v.id === vehicleId)
+    if (!vehicle) return
+
+    const now = new Date().toISOString()
+    const casePeople = getCasePeople(state.data, caseId)
+    const casePeopleIds = new Set(casePeople.map(p => p.id))
+    const caseIncidents = getCaseIncidents(state.data, caseId)
+    const caseIncidentIds = new Set(caseIncidents.map(i => i.id))
+
+    // 1. Remove relationships between this vehicle and this case's people or incidents
+    const relationships = state.data.relationships.filter(r => {
+      const isVehicleEndpoint = r.source === vehicleId || r.target === vehicleId
+      if (!isVehicleEndpoint) return true
+      const otherId = r.source === vehicleId ? r.target : r.source
+      if (casePeopleIds.has(otherId) || caseIncidentIds.has(otherId)) return false
+      return true
+    })
+
+    // 2. If vehicle.ownerId belongs to a person in this case, detach owner
+    const vehicles = state.data.vehicles.map(v => {
+      if (v.id === vehicleId && v.ownerId && casePeopleIds.has(v.ownerId)) {
+        return { ...v, ownerId: undefined }
+      }
+      return v
+    })
+
+    // 3. Remove sightings for this vehicle in this case
+    const sightings = state.data.sightings.filter(
+      s => !(s.caseId === caseId && s.vehicleId === vehicleId)
+    )
+
+    set((s) => ({
+      data: {
+        ...s.data,
+        vehicles,
+        relationships,
+        sightings,
+        cases: s.data.cases.map(c => c.id === caseId ? { ...c, updatedAt: now } : c),
+      }
+    }))
+
+    get().addActivity({
+      caseId,
+      action: 'status-changed',
+      description: `Removed vehicle ${vehicle.registration} from case`,
+    })
+  },
+
+  removeLocationFromCase: (caseId, locationId) => {
+    const state = get()
+    const loc = state.data.locations.find(l => l.id === locationId)
+    if (!loc) return
+
+    const now = new Date().toISOString()
+    const casePeople = getCasePeople(state.data, caseId)
+    const casePeopleIds = new Set(casePeople.map(p => p.id))
+
+    // 1. Remove visited relationships for case people to this location
+    const relationships = state.data.relationships.filter(
+      r => !(r.relationship === 'visited' && r.target === locationId && casePeopleIds.has(r.source))
+    )
+
+    // 2. Remove sightings for this location in this case
+    const sightings = state.data.sightings.filter(
+      s => !(s.caseId === caseId && s.locationId === locationId)
+    )
+
+    // 3. Clear locationId on this case's evidence
+    const evidence = state.data.evidence.map(e =>
+      e.caseId === caseId && e.locationId === locationId ? { ...e, locationId: undefined } : e
+    )
+
+    // 4. For incidents in this case at this location, fallback to another location if one exists
+    const otherLoc = state.data.locations.find(l => l.id !== locationId)
+    const incidents = state.data.incidents.map(i =>
+      i.caseId === caseId && i.locationId === locationId
+        ? { ...i, locationId: otherLoc ? otherLoc.id : '' }
+        : i
+    )
+
+    set((s) => ({
+      data: {
+        ...s.data,
+        relationships,
+        sightings,
+        evidence,
+        incidents,
+        cases: s.data.cases.map(c => c.id === caseId ? { ...c, updatedAt: now } : c),
+      }
+    }))
+
+    get().addActivity({
+      caseId,
+      action: 'status-changed',
+      description: `Removed location ${loc.name} from case`,
+    })
+  },
+
+  updatePerson: (personId, input) => {
+    const state = get()
+    const existing = state.data.persons.find(p => p.id === personId)
+    if (!existing) return
+
+    const updatedPerson: Person = {
+      ...existing,
+      fullName: input.fullName.trim(),
+      type: input.type,
+      phone: input.phone?.trim() || undefined,
+      address: input.address?.trim() || undefined,
+      knownAliases: input.knownAliases?.map(a => a.trim()).filter(Boolean) || undefined,
+    }
+
+    set((s) => ({
+      data: {
+        ...s.data,
+        persons: s.data.persons.map(p => p.id === personId ? updatedPerson : p),
+      }
+    }))
+
+    for (const cid of existing.relatedCases) {
+      get().addActivity({
+        caseId: cid,
+        action: 'status-changed',
+        description: `Updated details for ${input.fullName}`,
+      })
+    }
   }
 }))
