@@ -3,13 +3,15 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Briefcase, AlertTriangle, Users, FileSearch,
   Car, MapPin, Clock, Network, ShieldCheck, FileBarChart,
-  Search, Shield,
+  Search, Shield, RotateCcw,
 } from 'lucide-react'
 import { useInvestigationStore } from '../store/useInvestigationStore'
 import { buildGraph } from '../lib/graph'
 import { searchAll, getResultPath } from '../lib/search'
 import { searchByName } from '../lib/nameSearch'
 import EntityIcon from './EntityIcon'
+import ConnectionToast from './ConnectionToast'
+import ConfirmDeleteModal from './ConfirmDeleteModal'
 import type { SearchResult } from '../lib/search'
 import type { EntityType } from '../types'
 
@@ -29,8 +31,10 @@ const navItems = [
 
 export default function AppShell() {
   const data = useInvestigationStore(s => s.data)
+  const resetDemoData = useInvestigationStore(s => s.resetDemoData)
   const navigate = useNavigate()
 
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [showDropdown, setShowDropdown] = useState(false)
@@ -195,8 +199,29 @@ export default function AppShell() {
                 )
               })}
             </div>
-            <div className="hidden border-t border-slate-200 pt-3 text-[13px] text-slate-400 lg:block">
-              <p>v0.1.0 — Development</p>
+            <div className="border-t border-slate-200 pt-3 text-[13px] text-slate-400">
+              <div className="hidden lg:flex lg:flex-col lg:gap-1.5">
+                <div className="flex items-center justify-between">
+                  <p>v0.1.0 — Dev</p>
+                  <button
+                    type="button"
+                    onClick={() => setIsResetModalOpen(true)}
+                    className="text-[12px] text-slate-500 hover:text-red-600 hover:underline transition-colors cursor-pointer"
+                  >
+                    Reset demo data
+                  </button>
+                </div>
+              </div>
+              <div className="flex justify-center lg:hidden">
+                <button
+                  type="button"
+                  title="Reset demo data"
+                  onClick={() => setIsResetModalOpen(true)}
+                  className="p-1.5 rounded text-slate-400 hover:text-red-600 hover:bg-slate-100 transition-colors"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                </button>
+              </div>
             </div>
           </nav>
         </aside>
@@ -208,6 +233,22 @@ export default function AppShell() {
           </div>
         </main>
       </div>
+
+      {/* Global Connection Notifications Toast */}
+      <ConnectionToast />
+
+      {/* Confirmation Modal for Resetting Demo Data */}
+      <ConfirmDeleteModal
+        isOpen={isResetModalOpen}
+        onClose={() => setIsResetModalOpen(false)}
+        onConfirm={() => {
+          resetDemoData()
+        }}
+        title="Reset Demo Data"
+        message="Are you sure you want to reset all demo data? This will restore initial mock records and clear any custom additions or links."
+        confirmText="Reset Demo Data"
+        cancelText="Cancel"
+      />
     </div>
   )
 }

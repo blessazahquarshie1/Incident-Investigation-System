@@ -1,4 +1,4 @@
-import type { InvestigationData } from '../types'
+import type { InvestigationData, Person } from '../types'
 export function getOfficerName(data: InvestigationData, id: string): string {
   return data.officers.find(o => o.id === id)?.fullName ?? id
 }
@@ -7,6 +7,27 @@ export function getLocationName(data: InvestigationData, id: string): string {
 }
 export function getPersonName(data: InvestigationData, id: string): string {
   return data.persons.find(p => p.id === id)?.fullName ?? id
+}
+
+export function getVehicleOwner(data: InvestigationData, vehicleId: string): Person | null {
+  // Master source of truth: 'owns' relationship in data.relationships
+  const edge = data.relationships.find(
+    r => r.relationship === 'owns' && (
+      (r.target === vehicleId && r.source.startsWith('P-')) ||
+      (r.source === vehicleId && r.target.startsWith('P-'))
+    )
+  )
+  if (edge) {
+    const personId = edge.target === vehicleId ? edge.source : edge.target
+    const person = data.persons.find(p => p.id === personId)
+    if (person) return person
+  }
+  // Fallback to Vehicle.ownerId for older data
+  const vehicle = data.vehicles.find(v => v.id === vehicleId)
+  if (vehicle?.ownerId) {
+    return data.persons.find(p => p.id === vehicle.ownerId) ?? null
+  }
+  return null
 }
 
 export function getEntityLabel(data: InvestigationData, id: string): string {

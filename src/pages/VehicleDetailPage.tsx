@@ -6,7 +6,7 @@ import PageHeader from '../components/PageHeader'
 import Card from '../components/Card'
 import EmptyState from '../components/EmptyState'
 import EntityIcon from '../components/EntityIcon'
-import { getPersonName } from '../lib/lookup'
+import { getVehicleOwner } from '../lib/lookup'
 import type { EntityType } from '../types'
 
 export default function VehicleDetailPage() {
@@ -21,6 +21,8 @@ export default function VehicleDetailPage() {
   if (!entity) {
     return <EmptyState title="Not found" description="No record with this id." action={<Link to="/vehicles" className="text-blue-600 hover:underline">← Back to list</Link>} />
   }
+
+  const owner = getVehicleOwner(data, entity.id)
   
   const graph = buildGraph(data)
   const neighborIds = getNeighbors(graph, entity.id)
@@ -46,7 +48,16 @@ export default function VehicleDetailPage() {
           <div><span className="font-semibold text-slate-500 block">Make</span>{entity.make}</div>
           <div><span className="font-semibold text-slate-500 block">Model</span>{entity.model}</div>
           <div><span className="font-semibold text-slate-500 block">Color</span>{entity.color}</div>
-          <div><span className="font-semibold text-slate-500 block">Owner</span>{entity.ownerId ? <Link to={`/persons/${entity.ownerId}`} className="text-blue-600 hover:underline">{getPersonName(data, entity.ownerId)}</Link> : 'Unknown'}</div>
+          <div>
+            <span className="font-semibold text-slate-500 block">Owner</span>
+            {owner ? (
+              <Link to={`/persons/${owner.id}`} className="text-blue-600 hover:underline">
+                {owner.fullName}
+              </Link>
+            ) : (
+              'Unknown'
+            )}
+          </div>
         </div>
       </Card>
       <Card title="Linked to">

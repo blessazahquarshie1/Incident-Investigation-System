@@ -6,7 +6,7 @@ import PageHeader from '../components/PageHeader'
 import FilterBar from '../components/FilterBar'
 import DataTable from '../components/DataTable'
 import type { Column } from '../components/DataTable'
-import { getPersonName } from '../lib/lookup'
+import { getVehicleOwner } from '../lib/lookup'
 import type { Vehicle } from '../types'
 
 export default function VehiclesPage() {
@@ -37,7 +37,26 @@ export default function VehiclesPage() {
     { key: 'make', header: 'Make', render: r => r.make, sortable: true, getValue: r => r.make },
     { key: 'model', header: 'Model', render: r => r.model, sortable: true, getValue: r => r.model },
     { key: 'color', header: 'Color', render: r => r.color, sortable: true, getValue: r => r.color },
-    { key: 'owner', header: 'Owner', render: r => r.ownerId ? <Link to={`/persons/${r.ownerId}`} className="text-blue-600 hover:underline" onClick={e => e.stopPropagation()}>{getPersonName(data, r.ownerId)}</Link> : 'Unknown', sortable: true, getValue: r => r.ownerId ? getPersonName(data, r.ownerId) : '' },
+    {
+      key: 'owner',
+      header: 'Owner',
+      render: r => {
+        const owner = getVehicleOwner(data, r.id)
+        return owner ? (
+          <Link
+            to={`/persons/${owner.id}`}
+            className="text-blue-600 hover:underline"
+            onClick={e => e.stopPropagation()}
+          >
+            {owner.fullName}
+          </Link>
+        ) : (
+          'Unknown'
+        )
+      },
+      sortable: true,
+      getValue: r => getVehicleOwner(data, r.id)?.fullName ?? '',
+    },
   ]
   
   return (

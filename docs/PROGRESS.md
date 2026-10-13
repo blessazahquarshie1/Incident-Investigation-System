@@ -18,6 +18,48 @@
 | 11 | More cases mock data | done | pass | pass |
 | 12 | Case comparison engine | done | pass | pass |
 | 13 | Related cases screens | done | pass | pass |
+| 14 | A simple Case map | done | pass | pass |
+
+---
+
+## Step 14 Existing Feature Check & Acceptance Verification
+
+### 1. Existing Feature Verification (Section 1 Check)
+- **"Related cases" list on a case's Connections tab (`CaseConnectionsTab.tsx`):** Checked — exists, functional, lists related cases ordered by strength with current/past badges. Added "See on map" deep-link per section 5.
+- **Side-by-side Compare page (`/cases/:caseId/compare/:otherCaseId`):** Checked — exists, functional, compares cases side-by-side with shared entities, actionable leads, and synchronized dual timelines.
+- **Cases mode of the graph (`RelationshipGraphPage.tsx`):** Checked — existing Cases mode cleanly replaced with the new, readable Case map.
+- **Name search results (`SearchPage.tsx`, `nameSearch.ts`):** Checked — exists, functional, handles prefix matches, aliases, and 1-letter typo tolerance.
+
+### 2. Automated Step 14 Acceptance Verification (`acceptanceStep14.test.ts` & `caseMap.test.ts`)
+1. **Case Map Focus Mode (Default View):**
+   - Focus on `CASE-00123` with default `minScore: 4` renders the chosen case in the centre as a larger highlighted circle (175px).
+   - Surrounding cases (`CASE-00201`, `CASE-00203`, `CASE-00204`) placed evenly around it in a circle, strongest first.
+   - Weak link `CASE-00202` (score 3) excluded by default.
+2. **Connecting Link Lines & Plain-Word Labels:**
+   - Link lines styled dynamically by level: WEAK 1px grey, MODERATE 2px blue, STRONG 4px orange, VERY STRONG 6px red.
+   - Short labels in the middle formatted via `describeSharedShort`: e.g. `same person · same car · same method`.
+   - Clicking line to `CASE-00201` opens interactive detail panel displaying:
+     - Real names: Toyota Hilux `GT-4521-23`, suspect Kofi Boateng, and MO tag `grey-balaclava`.
+     - First 3 actionable investigative leads with priority badges.
+     - Direct "Compare" button opening `/cases/CASE-00123/compare/CASE-00201`.
+3. **Show Weak Links Toggle:**
+   - Checking "Show weak links" toggles `minScore: 0`, seamlessly placing `CASE-00202` on the radial circle.
+4. **All Cases Mode:**
+   - Positions every case evenly along one large perimeter circle using deterministic trigonometry.
+   - Draws exactly one edge per link from `findAllCaseLinks(data, 4)` (no duplicate edges, no self-links).
+   - Clicking any case highlights its lines and dims unconnected cases; side panel shows case details and short list of linked cases.
+5. **Detailed Entity Graph Usability Polish:**
+   - Removed "All Cases (Entire Network)" unreadable hairball; single-case picker only.
+   - Unconnected nodes in the current view are hidden.
+   - Edge labels displayed only for the active selected node's links, eliminating visual noise.
+   - Collapsible floating "Legend" button replaces the intrusive overlay panel.
+   - Force simulation tuned with link distance 180, charge repulsion -900, and collision radius 95 to prevent overlapping boxes.
+6. **Case Detail Deep Link:**
+   - On `CaseConnectionsTab.tsx`, added "See on map" link next to "Related cases" opening `/graph?case=<caseId>` in focus mode.
+7. **Quality Gates:**
+   - `npm run build` exits with code 0 (`tsc -b && vite build`).
+   - `npm run lint` (`oxlint`) reports 0 warnings and 0 errors across 131 files.
+   - `npm test` runs 101 passing unit and acceptance tests across 14 test suites.
 
 ---
 
@@ -106,6 +148,10 @@ Automated end-to-end verification executed via Vitest test suite (`src/lib/__tes
     - Symmetric pairwise comparison (`caseComparison.ts`) computes weighted link scores: shared phones (6), persons/vehicles (5), evidence tags (4), locations (2), time/type (1), with speculative name matches capped at 5 points.
     - Generates actionable investigative leads (`leads.ts`) sorted strictly by priority (`high` -> `medium` -> `low`).
     - Name search engine (`nameSearch.ts`) supports multi-word prefix matching, alias searching, 1-letter edit distance typo tolerance on words >= 5 characters, and full-text mention scanning across case descriptions, incidents, notes, witness statements, and evidence.
+21. **Step 14 Case Map & Graph Usability:**
+    - Case map layout uses pure deterministic clock-face trigonometry (`layoutCaseMap`) in `src/lib/caseMap.ts` instead of unstable physics simulation, placing the centre case at (400, 300) and surrounding cases at equal angle increments to guarantee zero node overlaps.
+    - Custom React Flow case nodes are rendered as clean circles (175px diameter for centre case, 155px for surrounding cases) with hidden centered handles to ensure clean straight-line edge routing.
+    - Detailed entity graph spacing was resolved by setting link distance to 180, charge repulsion to -900, and collision radius to 95 in `graphLayout.ts`, preventing entity box collisions without altering domain graph topology.
 
 ---
 

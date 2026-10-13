@@ -376,3 +376,37 @@ export function findAllCaseLinks(
   return links.sort((a, b) => b.score - a.score)
 }
 
+/**
+ * Returns up to 3 concise phrases in order explaining why two cases are connected,
+ * appending "+N more" if more than 3 signals are present.
+ * 
+ * Precedence order:
+ * 1. same person (shared suspect / person of interest)
+ * 2. same car (shared vehicle)
+ * 3. same phone (shared phone number)
+ * 4. same method (shared MO evidence tags e.g. 'grey-balaclava')
+ * 5. same place (shared incident or sighting location)
+ * 6. similar name (fuzzy or alias name match)
+ * 7. similar time (incidents within 90 mins time of day)
+ */
+export function describeSharedShort(comparison: CaseComparison): string[] {
+  const phrases: string[] = []
+
+  if (comparison.sharedPersonIds.length > 0) phrases.push('same person')
+  if (comparison.sharedVehicleIds.length > 0) phrases.push('same car')
+  if (comparison.sharedPhoneNumbers.length > 0) phrases.push('same phone')
+  if (comparison.sharedEvidenceTags.length > 0) phrases.push('same method')
+  if (comparison.sharedLocationIds.length > 0) phrases.push('same place')
+  if (comparison.nameMatches.length > 0) phrases.push('similar name')
+  if (comparison.similarTimeOfDay) phrases.push('similar time')
+
+  if (phrases.length <= 3) {
+    return phrases
+  }
+
+  const top3 = phrases.slice(0, 3)
+  const remaining = phrases.length - 3
+  top3.push(`+${remaining} more`)
+  return top3
+}
+

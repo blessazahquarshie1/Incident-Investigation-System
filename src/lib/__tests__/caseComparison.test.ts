@@ -4,6 +4,7 @@ import {
   compareCases,
   findRelatedCases,
   findAllCaseLinks,
+  describeSharedShort,
 } from '../caseComparison'
 import { getCaseFingerprint } from '../caseFingerprint'
 
@@ -116,5 +117,61 @@ describe('Step 12: findRelatedCases and findAllCaseLinks', () => {
         priorityRank[res.leads[i + 1].priority]
       )
     }
+  })
+})
+
+describe('Step 14: describeSharedShort', () => {
+  it('returns plain words for CASE-00123 vs CASE-00201 in precedence order with +2 more', () => {
+    const comp = compareCases(mockData, 'CASE-00123', 'CASE-00201')
+    const shortPhrases = describeSharedShort(comp)
+    // Signals present: same person (P-002), same car (V-001), same method (grey-balaclava),
+    // plus name match and similar time. Top 3 + 2 more = 5 total.
+    expect(shortPhrases).toEqual(['same person', 'same car', 'same method', '+2 more'])
+  })
+
+  it('returns single method phrase for CASE-00123 vs CASE-00204', () => {
+    const comp = compareCases(mockData, 'CASE-00123', 'CASE-00204')
+    const shortPhrases = describeSharedShort(comp)
+    expect(shortPhrases).toEqual(['same method'])
+  })
+
+  it('returns exactly 3 phrases without truncation when exactly 3 signals fire', () => {
+    const syntheticComp = {
+      caseAId: 'A',
+      caseBId: 'B',
+      sharedPersonIds: ['P-1'],
+      sharedVehicleIds: ['V-1'],
+      sharedPhoneNumbers: ['0240000000'],
+      sharedEvidenceTags: [],
+      sharedLocationIds: [],
+      nameMatches: [],
+      similarTimeOfDay: false,
+      sameType: false,
+      score: 16,
+      level: 'STRONG' as const,
+      breakdown: [],
+      leads: [],
+    }
+    expect(describeSharedShort(syntheticComp)).toEqual(['same person', 'same car', 'same phone'])
+  })
+
+  it('caps at 3 phrases and appends "+N more" when 4 signals fire', () => {
+    const syntheticComp = {
+      caseAId: 'A',
+      caseBId: 'B',
+      sharedPersonIds: ['P-1'],
+      sharedVehicleIds: ['V-1'],
+      sharedPhoneNumbers: ['0240000000'],
+      sharedEvidenceTags: ['tag1'],
+      sharedLocationIds: [],
+      nameMatches: [],
+      similarTimeOfDay: false,
+      sameType: false,
+      score: 20,
+      level: 'VERY STRONG' as const,
+      breakdown: [],
+      leads: [],
+    }
+    expect(describeSharedShort(syntheticComp)).toEqual(['same person', 'same car', 'same phone', '+1 more'])
   })
 })

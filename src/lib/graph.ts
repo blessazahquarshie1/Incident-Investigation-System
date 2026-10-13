@@ -1,4 +1,5 @@
 import type { InvestigationData, InvestigationNode, InvestigationEdge, EntityType } from '../types'
+import { getVehicleOwner } from './lookup'
 
 export interface Graph {
   nodes: InvestigationNode[]
@@ -54,8 +55,9 @@ export function buildGraph(data: InvestigationData): Graph {
   }
   
   for (const v of data.vehicles) {
-    if (v.ownerId) {
-      addEdge({ source: v.ownerId, target: v.id, relationship: 'owns' })
+    const owner = getVehicleOwner(data, v.id)
+    if (owner) {
+      addEdge({ source: owner.id, target: v.id, relationship: 'owns' })
     }
   }
   

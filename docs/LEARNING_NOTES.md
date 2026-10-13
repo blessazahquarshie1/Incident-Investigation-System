@@ -469,3 +469,42 @@ Related cases listed on a case, a compare page with "where to look" leads, a map
 3. Why does a name match say "check whether they are the same person" instead of "this is the same person"?
    *Because two records sharing a name, alias, or surname could be two different individuals (e.g. family members or unrelated namesakes); prematurely asserting they are identical could cause wrongful arrests or tainted evidence, so the system responsibly guides the human investigator to verify.*
 
+---
+
+## Step 14 — A simple Case map (make the graph page readable)
+
+**What was built:**
+Replaced the default view of `/graph` with an instantly readable, deterministic **Case map**. Cases are rendered as clean, non-draggable circles (blue border for current cases, grey border for past/closed cases, and a thicker highlighted border for the focused centre case) with a single-line legend underneath. Connection lines between cases communicate relationship strength through line thickness (1px WEAK, 2px MODERATE, 4px STRONG, 6px VERY STRONG), color, and a short label in plain words (`same person · same car · same method`). Clicking any line or case circle opens an interactive side panel showing exact shared entities with real names, the top 3 actionable investigative leads, and a direct button to the side-by-side Compare page. Added a "See on map" shortcut directly from a case's Connections tab (`/graph?case=<caseId>`). The detailed entity graph remains accessible under a top-level switch ("Case map" / "Detailed graph"), but is cleaned up: "All Cases" is removed, unconnected nodes in the current view are hidden, edge labels appear only for the selected node's links, the legend is collapsed into a non-intrusive button, and node spacing is substantially increased with stronger charge repulsion and collision radii so boxes never overlap.
+
+**How it works (plain English):**
+A graph is easy to read only when it shows **one kind of thing**. The old graph mixed five kinds (people, incidents, vehicles, evidence, locations), so nothing stood out. The Case map shows only cases, and uses **thickness** (how strong), **colour** (current or past) and a **short label** (why) to answer the three questions an investigator has: *which cases are linked, how strongly, and because of what.* The positions come from simple maths (an even circle), so the picture is the same every time and never overlaps. The detailed graph is the "zoom in" view for when you want to see the people and cars behind the link.
+
+*Everyday analogy:*
+Think of Google Maps. When you look at an entire country, you do not want to see every individual house, mailbox, and pedestrian — you just want to see major cities and the highways connecting them. The Case map is that country-level highway view, where each city is a case and the highways are the shared evidence linking them together. When an investigator wants to inspect the individual houses and mailboxes for a specific case, they zoom into the Detailed graph.
+
+**Key concepts:**
+- **Single-Entity Abstraction:** Presenting only case-level nodes so high-level investigative patterns and crime rings are immediately obvious within 5 seconds.
+- **Deterministic Geometric Layout:** Replacing jittery physics simulations with clock-face radial circle mathematics, ensuring stable, neat, and non-overlapping layouts on every render.
+- **Visual Encoding of Confidence:** Using thickness (1px–6px) and color (grey, blue, orange, red) to convey link strength, paired with plain-word summary labels (`same car · same person · same method`).
+- **Focus vs. All Cases Navigation:** Allowing investigators to either orbit related cases around a single case of interest (`CASE-00123`) or view the macro circle of all department cases with interactive link highlighting.
+- **Progressive Disclosure:** Keeping the Detailed graph available for deep entity inspection, but decluttering it by hiding unconnected nodes, collapsing the legend, and showing edge labels only for active selections.
+
+**Files to open:**
+- `src/lib/caseMap.ts` — pure data builder (`buildCaseMap`) and geometric circle layout (`layoutCaseMap`).
+- `src/lib/caseComparison.ts` — added `describeSharedShort` helper returning ordered plain-word reasons.
+- `src/pages/RelationshipGraphPage.tsx` — Case map with custom circle nodes and custom link edges, side panel, legend, and polished Detailed graph.
+- `src/components/CaseConnectionsTab.tsx` — added "See on map" deep link next to Related cases heading.
+- `src/lib/__tests__/caseMap.test.ts` — unit tests for focus mode, weak links, and geometric circle spacing.
+- `src/lib/__tests__/acceptanceStep14.test.ts` — end-to-end acceptance tests verifying all Step 14 requirements.
+
+**What I should see:**
+A neat picture with the Accra Mall robbery in the middle and the other cases around it, joined by lines that say "same car · same person", and a panel that explains the link in plain words. In All cases mode, every case sits evenly on one big circle. The Detailed graph no longer has "All Cases", and nodes never overlap. All 101 tests pass, 0 linter errors, clean build.
+
+**I should be able to explain:**
+1. Why does the Case map only show cases and not people, cars and evidence?
+   *Because mixing five different entity types simultaneously creates visual clutter where cases get lost in a sea of details. Showing only cases gives investigators an immediate, high-level map of how investigations interconnect, allowing them to grasp serial crime patterns in seconds before diving into specifics.*
+2. What do the thickness, colour and label of a line tell you?
+   *Thickness represents connection strength (from 1px for WEAK up to 6px for VERY STRONG). Colour indicates confidence level (grey, blue, orange, red). The label provides the plain-English evidentiary reason why the cases are linked (e.g. `same car · same person · same method`).*
+3. Why is the layout a simple circle instead of a physics simulation?
+   *Physics simulations are non-deterministic, jitter during rendering, and frequently pull nodes into overlapping clumps. Pure trigonometric circle maths places nodes at equal angular increments around the centre, guaranteeing a neat, consistent, stable picture with zero overlaps every single time.*
+

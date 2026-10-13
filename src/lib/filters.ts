@@ -24,6 +24,40 @@ export function filterCases(cases: Case[], f: CaseFilters): Case[] {
   })
 }
 
+const STATUS_ORDER: Record<string, number> = {
+  investigating: 0,
+  open: 1,
+  closed: 2,
+  pending: 3,
+}
+
+const PRIORITY_ORDER: Record<string, number> = {
+  critical: 0,
+  high: 1,
+  medium: 2,
+  low: 3,
+}
+
+/**
+ * Default order of cases list:
+ * 1. Status: investigating -> open -> closed -> pending
+ * 2. Priority: critical -> high -> medium -> low
+ * 3. UpdatedAt: newest first
+ */
+export function sortCasesDefault(cases: Case[]): Case[] {
+  return [...cases].sort((a, b) => {
+    const statusA = STATUS_ORDER[a.status] ?? 99
+    const statusB = STATUS_ORDER[b.status] ?? 99
+    if (statusA !== statusB) return statusA - statusB
+
+    const prioA = PRIORITY_ORDER[a.priority] ?? 99
+    const prioB = PRIORITY_ORDER[b.priority] ?? 99
+    if (prioA !== prioB) return prioA - prioB
+
+    return b.updatedAt.localeCompare(a.updatedAt)
+  })
+}
+
 // ─── Persons ─────────────────────────────────────────────────────────────────
 
 export interface PersonFilters { text?: string; type?: string }

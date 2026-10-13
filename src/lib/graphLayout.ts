@@ -41,8 +41,8 @@ export function computeLayout(
     return {}
   }
 
-  const width = 800
-  const height = 600
+  const width = 1000
+  const height = 750
   const centerX = width / 2
   const centerY = height / 2
 
@@ -73,11 +73,11 @@ export function computeLayout(
       'link',
       forceLink<LayoutNode, LayoutLink>(simulationLinks)
         .id(d => d.id)
-        .distance(120)
+        .distance(180)
     )
-    .force('charge', forceManyBody<LayoutNode>().strength(-450))
+    .force('charge', forceManyBody<LayoutNode>().strength(-900))
     .force('center', forceCenter<LayoutNode>(centerX, centerY))
-    .force('collide', forceCollide<LayoutNode>().radius(55))
+    .force('collide', forceCollide<LayoutNode>().radius(95))
     .stop()
 
   // Run synchronously for 300 ticks to let forces settle

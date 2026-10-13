@@ -118,3 +118,29 @@ This script provides a step-by-step walkthrough covering every key capability of
   5. **Live Reactive Updates:** Create a new case, add a person with surname "Asante", and link vehicle `GT-4521-23`. Navigating to the new case's Connections tab immediately surfaces `CASE-00123` with zero manual refreshes.
 - **Learning Objective:** Demonstrates automated case fingerprinting, multi-factor cross-case comparison scoring, prioritized operational lead generation, and dynamic graph-driven investigative intelligence.
 
+---
+
+### Step 14: The Case Map (Instant Visual Case Intelligence)
+- **What to do:** Open `/graph` in your browser (or click "See on map" directly from `CASE-00123`'s Connections tab).
+- **What appears:**
+  1. **Instant Clarity in 5 Seconds:** The page opens directly on the **Case map** with `CASE-00123` sitting prominently as a large circle in the centre, and its related cases (`CASE-00201`, `CASE-00203`, `CASE-00204`) orbiting around it in an orderly, non-overlapping circle.
+  2. **Visual Encoding (Thickness, Color, Plain Words):**
+     - Blue circular border = current case; grey circular border = past (closed) case.
+     - Connection lines have varying thickness matching strength: WEAK (1px), MODERATE (2px), STRONG (4px), VERY STRONG (6px).
+     - Each line carries a plain-language summary label in the middle, such as `same person · same car · same method`.
+  3. **Interactive Evidence Side Panel:**
+     - Click the line connecting to `CASE-00201` (or click `CASE-00201`'s circle).
+     - The side panel opens displaying exact real names:
+       - `Same car: GT-4521-23 Toyota Hilux`
+       - `Same person: Kofi Boateng`
+       - `Same method: grey-balaclava`
+     - The top 3 actionable leads ("Where to look") are displayed with priority badges.
+     - Clicking the **Compare** button navigates directly to the side-by-side Compare page.
+  4. **Weak Links Toggle:**
+     - Check the **Show weak links** checkbox. The map automatically recalculates and adds `CASE-00202` (Accra Mall vehicle theft) to the circle.
+  5. **All Cases Mode:**
+     - Toggle from "Focus on one case" to **All cases**. Every case across the department is placed evenly around one large circle. Clicking any case highlights its connecting lines and dims unrelated cases, with the side panel listing all connected cases.
+  6. **Decluttered Detailed Graph:**
+     - Toggle the top switch to **Detailed graph**. Notice that "All Cases" is gone, nodes never overlap thanks to expanded spacing, edge labels only appear for the selected node's links, and the legend is neatly collapsed into a non-intrusive floating button.
+- **Learning Objective:** Demonstrates how abstracting macroscopic patterns to case circles and deterministic circle geometry allows investigators to understand inter-case links in seconds without visual clutter.
+

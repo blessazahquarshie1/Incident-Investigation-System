@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react'
 import { useSearchParams, useNavigate, Link } from 'react-router-dom'
 import { useInvestigationStore } from '../store/useInvestigationStore'
-import { filterCases } from '../lib/filters'
+import { filterCases, sortCasesDefault } from '../lib/filters'
 import PageHeader from '../components/PageHeader'
 import FilterBar from '../components/FilterBar'
 import DataTable from '../components/DataTable'
@@ -29,7 +29,10 @@ export default function CasesPage() {
   const priority = params.get('priority') ?? ''
   const status = params.get('status') ?? ''
   
-  const filtered = useMemo(() => filterCases(data.cases, { text, type, priority, status }), [data, text, type, priority, status])
+  const filtered = useMemo(
+    () => sortCasesDefault(filterCases(data.cases, { text, type, priority, status })),
+    [data.cases, text, type, priority, status]
+  )
   
   function setParam(key: string, value: string) {
     const next = new URLSearchParams(params)

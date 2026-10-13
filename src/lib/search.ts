@@ -1,6 +1,7 @@
 import type { InvestigationData, EntityType } from '../types'
 import type { Graph } from './graph'
 import { getNeighbors, getLinkedCaseIds, getNodeType } from './graph'
+import { getVehicleOwner } from './lookup'
 
 // SearchResult entityType includes 'case' since cases are not in EntityType
 export type SearchEntityType = EntityType | 'case'
@@ -57,7 +58,7 @@ export function searchAll(
     if (score > 0) {
       const linkedCases = getLinkedCaseIds(data, graph, p.id)
       const linkedVehicles = data.vehicles
-        .filter(v => v.ownerId === p.id ||
+        .filter(v => getVehicleOwner(data, v.id)?.id === p.id ||
           data.relationships.some(r =>
             (r.source === p.id && r.target === v.id) ||
             (r.source === v.id && r.target === p.id)
@@ -90,9 +91,10 @@ export function searchAll(
     ])
     if (score > 0) {
       const linkedCases = getLinkedCaseIds(data, graph, v.id)
+      const owner = getVehicleOwner(data, v.id)
       const linkedPersons = data.persons
         .filter(p =>
-          p.id === v.ownerId ||
+          p.id === owner?.id ||
           data.relationships.some(r =>
             (r.source === p.id && r.target === v.id) ||
             (r.source === v.id && r.target === p.id)
@@ -105,7 +107,6 @@ export function searchAll(
       getNeighbors(graph, v.id).filter(nid => getNodeType(nid) === 'location').forEach(lid => seenLocIds.add(lid))
       const seenLocations = [...seenLocIds]
         .map(lid => data.locations.find(l => l.id === lid)?.name ?? lid)
-      const owner = data.persons.find(p => p.id === v.ownerId)
       results.push({
         entityType: 'vehicle',
         id: v.id,

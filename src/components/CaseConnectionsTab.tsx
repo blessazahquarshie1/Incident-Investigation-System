@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useInvestigationStore } from '../store/useInvestigationStore'
 import { getCasePeople } from '../lib/caseScope'
 import { calculateConnection } from '../lib/connections'
-import { findShortestConnection } from '../lib/pathfinding'
+import { findAllShortestConnections, type ConnectionPath } from '../lib/pathfinding'
 import { getPersonName } from '../lib/lookup'
 import { findRelatedCases, type ComparisonLevel } from '../lib/caseComparison'
 import {
@@ -77,12 +77,12 @@ export default function CaseConnectionsTab({ caseId }: Props) {
   // BFS path tool
   const [personA, setPersonA] = useState('')
   const [personB, setPersonB] = useState('')
-  const [pathResult, setPathResult] = useState<ReturnType<typeof findShortestConnection> | undefined>(undefined)
+  const [pathsResult, setPathsResult] = useState<ConnectionPath[] | undefined>(undefined)
   const [scoreResult, setScoreResult] = useState<ReturnType<typeof calculateConnection> | undefined>(undefined)
 
   function runAnalysis() {
     if (!personA || !personB) return
-    setPathResult(findShortestConnection(data, personA, personB))
+    setPathsResult(findAllShortestConnections(data, personA, personB))
     setScoreResult(calculateConnection(data, personA, personB))
   }
 
@@ -93,8 +93,16 @@ export default function CaseConnectionsTab({ caseId }: Props) {
       {/* SECTION 1: RELATED CASES */}
       <section className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
-          <div>
-            <h2 className="text-[20px] font-bold text-slate-900">Related cases</h2>
+          <div className="space-y-1">
+            <div className="flex items-center gap-3">
+              <h2 className="text-[20px] font-bold text-slate-900">Related cases</h2>
+              <Link
+                to={`/graph?case=${caseId}`}
+                className="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2.5 py-1 text-[13px] font-semibold text-blue-700 hover:bg-blue-100 hover:text-blue-800 transition-colors"
+              >
+                <span>See on map</span>
+              </Link>
+            </div>
             <p className="text-[14px] text-slate-500">
               Other cases sharing suspect footprints, vehicles, locations, phone numbers, or evidence tags.
             </p>
@@ -320,15 +328,33 @@ export default function CaseConnectionsTab({ caseId }: Props) {
             </button>
           </div>
 
-          {pathResult !== undefined && (
-            <div className="mt-4 space-y-3">
-              {pathResult === null ? (
+          {pathsResult !== undefined && (
+            <div className="mt-4 space-y-4">
+              {pathsResult.length === 0 ? (
                 <p className="text-[15px] text-slate-600">No connection found between these two people.</p>
               ) : (
-                <>
-                  <p className="text-[14px] text-slate-500">Path length: {pathResult.length} steps</p>
-                  <ConnectionPathView path={pathResult} />
-                </>
+                <div className="space-y-2">
+                  <p className="text-[14px] font-semibold text-slate-800">
+                    {pathsResult.length === 1
+                      ? `Shortest connection path (${pathsResult[0].length} step${pathsResult[0].length === 1 ? '' : 's'}):`
+                      : `${pathsResult.length} shortest connection paths found (${pathsResult[0].length} steps each):`}
+                  </p>
+                  <div className="space-y-2">
+                    {pathsResult.map((path, idx) => (
+                      <div
+                        key={idx}
+                        className="rounded-lg border border-slate-200 bg-slate-50 p-2.5 flex items-center gap-3 overflow-x-auto"
+                      >
+                        {pathsResult.length > 1 && (
+                          <span className="text-[12px] font-bold text-slate-500 shrink-0">
+                            Path {idx + 1}:
+                          </span>
+                        )}
+                        <ConnectionPathView path={path} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
               {scoreResult && scoreResult.score > 0 && (
                 <ConnectionScoreCard

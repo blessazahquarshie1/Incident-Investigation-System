@@ -12,7 +12,7 @@ import {
   getCaseLocations,
   getCaseActivity,
 } from '../lib/caseScope'
-import { getOfficerName, getPersonName } from '../lib/lookup'
+import { getOfficerName, getVehicleOwner } from '../lib/lookup'
 import { formatDate, formatDateTime } from '../lib/dates'
 import PageHeader from '../components/PageHeader'
 import Card from '../components/Card'
@@ -375,6 +375,20 @@ function PeopleTab({ kase, people }: { kase: Case; people: Person[] }) {
     if (byType[p.type]) byType[p.type].push(p)
   })
 
+  const pluralHeaders: Record<string, string> = {
+    suspect: 'Suspects',
+    witness: 'Witnesses',
+    victim: 'Victims',
+    'person-of-interest': 'Persons of interest',
+  }
+
+  const emptyTexts: Record<string, string> = {
+    suspect: 'No suspects recorded.',
+    witness: 'No witnesses recorded.',
+    victim: 'No victims recorded.',
+    'person-of-interest': 'No persons of interest recorded.',
+  }
+
   return (
     <div className="space-y-6 pt-4">
       <div className="flex justify-between items-center">
@@ -408,7 +422,7 @@ function PeopleTab({ kase, people }: { kase: Case; people: Person[] }) {
         />
       ) : (
         Object.entries(byType).map(([type, list]) => (
-          <Card key={type} title={type.charAt(0).toUpperCase() + type.slice(1).replace('-', ' ') + 's'}>
+          <Card key={type} title={pluralHeaders[type] ?? type}>
             {list.length > 0 ? (
               <DataTable
                 columns={[
@@ -461,7 +475,7 @@ function PeopleTab({ kase, people }: { kase: Case; people: Person[] }) {
                           }}
                           className="text-[13px] text-red-600 hover:text-red-800 hover:underline font-medium"
                         >
-                          Remove
+                          Remove from case
                         </button>
                       </div>
                     ),
@@ -471,7 +485,7 @@ function PeopleTab({ kase, people }: { kase: Case; people: Person[] }) {
                 getRowKey={(r: Person) => r.id}
               />
             ) : (
-              <div className="text-slate-500 text-[14px]">No {type.replace('-', ' ')}s recorded.</div>
+              <div className="text-slate-500 text-[14px]">{emptyTexts[type] ?? `No ${type} recorded.`}</div>
             )}
           </Card>
         ))
@@ -654,7 +668,7 @@ function LocationsTab({ kase, locations }: { kase: Case; locations: Location[] }
                       }}
                       className="text-[13px] text-red-600 hover:text-red-800 hover:underline font-medium"
                     >
-                      Remove
+                      Remove from case
                     </button>
                   </div>
                 ),
@@ -710,6 +724,11 @@ function VehiclesTab({ kase, vehicles }: { kase: Case; vehicles: Vehicle[] }) {
 
   const [isAddVehicleOpen, setIsAddVehicleOpen] = useState(false)
   const [removingVehicle, setRemovingVehicle] = useState<Vehicle | null>(null)
+  const [pendingOwnerConflict, setPendingOwnerConflict] = useState<{
+    vehicle: Vehicle
+    currentOwner: Person
+    newOwner: Person
+  } | null>(null)
   const casePeople = useMemo(() => getCasePeople(data, kase.id), [data, kase.id])
 
   const [linkVehId, setLinkVehId] = useState('')
@@ -717,16 +736,36 @@ function VehiclesTab({ kase, vehicles }: { kase: Case; vehicles: Vehicle[] }) {
   const [linkRel, setLinkRel] = useState<'owns' | 'connected-to'>('connected-to')
   const [linkSuccess, setLinkSuccess] = useState('')
 
+  function executeLink(vId: string, pId: string, rel: 'owns' | 'connected-to') {
+    linkVehicleToPerson(kase.id, vId, pId, rel)
+    const veh = vehicles.find(v => v.id === vId)
+    const person = casePeople.find(p => p.id === pId)
+    setLinkSuccess(`Linked ${veh?.registration ?? vId} to ${person?.fullName ?? pId} as "${rel}".`)
+    setLinkVehId('')
+    setLinkPersonId('')
+    setPendingOwnerConflict(null)
+    setTimeout(() => setLinkSuccess(''), 4000)
+  }
+
   function handleLinkSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!linkVehId || !linkPersonId) return
-    linkVehicleToPerson(kase.id, linkVehId, linkPersonId, linkRel)
     const veh = vehicles.find(v => v.id === linkVehId)
     const person = casePeople.find(p => p.id === linkPersonId)
-    setLinkSuccess(`Linked ${veh?.registration ?? linkVehId} to ${person?.fullName ?? linkPersonId} as "${linkRel}".`)
-    setLinkVehId('')
-    setLinkPersonId('')
-    setTimeout(() => setLinkSuccess(''), 4000)
+
+    if (linkRel === 'owns') {
+      const currentOwner = getVehicleOwner(data, linkVehId)
+      if (currentOwner && currentOwner.id !== linkPersonId && veh && person) {
+        setPendingOwnerConflict({
+          vehicle: veh,
+          currentOwner,
+          newOwner: person,
+        })
+        return
+      }
+    }
+
+    executeLink(linkVehId, linkPersonId, linkRel)
   }
 
   return (
@@ -763,7 +802,16 @@ function VehiclesTab({ kase, vehicles }: { kase: Case; vehicles: Vehicle[] }) {
               {
                 key: 'owner',
                 header: 'Owner',
-                render: (r: Vehicle) => (r.ownerId ? getPersonName(data, r.ownerId) : 'Unknown'),
+                render: (r: Vehicle) => {
+                  const owner = getVehicleOwner(data, r.id)
+                  return owner ? (
+                    <Link to={`/persons/${owner.id}`} className="text-blue-600 hover:underline">
+                      {owner.fullName}
+                    </Link>
+                  ) : (
+                    'Unknown'
+                  )
+                },
               },
               {
                 key: 'actions',
@@ -778,7 +826,7 @@ function VehiclesTab({ kase, vehicles }: { kase: Case; vehicles: Vehicle[] }) {
                       }}
                       className="text-[13px] text-red-600 hover:text-red-800 hover:underline font-medium"
                     >
-                      Remove
+                      Remove from case
                     </button>
                   </div>
                 ),
@@ -896,6 +944,24 @@ function VehiclesTab({ kase, vehicles }: { kase: Case; vehicles: Vehicle[] }) {
         message="Are you sure you want to remove this vehicle from the case? This will disconnect the vehicle from this case's people and incidents."
         entityName={removingVehicle ? `${removingVehicle.registration} (${removingVehicle.make} ${removingVehicle.model})` : undefined}
         confirmText="Remove from Case"
+      />
+
+      <ConfirmDeleteModal
+        isOpen={Boolean(pendingOwnerConflict)}
+        onClose={() => setPendingOwnerConflict(null)}
+        onConfirm={() => {
+          if (pendingOwnerConflict) {
+            executeLink(pendingOwnerConflict.vehicle.id, pendingOwnerConflict.newOwner.id, 'owns')
+          }
+        }}
+        title="Change Vehicle Owner"
+        message={
+          pendingOwnerConflict
+            ? `${pendingOwnerConflict.vehicle.registration} is already owned by ${pendingOwnerConflict.currentOwner.fullName}. Make ${pendingOwnerConflict.newOwner.fullName} the owner? ${pendingOwnerConflict.currentOwner.fullName} will become 'connected to' the vehicle.`
+            : ''
+        }
+        confirmText="Change Owner"
+        cancelText="Cancel"
       />
     </div>
   )
