@@ -26,7 +26,7 @@ export const cases: Case[] = [
   {
     "id": "CASE-00031",
     "title": "Hit and Run",
-    "description": "Hit and run in Kasoa",
+    "description": "Pedestrian hit and run collision on Kasoa New Market Rd involving white pickup truck",
     "type": "assault",
     "priority": "critical",
     "status": "open",
@@ -36,9 +36,9 @@ export const cases: Case[] = [
   },
   {
     "id": "CASE-00001",
-    "title": "Case 1",
-    "description": "Desc",
-    "type": "other",
+    "title": "Kokomlemle Street Assault",
+    "description": "Physical altercation resulting in assault charges involving local youths",
+    "type": "assault",
     "priority": "low",
     "status": "pending",
     "leadInvestigator": "O-004",

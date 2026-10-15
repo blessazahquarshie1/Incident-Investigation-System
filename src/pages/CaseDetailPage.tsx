@@ -1,7 +1,8 @@
 import React, { useMemo, useState, useEffect } from 'react'
 import { useParams, Link, useSearchParams } from 'react-router-dom'
-import { Plus } from 'lucide-react'
+import { Plus, Car, MapPin, AlertTriangle } from 'lucide-react'
 import { useInvestigationStore } from '../store/useInvestigationStore'
+import { buildGraph, getNeighbors } from '../lib/graph'
 import {
   getCasePeople,
   getCaseEvidence,
@@ -359,6 +360,7 @@ function OverviewTab({
 }
 
 function PeopleTab({ kase, people }: { kase: Case; people: Person[] }) {
+  const data = useInvestigationStore(s => s.data)
   const removePersonFromCase = useInvestigationStore(s => s.removePersonFromCase)
   const [isAddPersonOpen, setIsAddPersonOpen] = useState(false)
   const [connectionPersonId, setConnectionPersonId] = useState<string | null>(null)
@@ -388,6 +390,8 @@ function PeopleTab({ kase, people }: { kase: Case; people: Person[] }) {
     victim: 'No victims recorded.',
     'person-of-interest': 'No persons of interest recorded.',
   }
+
+  const graph = useMemo(() => buildGraph(data), [data])
 
   return (
     <div className="space-y-6 pt-4">
@@ -441,6 +445,58 @@ function PeopleTab({ kase, people }: { kase: Case; people: Person[] }) {
                     key: 'aliases',
                     header: 'Aliases',
                     render: (r: Person) => (r.knownAliases || []).join(', ') || '—',
+                  },
+                  {
+                    key: 'connections',
+                    header: 'Linked Entities',
+                    render: (r: Person) => {
+                      const neighbors = getNeighbors(graph, r.id)
+                      const vehs = data.vehicles.filter((v: Vehicle) => neighbors.includes(v.id))
+                      const locs = data.locations.filter((l: Location) => neighbors.includes(l.id))
+                      const incs = data.incidents.filter((i: Incident) => neighbors.includes(i.id))
+
+                      if (vehs.length === 0 && locs.length === 0 && incs.length === 0) {
+                        return <span className="text-slate-400 text-[13px]">No links</span>
+                      }
+
+                      return (
+                        <div className="flex flex-wrap gap-1 max-w-xs">
+                          {vehs.map((v: Vehicle) => (
+                            <Link
+                              key={v.id}
+                              to={`/vehicles/${v.id}`}
+                              className="inline-flex items-center gap-1 rounded bg-blue-50 border border-blue-200 px-1.5 py-0.5 text-[12px] font-medium text-blue-800 hover:bg-blue-100"
+                              title={`${v.make} ${v.model}`}
+                            >
+                              <Car className="h-3 w-3" />
+                              {v.registration}
+                            </Link>
+                          ))}
+                          {locs.map((l: Location) => (
+                            <Link
+                              key={l.id}
+                              to={`/locations/${l.id}`}
+                              className="inline-flex items-center gap-1 rounded bg-rose-50 border border-rose-200 px-1.5 py-0.5 text-[12px] font-medium text-rose-800 hover:bg-rose-100"
+                              title={l.city}
+                            >
+                              <MapPin className="h-3 w-3" />
+                              {l.name}
+                            </Link>
+                          ))}
+                          {incs.map((i: Incident) => (
+                            <Link
+                              key={i.id}
+                              to={`/incidents/${i.id}`}
+                              className="inline-flex items-center gap-1 rounded bg-amber-50 border border-amber-200 px-1.5 py-0.5 text-[12px] font-medium text-amber-800 hover:bg-amber-100"
+                              title={i.title}
+                            >
+                              <AlertTriangle className="h-3 w-3" />
+                              {i.id}
+                            </Link>
+                          ))}
+                        </div>
+                      )
+                    },
                   },
                   {
                     key: 'actions',

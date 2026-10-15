@@ -4,9 +4,10 @@ import FormField from './FormField'
 import EntityPicker from './EntityPicker'
 import ConfirmDeleteModal from './ConfirmDeleteModal'
 import { useInvestigationStore } from '../store/useInvestigationStore'
-import { validateConnectionInput } from '../lib/validation'
 import { getCasePeople, getCaseLocations, getCaseIncidents, getCaseVehicles } from '../lib/caseScope'
+import { validateConnectionInput } from '../lib/validation'
 import { getVehicleOwner } from '../lib/lookup'
+import { buildGraph, getNeighbors, getNodeEdges } from '../lib/graph'
 import type { InvestigationEdge } from '../types'
 
 interface AddConnectionModalProps {
@@ -166,6 +167,32 @@ export default function AddConnectionModal({
               error={!!errors.personId}
             />
           </FormField>
+
+          {/* Current links for the selected person */}
+          {(() => {
+            if (!effectivePersonId) return null
+            const graph = buildGraph(data)
+            const neighbors = getNeighbors(graph, effectivePersonId)
+            const edges = getNodeEdges(graph, effectivePersonId)
+            if (neighbors.length === 0) return null
+
+            return (
+              <div className="rounded-lg bg-slate-50 border border-slate-200 p-2.5 space-y-1 text-[13px]">
+                <p className="font-semibold text-slate-700">Currently linked to:</p>
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  {neighbors.map(nid => {
+                    const edge = edges.find(e => e.source === nid || e.target === nid)
+                    const label = graph.nodes.find(n => n.id === nid)?.label ?? nid
+                    return (
+                      <span key={nid} className="inline-flex items-center gap-1 rounded bg-white border border-slate-200 px-2 py-0.5 text-slate-700 font-medium">
+                        {label} <span className="text-slate-400 font-normal italic">({edge?.relationship})</span>
+                      </span>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })()}
 
           <FormField label="Relationship Type" required error={errors.relationship} htmlFor="conn-rel">
             <select

@@ -138,18 +138,45 @@ export function calculateConnection(data: InvestigationData, personAId: string, 
   }
 }
 
-export function describeScore(pair: PairConnection): string[] {
+export function describeScore(pair: PairConnection, data?: InvestigationData): string[] {
   const lines: string[] = []
-  if (pair.sharedLocations.length > 0)
-    lines.push(`${pair.sharedLocations.length} location${pair.sharedLocations.length > 1 ? 's' : ''} × ${SCORE_WEIGHTS.location} = ${pair.sharedLocations.length * SCORE_WEIGHTS.location}`)
-  if (pair.sharedVehicles.length > 0)
-    lines.push(`${pair.sharedVehicles.length} vehicle${pair.sharedVehicles.length > 1 ? 's' : ''} × ${SCORE_WEIGHTS.vehicle} = ${pair.sharedVehicles.length * SCORE_WEIGHTS.vehicle}`)
-  if (pair.sharedIncidents.length > 0)
-    lines.push(`${pair.sharedIncidents.length} incident${pair.sharedIncidents.length > 1 ? 's' : ''} × ${SCORE_WEIGHTS.incident} = ${pair.sharedIncidents.length * SCORE_WEIGHTS.incident}`)
-  if (pair.sharedEvidence.length > 0)
-    lines.push(`${pair.sharedEvidence.length} evidence × ${SCORE_WEIGHTS.evidence} = ${pair.sharedEvidence.length * SCORE_WEIGHTS.evidence}`)
-  if (pair.sharedPhoneNumbers.length > 0)
-    lines.push(`${pair.sharedPhoneNumbers.length} phone number${pair.sharedPhoneNumbers.length > 1 ? 's' : ''} × ${SCORE_WEIGHTS.phone} = ${pair.sharedPhoneNumbers.length * SCORE_WEIGHTS.phone}`)
+  if (pair.sharedLocations.length > 0) {
+    const locNames = data
+      ? ` (${pair.sharedLocations.map(id => data.locations.find(l => l.id === id)?.name ?? id).join(', ')})`
+      : ''
+    lines.push(`${pair.sharedLocations.length} location${pair.sharedLocations.length > 1 ? 's' : ''} × ${SCORE_WEIGHTS.location} = ${pair.sharedLocations.length * SCORE_WEIGHTS.location}${locNames}`)
+  }
+  if (pair.sharedVehicles.length > 0) {
+    const vehNames = data
+      ? ` (${pair.sharedVehicles.map(id => {
+          const v = data.vehicles.find(x => x.id === id)
+          return v ? `${v.registration} ${v.make} ${v.model}` : id
+        }).join(', ')})`
+      : ''
+    lines.push(`${pair.sharedVehicles.length} vehicle${pair.sharedVehicles.length > 1 ? 's' : ''} × ${SCORE_WEIGHTS.vehicle} = ${pair.sharedVehicles.length * SCORE_WEIGHTS.vehicle}${vehNames}`)
+  }
+  if (pair.sharedIncidents.length > 0) {
+    const incNames = data
+      ? ` (${pair.sharedIncidents.map(id => {
+          const inc = data.incidents.find(x => x.id === id)
+          return inc ? `${inc.id}: ${inc.title}` : id
+        }).join(', ')})`
+      : ''
+    lines.push(`${pair.sharedIncidents.length} incident${pair.sharedIncidents.length > 1 ? 's' : ''} × ${SCORE_WEIGHTS.incident} = ${pair.sharedIncidents.length * SCORE_WEIGHTS.incident}${incNames}`)
+  }
+  if (pair.sharedEvidence.length > 0) {
+    const evNames = data
+      ? ` (${pair.sharedEvidence.map(id => {
+          const ev = data.evidence.find(x => x.id === id)
+          return ev ? `${ev.id}: ${ev.title}` : id
+        }).join(', ')})`
+      : ''
+    lines.push(`${pair.sharedEvidence.length} evidence × ${SCORE_WEIGHTS.evidence} = ${pair.sharedEvidence.length * SCORE_WEIGHTS.evidence}${evNames}`)
+  }
+  if (pair.sharedPhoneNumbers.length > 0) {
+    const phDetails = data ? ` (${pair.sharedPhoneNumbers.join(', ')})` : ''
+    lines.push(`${pair.sharedPhoneNumbers.length} phone number${pair.sharedPhoneNumbers.length > 1 ? 's' : ''} × ${SCORE_WEIGHTS.phone} = ${pair.sharedPhoneNumbers.length * SCORE_WEIGHTS.phone}${phDetails}`)
+  }
   return lines
 }
 

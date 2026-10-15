@@ -132,6 +132,14 @@ interface InvestigationStore {
 const safeLocalStorage = {
   getItem: (name: string): string | null => {
     if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        localStorage.removeItem('iis-investigation-data-v1')
+        localStorage.removeItem('iis-investigation-data-v2')
+        localStorage.removeItem('iis-investigation-data-v3')
+        localStorage.removeItem('iis-investigation-data-v4')
+      } catch {
+        // ignore
+      }
       return localStorage.getItem(name)
     }
     return null
@@ -207,6 +215,9 @@ export const useInvestigationStore = create<InvestigationStore>()(
           if (typeof window !== 'undefined' && window.localStorage) {
             try {
               localStorage.removeItem('iis-investigation-data-v1')
+              localStorage.removeItem('iis-investigation-data-v2')
+              localStorage.removeItem('iis-investigation-data-v3')
+              localStorage.removeItem('iis-investigation-data-v4')
             } catch {
               // ignore
             }
@@ -985,10 +996,30 @@ export const useInvestigationStore = create<InvestigationStore>()(
       }
     },
     {
-      name: 'iis-investigation-data-v1',
-      version: 1,
+      name: 'iis-investigation-data-v5',
+      version: 5,
       storage: createJSONStorage(() => safeLocalStorage),
       partialize: (state) => ({ data: state.data }),
+      onRehydrateStorage: () => (state) => {
+        if (state?.data?.persons) {
+          const mergedPersons = state.data.persons.map((p) => {
+            const defaultPerson = mockData.persons.find((mp) => mp.id === p.id)
+            if (defaultPerson) {
+              return {
+                ...p,
+                phone: defaultPerson.phone || p.phone,
+                type: defaultPerson.type,
+                relatedCases: defaultPerson.relatedCases,
+              }
+            }
+            return p
+          })
+          state.data = {
+            ...state.data,
+            persons: mergedPersons,
+          }
+        }
+      },
     }
   )
 )

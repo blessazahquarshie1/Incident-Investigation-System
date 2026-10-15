@@ -152,6 +152,19 @@ Automated end-to-end verification executed via Vitest test suite (`src/lib/__tes
     - Case map layout uses pure deterministic clock-face trigonometry (`layoutCaseMap`) in `src/lib/caseMap.ts` instead of unstable physics simulation, placing the centre case at (400, 300) and surrounding cases at equal angle increments to guarantee zero node overlaps.
     - Custom React Flow case nodes are rendered as clean circles (175px diameter for centre case, 155px for surrounding cases) with hidden centered handles to ensure clean straight-line edge routing.
     - Detailed entity graph spacing was resolved by setting link distance to 180, charge repulsion to -900, and collision radius to 95 in `graphLayout.ts`, preventing entity box collisions without altering domain graph topology.
+22. **Cross-Case Phone Consistency & Narrative Realignment:**
+    - Populated unique, realistic Ghanaian phone numbers (MTN `024`/`054`/`055` and Telecel `020`) across person profiles in `src/data/persons.ts` so the directory and case tables display complete contact records rather than unpopulated dashes (`—`).
+    - Resolved the `0241111111` cross-case storyline: clarified via case notes `N-014` and `N-015` as well as investigative reports `D-007` and `D-008` that `0241111111` is an innocent civilian's registered SIM cloned by the syndicate and operated as an illicit burner in both the Accra Mall robbery (`CASE-00123`) and Osu SIM swap fraud (`CASE-00203`). Ama Boateng (`P-004`) has zero criminal ties to Kofi Boateng or the robbery suspects.
+    - Kept suspect `P-002` without a phone on record to ensure `CASE-00201` maintains its exact prescribed signal profile (sharing vehicle, suspect, and method tags only, without an unintended phone match).
+23. **Ama Boateng Victim Alignment & Vehicle Linkage Clarification:**
+    - **CASE-00203 Victim Linkage:** Updated `P-004` (Ama Boateng) in `src/data/persons.ts` with `type: 'victim'` and `relatedCases: ['CASE-00203']`. She now immediately renders under **Victims** on `/cases/CASE-00203?tab=people` with phone `0241111111` and Cantonments address, matching case note `N-015` (unauthorized SIM swap victim).
+    - **Vehicle Link Story Alignment:** Clarified why Ama Boateng and Kofi Boateng connect via vehicle `V-001` (`GT-4521-23` White Toyota Hilux): Ama Boateng reported this family vehicle stolen from Cantonments in `CASE-00022` (Vehicle Theft). The vehicle was subsequently operated by suspect Kofi Boateng (`P-002`) and registered under gang leader Kwame Asante (`P-001`) during armed robbery operations (`CASE-00123`, `CASE-00201`).
+    - **UI Transparency & Rich Badges:** Enhanced `ConnectionScoreCard.tsx` and `describeScore`:
+      - Shows person role badges (`(victim)` vs `(suspect)`).
+      - Replaced cryptic `1 vehicle × 4 = 4` with exact registration and make/model: `1 vehicle × 4 = 4 (GT-4521-23 Toyota Hilux)`.
+      - Added dedicated contextual callout explaining the victim/stolen vehicle vs suspect operator relationship.
+    - **Vehicle & Person Detail Page Annotations:** Updated `VehicleDetailPage.tsx` and `PersonDetailPage.tsx` with investigation background notes explaining the stolen report (`CASE-00022`) vs suspect operator (`CASE-00123`).
+    - **Store Cache Upgrade:** Bumped Zustand storage key to `iis-investigation-data-v3` and added legacy cache eviction in `safeLocalStorage` so browser reloads immediately fetch updated case people and contact records.
 
 ---
 

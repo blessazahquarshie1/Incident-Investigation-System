@@ -22,7 +22,7 @@ export const phoneRecords: PhoneRecord[] = [
   {
     "id": "PR-003",
     "caseId": "CASE-00123",
-    "personId": "P-005",
+    "personId": "P-034",
     "phoneNumber": "0241111111",
     "kind": "sms",
     "timestamp": "2026-09-14T00:00:00Z"
@@ -139,5 +139,13 @@ export const phoneRecords: PhoneRecord[] = [
     "kind": "call",
     "timestamp": "2026-10-01T10:20:00Z",
     "otherNumber": "0209988776"
+  },
+  {
+    "id": "PR-018",
+    "caseId": "CASE-00031",
+    "personId": "P-005",
+    "phoneNumber": "0242222222",
+    "kind": "call",
+    "timestamp": "2026-08-20T10:30:00Z"
   }
 ];

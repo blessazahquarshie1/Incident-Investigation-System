@@ -263,7 +263,7 @@ export function validateConnectionInput(
       r => r.source === input.personId && r.target === input.targetId && r.relationship === input.relationship
     )
     if (exists) {
-      errors.targetId = 'This connection already exists.'
+      errors.targetId = 'This connection already exists in the system (already linked globally).'
     }
   }
 

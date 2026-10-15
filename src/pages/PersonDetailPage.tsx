@@ -203,13 +203,13 @@ export default function PersonDetailPage() {
         )}
       </Card>
 
-      {/* NEW SECTION 2: POSSIBLE SAME PERSON IN OTHER RECORDS */}
-      <Card title="Possible same person in other records">
+      {/* NEW SECTION 2: CROSS-RECORD NAME & IDENTITY MATCHES */}
+      <Card title="Name & Identity Matches Across Records">
         <div className="space-y-4">
           <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 flex items-start gap-2.5">
             <Info className="h-4 w-4 text-slate-500 shrink-0 mt-0.5" />
             <p className="text-[14px] text-slate-700">
-              These are different records. Check whether they are the same person.
+              Scans directory records for potential duplicate suspect identities, shared street aliases, or common family surnames across investigations.
             </p>
           </div>
 
@@ -219,26 +219,43 @@ export default function PersonDetailPage() {
             </p>
           ) : (
             <div className="space-y-3">
-              {possibleSamePersonMatches.map((m, idx) => (
-                <div
-                  key={idx}
-                  className="rounded-xl border border-slate-200 bg-white p-4 space-y-2.5 shadow-sm"
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <Link
-                        to={`/persons/${m.person.id}`}
-                        className="text-[16px] font-bold text-blue-600 hover:underline"
-                      >
-                        {m.person.fullName}
-                      </Link>
-                      <span className="font-mono text-[13px] text-slate-400">{m.person.id}</span>
-                      <EntityTypeBadge type={m.person.type} />
+              {possibleSamePersonMatches.map((m, idx) => {
+                const badgeStyle =
+                  m.kind === 'Exact name'
+                    ? 'bg-red-100 border-red-200 text-red-800'
+                    : m.kind === 'Shared alias'
+                      ? 'bg-amber-100 border-amber-200 text-amber-800'
+                      : m.kind === 'Surname only'
+                        ? 'bg-slate-100 border-slate-200 text-slate-700'
+                        : 'bg-purple-100 border-purple-200 text-purple-800'
+
+                const badgeLabel =
+                  m.kind === 'Surname only'
+                    ? `Shared surname: "${m.term}" (Family name match only)`
+                    : m.kind === 'Exact name'
+                      ? `Exact name match: "${m.term}" (Potential duplicate)`
+                      : `${m.kind}: "${m.term}"`
+
+                return (
+                  <div
+                    key={idx}
+                    className="rounded-xl border border-slate-200 bg-white p-4 space-y-2.5 shadow-sm"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <Link
+                          to={`/persons/${m.person.id}`}
+                          className="text-[16px] font-bold text-blue-600 hover:underline"
+                        >
+                          {m.person.fullName}
+                        </Link>
+                        <span className="font-mono text-[13px] text-slate-400">{m.person.id}</span>
+                        <EntityTypeBadge type={m.person.type} />
+                      </div>
+                      <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[13px] font-bold ${badgeStyle}`}>
+                        {badgeLabel}
+                      </span>
                     </div>
-                    <span className="inline-flex items-center rounded-full bg-purple-100 border border-purple-200 px-2.5 py-0.5 text-[13px] font-bold text-purple-800">
-                      {m.kind}: &ldquo;{m.term}&rdquo;
-                    </span>
-                  </div>
 
                   {m.person.knownAliases && m.person.knownAliases.length > 0 && (
                     <p className="text-[13px] text-slate-500">
@@ -264,7 +281,7 @@ export default function PersonDetailPage() {
                     })}
                   </div>
                 </div>
-              ))}
+              )})}
             </div>
           )}
         </div>
@@ -279,15 +296,23 @@ export default function PersonDetailPage() {
               <div key={type}>
                 <h4 className="text-sm font-semibold capitalize text-slate-600 mb-2 border-b pb-1">{type}s</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {items.map(item => (
-                    <div key={item.id} className="flex items-center gap-2 bg-slate-50 p-2 rounded border">
-                      <EntityIcon type={type as EntityType} />
-                      <div className="flex-1 min-w-0">
-                        <Link to={`/${type}s/${item.id}`} className="text-sm font-medium text-blue-600 hover:underline truncate block">{item.label}</Link>
-                        <div className="text-[13px] text-slate-500 truncate">{item.relationship}</div>
+                  {items.map(item => {
+                    let note = item.relationship
+                    if (item.id === 'V-001') {
+                      if (entity.id === 'P-004') note = `${item.relationship} (Reported stolen in CASE-00022)`
+                      else if (entity.id === 'P-002') note = `${item.relationship} (Operated in armed robberies)`
+                      else if (entity.id === 'P-001') note = `${item.relationship} (Syndicate possessor)`
+                    }
+                    return (
+                      <div key={item.id} className="flex items-center gap-2 bg-slate-50 p-2 rounded border">
+                        <EntityIcon type={type as EntityType} />
+                        <div className="flex-1 min-w-0">
+                          <Link to={`/${type}s/${item.id}`} className="text-sm font-medium text-blue-600 hover:underline truncate block">{item.label}</Link>
+                          <div className="text-[13px] text-slate-500 truncate" title={note}>{note}</div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
             )
@@ -305,14 +330,25 @@ export default function PersonDetailPage() {
             }
             return (
               <div className="space-y-2">
-                {result.connections.map(pair => (
-                  <ConnectionScoreCard
-                    key={`${pair.personAId}-${pair.personBId}`}
-                    pair={pair}
-                    personAName={data.persons.find(p => p.id === pair.personAId)?.fullName ?? pair.personAId}
-                    personBName={data.persons.find(p => p.id === pair.personBId)?.fullName ?? pair.personBId}
-                  />
-                ))}
+                {result.connections.map(pair => {
+                  const pA = data.persons.find(p => p.id === pair.personAId)
+                  const pB = data.persons.find(p => p.id === pair.personBId)
+                  const labelA = pA
+                    ? `${pA.fullName}${pA.id !== entity.id ? ` (${pA.id}${pA.relatedCases[0] ? ` · ${pA.relatedCases[0]}` : ''})` : ''}`
+                    : pair.personAId
+                  const labelB = pB
+                    ? `${pB.fullName}${pB.id !== entity.id ? ` (${pB.id}${pB.relatedCases[0] ? ` · ${pB.relatedCases[0]}` : ''})` : ''}`
+                    : pair.personBId
+
+                  return (
+                    <ConnectionScoreCard
+                      key={`${pair.personAId}-${pair.personBId}`}
+                      pair={pair}
+                      personAName={labelA}
+                      personBName={labelB}
+                    />
+                  )
+                })}
               </div>
             )
           })()}

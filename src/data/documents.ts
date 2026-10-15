@@ -52,17 +52,17 @@ export const documents: CaseDocument[] = [
   {
     "id": "D-007",
     "caseId": "CASE-00123",
-    "title": "Doc 7",
+    "title": "Carrier Analysis: Cloned Burner MSISDN 0241111111",
     "kind": "report",
-    "uploadedAt": "2026-09-14T00:00:00Z",
+    "uploadedAt": "2026-09-15T09:30:00Z",
     "uploadedBy": "O-001"
   },
   {
     "id": "D-008",
-    "caseId": "CASE-00123",
-    "title": "Doc 8",
+    "caseId": "CASE-00203",
+    "title": "Telecom Carrier SIM Swap Audit (0241111111)",
     "kind": "report",
-    "uploadedAt": "2026-09-14T00:00:00Z",
-    "uploadedBy": "O-001"
+    "uploadedAt": "2026-10-01T14:00:00Z",
+    "uploadedBy": "O-006"
   }
 ];

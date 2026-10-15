@@ -508,3 +508,23 @@ A neat picture with the Accra Mall robbery in the middle and the other cases aro
 3. Why is the layout a simple circle instead of a physics simulation?
    *Physics simulations are non-deterministic, jitter during rendering, and frequently pull nodes into overlapping clumps. Pure trigonometric circle maths places nodes at equal angular increments around the centre, guaranteeing a neat, consistent, stable picture with zero overlaps every single time.*
 
+---
+
+## Step 15 — Live updates, case order, and cross-case phone consistency
+
+**What was built:**
+- Fixed case list sorting: active cases (`investigating`, then `open`) appear first, ordered by priority (`critical` down to `low`) and newest update date; `pending` cases sit at the bottom.
+- Live reactive updates: adding a person, linking a vehicle, or uploading evidence triggers instantaneous recalculation of case comparison fingerprints and people connection scores across all views without page reloads.
+- Connection toast notifications: an 8-second toast banner alerts detectives whenever a new cross-case connection is uncovered or a connection level strengthens.
+- Cross-case phone numbers and narrative consistency: populated unique, realistic Ghanaian phone numbers across persons in `src/data/persons.ts`. Clarified the storyline of MSISDN `0241111111` across `CASE-00123` and `CASE-00203` with case notes (`N-014`, `N-015`) and forensic documents (`D-007`, `D-008`), establishing that `0241111111` was an innocent civilian's registered number hijacked via SIM swap by the Osu syndicate and operated as an operational burner.
+
+**How it works (plain English):**
+Investigation systems need to react immediately as detectives enter clues from the field. When a phone number or vehicle is entered into one case, the system compares it against every other case in memory. Because phone numbers are registered to individuals, having full contact numbers for people allows investigators to spot shared communications, while background forensic notes explain why a cloned burner was used across two different robberies without falsely implicating innocent civilian owners.
+
+**Key concepts:**
+- **Dynamic in-memory diffing**: comparing before and after connection snapshots to generate friendly notifications (`Alice Mensah and Bob Asante now share a vehicle`).
+- **Investigative realism**: distinguishing registered subscribers from unauthorized SIM swap perpetrators through linked intelligence notes and documents.
+- **Deterministic ordering**: keeping high-priority, active cases at the top of the investigative queue while shelving pending cases at the bottom.
+- **Narrative coherence in connection paths**: ensuring that when a civilian victim and a criminal suspect share a vehicle link (such as a vehicle reported stolen by the victim and later operated by the suspect), the UI explicitly presents the vehicle details, role tags (`victim` vs `suspect`), and background investigation notes instead of displaying an unhelpful abstract equation like `1 vehicle × 4 = 4`.
+
+

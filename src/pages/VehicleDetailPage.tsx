@@ -60,6 +60,26 @@ export default function VehicleDetailPage() {
           </div>
         </div>
       </Card>
+
+      {entity.id === 'V-001' && (
+        <Card title="Investigation Context & History">
+          <div className="rounded-lg bg-blue-50/80 border border-blue-200/70 p-4 space-y-2 text-[14px] text-blue-900">
+            <p className="font-semibold text-blue-950">Vehicle Linkage & Background:</p>
+            <ul className="list-disc list-inside space-y-1 text-blue-900">
+              <li>
+                <strong>Reported Stolen:</strong> Originally registered to complainant <strong>Ama Boateng (P-004)</strong> and reported stolen from Cantonments in <em>CASE-00022 (Vehicle Theft)</em>.
+              </li>
+              <li>
+                <strong>Syndicate Acquisition:</strong> Subsequently documented in possession of <strong>Kwame Asante (P-001)</strong> and operated by suspect <strong>Kofi Boateng (P-002)</strong> during armed robberies (<em>CASE-00123</em>, <em>CASE-00201</em>).
+              </li>
+              <li>
+                <strong>ANPR Surveillance:</strong> Automated cameras logged sightings of this vehicle along Accra, Tema, and Kasoa corridors.
+              </li>
+            </ul>
+          </div>
+        </Card>
+      )}
+
       <Card title="Linked to">
         <div className="space-y-4">
           {Object.entries(neighborsByType).map(([type, items]) => {
@@ -68,15 +88,23 @@ export default function VehicleDetailPage() {
               <div key={type}>
                 <h4 className="text-sm font-semibold capitalize text-slate-600 mb-2 border-b pb-1">{type}s</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {items.map(item => (
-                    <div key={item.id} className="flex items-center gap-2 bg-slate-50 p-2 rounded border">
-                      <EntityIcon type={type as EntityType} />
-                      <div className="flex-1 min-w-0">
-                        <Link to={`/${type}s/${item.id}`} className="text-sm font-medium text-blue-600 hover:underline truncate block">{item.label}</Link>
-                        <div className="text-[13px] text-slate-500 truncate">{item.relationship}</div>
+                  {items.map(item => {
+                    let note = item.relationship
+                    if (entity.id === 'V-001') {
+                      if (item.id === 'P-004') note = `${item.relationship} (Reported stolen in CASE-00022)`
+                      else if (item.id === 'P-002') note = `${item.relationship} (Suspect driver in robberies)`
+                      else if (item.id === 'P-001') note = `${item.relationship} (Syndicate possessor)`
+                    }
+                    return (
+                      <div key={item.id} className="flex items-center gap-2 bg-slate-50 p-2 rounded border">
+                        <EntityIcon type={type as EntityType} />
+                        <div className="flex-1 min-w-0">
+                          <Link to={`/${type}s/${item.id}`} className="text-sm font-medium text-blue-600 hover:underline truncate block">{item.label}</Link>
+                          <div className="text-[13px] text-slate-500 truncate" title={note}>{note}</div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
             )
