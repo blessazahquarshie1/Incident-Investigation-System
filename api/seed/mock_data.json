@@ -1,0 +1,3086 @@
+{
+  "officers": [
+    {
+      "id": "O-001",
+      "fullName": "John Doe",
+      "rank": "Inspector",
+      "badgeNumber": "B-1234",
+      "department": "CID"
+    },
+    {
+      "id": "O-002",
+      "fullName": "Jane Smith",
+      "rank": "Sergeant",
+      "badgeNumber": "B-2345",
+      "department": "Patrol"
+    },
+    {
+      "id": "O-003",
+      "fullName": "Mike Jones",
+      "rank": "Officer",
+      "badgeNumber": "B-3456",
+      "department": "Forensics"
+    },
+    {
+      "id": "O-004",
+      "fullName": "Samuel Osei",
+      "rank": "Detective",
+      "badgeNumber": "B-4567",
+      "department": "CID"
+    },
+    {
+      "id": "O-005",
+      "fullName": "Kwabena Yeboah",
+      "rank": "Officer",
+      "badgeNumber": "B-5678",
+      "department": "Traffic"
+    },
+    {
+      "id": "O-006",
+      "fullName": "Ama Serwaa",
+      "rank": "Inspector",
+      "badgeNumber": "B-6789",
+      "department": "Cyber"
+    }
+  ],
+  "locations": [
+    {
+      "id": "L-001",
+      "name": "Accra Mall",
+      "city": "Accra",
+      "region": "Greater Accra"
+    },
+    {
+      "id": "L-002",
+      "name": "Tema Port",
+      "city": "Tema",
+      "region": "Greater Accra"
+    },
+    {
+      "id": "L-003",
+      "name": "Kasoa Market",
+      "city": "Kasoa",
+      "region": "Central"
+    },
+    {
+      "id": "L-004",
+      "name": "Kumasi City Mall",
+      "city": "Kumasi",
+      "region": "Ashanti"
+    },
+    {
+      "id": "L-005",
+      "name": "Takoradi Harbour",
+      "city": "Takoradi",
+      "region": "Western"
+    },
+    {
+      "id": "L-006",
+      "name": "Cape Coast Castle",
+      "city": "Cape Coast",
+      "region": "Central"
+    },
+    {
+      "id": "L-007",
+      "name": "Osu Oxford Street",
+      "city": "Accra",
+      "region": "Greater Accra"
+    },
+    {
+      "id": "L-008",
+      "name": "Madina Market",
+      "city": "Accra",
+      "region": "Greater Accra"
+    },
+    {
+      "id": "L-009",
+      "name": "Dansoman",
+      "city": "Accra",
+      "region": "Greater Accra"
+    },
+    {
+      "id": "L-010",
+      "name": "East Legon",
+      "city": "Accra",
+      "region": "Greater Accra"
+    }
+  ],
+  "cases": [
+    {
+      "id": "CASE-00123",
+      "title": "Armed Robbery Investigation",
+      "description": "Robbery at Accra Mall",
+      "type": "theft",
+      "priority": "high",
+      "status": "investigating",
+      "leadInvestigator": "O-001",
+      "createdAt": "2026-09-14T08:31:00Z",
+      "updatedAt": "2026-09-15T17:30:00Z"
+    },
+    {
+      "id": "CASE-00022",
+      "title": "Vehicle Theft",
+      "description": "Stolen Hilux",
+      "type": "theft",
+      "priority": "medium",
+      "status": "closed",
+      "leadInvestigator": "O-002",
+      "createdAt": "2026-08-10T10:00:00Z",
+      "updatedAt": "2026-08-15T10:00:00Z"
+    },
+    {
+      "id": "CASE-00031",
+      "title": "Hit and Run",
+      "description": "Pedestrian hit and run collision on Kasoa New Market Rd involving white pickup truck",
+      "type": "assault",
+      "priority": "critical",
+      "status": "open",
+      "leadInvestigator": "O-005",
+      "createdAt": "2026-08-20T10:00:00Z",
+      "updatedAt": "2026-08-20T10:00:00Z"
+    },
+    {
+      "id": "CASE-00001",
+      "title": "Kokomlemle Street Assault",
+      "description": "Physical altercation resulting in assault charges involving local youths",
+      "type": "assault",
+      "priority": "low",
+      "status": "pending",
+      "leadInvestigator": "O-004",
+      "createdAt": "2026-01-01T00:00:00Z",
+      "updatedAt": "2026-01-01T00:00:00Z"
+    },
+    {
+      "id": "CASE-00002",
+      "title": "Case 2",
+      "description": "Desc",
+      "type": "other",
+      "priority": "low",
+      "status": "pending",
+      "leadInvestigator": "O-004",
+      "createdAt": "2026-01-01T00:00:00Z",
+      "updatedAt": "2026-01-01T00:00:00Z"
+    },
+    {
+      "id": "CASE-00003",
+      "title": "Case 3",
+      "description": "Desc",
+      "type": "other",
+      "priority": "low",
+      "status": "pending",
+      "leadInvestigator": "O-004",
+      "createdAt": "2026-01-01T00:00:00Z",
+      "updatedAt": "2026-01-01T00:00:00Z"
+    },
+    {
+      "id": "CASE-00004",
+      "title": "Case 4",
+      "description": "Desc",
+      "type": "other",
+      "priority": "low",
+      "status": "pending",
+      "leadInvestigator": "O-004",
+      "createdAt": "2026-01-01T00:00:00Z",
+      "updatedAt": "2026-01-01T00:00:00Z"
+    },
+    {
+      "id": "CASE-00005",
+      "title": "Case 5",
+      "description": "Desc",
+      "type": "other",
+      "priority": "low",
+      "status": "pending",
+      "leadInvestigator": "O-004",
+      "createdAt": "2026-01-01T00:00:00Z",
+      "updatedAt": "2026-01-01T00:00:00Z"
+    },
+    {
+      "id": "CASE-00006",
+      "title": "Case 6",
+      "description": "Desc",
+      "type": "other",
+      "priority": "low",
+      "status": "pending",
+      "leadInvestigator": "O-004",
+      "createdAt": "2026-01-01T00:00:00Z",
+      "updatedAt": "2026-01-01T00:00:00Z"
+    },
+    {
+      "id": "CASE-00007",
+      "title": "Case 7",
+      "description": "Desc",
+      "type": "other",
+      "priority": "low",
+      "status": "pending",
+      "leadInvestigator": "O-004",
+      "createdAt": "2026-01-01T00:00:00Z",
+      "updatedAt": "2026-01-01T00:00:00Z"
+    },
+    {
+      "id": "CASE-00008",
+      "title": "Case 8",
+      "description": "Desc",
+      "type": "other",
+      "priority": "low",
+      "status": "pending",
+      "leadInvestigator": "O-004",
+      "createdAt": "2026-01-01T00:00:00Z",
+      "updatedAt": "2026-01-01T00:00:00Z"
+    },
+    {
+      "id": "CASE-00009",
+      "title": "Case 9",
+      "description": "Desc",
+      "type": "other",
+      "priority": "low",
+      "status": "pending",
+      "leadInvestigator": "O-004",
+      "createdAt": "2026-01-01T00:00:00Z",
+      "updatedAt": "2026-01-01T00:00:00Z"
+    },
+    {
+      "id": "CASE-00201",
+      "title": "Kasoa Fuel Station Robbery",
+      "description": "Armed robbery at Total fuel station in Kasoa",
+      "type": "theft",
+      "priority": "high",
+      "status": "closed",
+      "leadInvestigator": "O-002",
+      "createdAt": "2026-03-12T08:50:00Z",
+      "updatedAt": "2026-03-20T16:00:00Z"
+    },
+    {
+      "id": "CASE-00202",
+      "title": "Accra Mall Parking Vehicle Theft",
+      "description": "Unattended saloon vehicle stolen from Accra Mall parking lot",
+      "type": "theft",
+      "priority": "low",
+      "status": "investigating",
+      "leadInvestigator": "O-004",
+      "createdAt": "2026-09-18T14:00:00Z",
+      "updatedAt": "2026-09-19T10:00:00Z"
+    },
+    {
+      "id": "CASE-00203",
+      "title": "Osu Mobile Money Fraud",
+      "description": "SIM swap and illicit wallet transfer targeting mobile money vendor",
+      "type": "fraud",
+      "priority": "medium",
+      "status": "investigating",
+      "leadInvestigator": "O-006",
+      "createdAt": "2026-10-01T11:00:00Z",
+      "updatedAt": "2026-10-02T15:00:00Z"
+    },
+    {
+      "id": "CASE-00204",
+      "title": "Takoradi Market Theft (2024)",
+      "description": "Night-time break-in of hardware stalls at Market Circle",
+      "type": "theft",
+      "priority": "medium",
+      "status": "closed",
+      "leadInvestigator": "O-004",
+      "createdAt": "2024-05-10T09:00:00Z",
+      "updatedAt": "2024-05-20T17:00:00Z"
+    }
+  ],
+  "persons": [
+    {
+      "id": "P-001",
+      "fullName": "Kwame Asante",
+      "type": "suspect",
+      "phone": "0240000001",
+      "address": "14 Independence Ave, Ridge, Accra",
+      "relatedCases": [
+        "CASE-00123"
+      ]
+    },
+    {
+      "id": "P-002",
+      "fullName": "Kofi Boateng",
+      "type": "suspect",
+      "address": "Plot 8, Heavy Industrial Area, Tema",
+      "knownAliases": [
+        "Kojo B"
+      ],
+      "relatedCases": [
+        "CASE-00123",
+        "CASE-00201"
+      ]
+    },
+    {
+      "id": "P-003",
+      "fullName": "Yaw Osei",
+      "type": "person-of-interest",
+      "phone": "0243333333",
+      "address": "22 Ring Road Central, Kokomlemle, Accra",
+      "relatedCases": [
+        "CASE-00001"
+      ]
+    },
+    {
+      "id": "P-004",
+      "fullName": "Ama Boateng",
+      "type": "victim",
+      "phone": "0242222222",
+      "address": "Block B, Flat 4, Cantonments, Accra",
+      "relatedCases": [
+        "CASE-00022"
+      ]
+    },
+    {
+      "id": "P-005",
+      "fullName": "Abena Manu",
+      "type": "victim",
+      "phone": "0205555555",
+      "address": "House 12, Kasoa New Market Rd, Kasoa",
+      "relatedCases": [
+        "CASE-00031"
+      ]
+    },
+    {
+      "id": "P-006",
+      "fullName": "Kojo Antwi",
+      "type": "suspect",
+      "phone": "0246666666",
+      "address": "57 Liberation Rd, Airport Residential Area, Accra",
+      "relatedCases": [
+        "CASE-00001"
+      ]
+    },
+    {
+      "id": "P-007",
+      "fullName": "Kofi Agyei",
+      "type": "witness",
+      "phone": "0240000002",
+      "address": "18 High Street, Jamestown, Accra",
+      "relatedCases": [
+        "CASE-00123"
+      ]
+    },
+    {
+      "id": "P-008",
+      "fullName": "Person 8",
+      "type": "witness",
+      "phone": "0248888888",
+      "address": "Plot 14, Commercial District, Cape Coast",
+      "relatedCases": []
+    },
+    {
+      "id": "P-009",
+      "fullName": "Person 9",
+      "type": "witness",
+      "phone": "0249999999",
+      "address": "24 Harper Road, Adum, Kumasi",
+      "relatedCases": []
+    },
+    {
+      "id": "P-010",
+      "fullName": "Person 10",
+      "type": "witness",
+      "phone": "0241010101",
+      "address": "Plot 3, Beach Road, Takoradi",
+      "relatedCases": []
+    },
+    {
+      "id": "P-011",
+      "fullName": "Person 11",
+      "type": "witness",
+      "phone": "0241122334",
+      "address": "House 8, Community 1, Tema",
+      "relatedCases": []
+    },
+    {
+      "id": "P-012",
+      "fullName": "Person 12",
+      "type": "witness",
+      "phone": "0242233445",
+      "address": "45 Spintex Road, Baatsona, Accra",
+      "relatedCases": []
+    },
+    {
+      "id": "P-013",
+      "fullName": "Person 13",
+      "type": "witness",
+      "phone": "0243344556",
+      "address": "12 Market Circle, Takoradi",
+      "relatedCases": []
+    },
+    {
+      "id": "P-014",
+      "fullName": "Person 14",
+      "type": "witness",
+      "phone": "0244455667",
+      "address": "Plot 19, Sunyani Road, Kumasi",
+      "relatedCases": []
+    },
+    {
+      "id": "P-015",
+      "fullName": "Person 15",
+      "type": "witness",
+      "phone": "0245566778",
+      "address": "8 Castle Road, Osu, Accra",
+      "relatedCases": []
+    },
+    {
+      "id": "P-016",
+      "fullName": "Person 16",
+      "type": "witness",
+      "phone": "0246677889",
+      "address": "House 5, New Winneba Rd, Kasoa",
+      "relatedCases": []
+    },
+    {
+      "id": "P-017",
+      "fullName": "Person 17",
+      "type": "witness",
+      "phone": "0247788990",
+      "address": "15 Oxford Street, Osu, Accra",
+      "relatedCases": []
+    },
+    {
+      "id": "P-018",
+      "fullName": "Person 18",
+      "type": "witness",
+      "phone": "0248899001",
+      "address": "Plot 22, Industrial Estate, Tema",
+      "relatedCases": []
+    },
+    {
+      "id": "P-019",
+      "fullName": "Person 19",
+      "type": "witness",
+      "phone": "0249900112",
+      "address": "33 Prempeh II Ave, Kumasi",
+      "relatedCases": []
+    },
+    {
+      "id": "P-020",
+      "fullName": "Person 20",
+      "type": "witness",
+      "phone": "0201122334",
+      "address": "House 17, Harbour View, Takoradi",
+      "relatedCases": []
+    },
+    {
+      "id": "P-021",
+      "fullName": "Person 21",
+      "type": "witness",
+      "phone": "0202233445",
+      "address": "10 Victoria Road, Cape Coast",
+      "relatedCases": []
+    },
+    {
+      "id": "P-022",
+      "fullName": "Person 22",
+      "type": "witness",
+      "phone": "0203344556",
+      "address": "Plot 6, Dansoman High St, Accra",
+      "relatedCases": []
+    },
+    {
+      "id": "P-023",
+      "fullName": "Person 23",
+      "type": "witness",
+      "phone": "0204455667",
+      "address": "52 Graphic Road, South Industrial Area, Accra",
+      "relatedCases": []
+    },
+    {
+      "id": "P-024",
+      "fullName": "Person 24",
+      "type": "witness",
+      "phone": "0205566778",
+      "address": "House 9, Community 5, Tema",
+      "relatedCases": []
+    },
+    {
+      "id": "P-025",
+      "fullName": "Person 25",
+      "type": "witness",
+      "phone": "0206677889",
+      "address": "Plot 31, Bantama High St, Kumasi",
+      "relatedCases": []
+    },
+    {
+      "id": "P-026",
+      "fullName": "Person 26",
+      "type": "witness",
+      "phone": "0207788990",
+      "address": "14 Giffard Road, East Cantonments, Accra",
+      "relatedCases": []
+    },
+    {
+      "id": "P-027",
+      "fullName": "Kweku Baah",
+      "type": "victim",
+      "phone": "0201234567",
+      "address": "Opposite Kasoa New Market, Kasoa",
+      "relatedCases": [
+        "CASE-00201"
+      ]
+    },
+    {
+      "id": "P-028",
+      "fullName": "Emmanuel Tetteh",
+      "type": "witness",
+      "phone": "0207654321",
+      "address": "Ofankor Barrier, Greater Accra",
+      "relatedCases": [
+        "CASE-00201"
+      ]
+    },
+    {
+      "id": "P-029",
+      "fullName": "Selorm Agbenu",
+      "type": "victim",
+      "phone": "0551122334",
+      "address": "12 Volta Street, Dzorwulu, Accra",
+      "relatedCases": [
+        "CASE-00202"
+      ]
+    },
+    {
+      "id": "P-030",
+      "fullName": "Fafali Dogbe",
+      "type": "witness",
+      "phone": "0559988776",
+      "address": "Apenkwa, Achimota, Accra",
+      "relatedCases": [
+        "CASE-00202"
+      ]
+    },
+    {
+      "id": "P-031",
+      "fullName": "Kwame Asante",
+      "type": "suspect",
+      "phone": "0541234001",
+      "address": "Osu RE, Accra",
+      "relatedCases": [
+        "CASE-00203"
+      ]
+    },
+    {
+      "id": "P-032",
+      "fullName": "Esi Asante",
+      "type": "person-of-interest",
+      "phone": "0243334444",
+      "address": "Ringway Estate, Osu, Accra",
+      "relatedCases": [
+        "CASE-00203"
+      ]
+    },
+    {
+      "id": "P-033",
+      "fullName": "Daniel Cudjoe",
+      "type": "suspect",
+      "phone": "0208889999",
+      "address": "Salvation Army St, Osu, Accra",
+      "knownAliases": [
+        "Kojo B"
+      ],
+      "relatedCases": [
+        "CASE-00203"
+      ]
+    },
+    {
+      "id": "P-034",
+      "fullName": "Akua Agyemang",
+      "type": "victim",
+      "phone": "0241111111",
+      "address": "Oxford Street Commercial strip, Osu, Accra",
+      "relatedCases": [
+        "CASE-00203",
+        "CASE-00123"
+      ]
+    },
+    {
+      "id": "P-035",
+      "fullName": "Fiifi Quaye",
+      "type": "suspect",
+      "phone": "0544556677",
+      "address": "New Takoradi, Takoradi",
+      "relatedCases": [
+        "CASE-00204"
+      ]
+    },
+    {
+      "id": "P-036",
+      "fullName": "Araba Hanson",
+      "type": "victim",
+      "phone": "0549887766",
+      "address": "Market Circle Commercial Block, Takoradi",
+      "relatedCases": [
+        "CASE-00204"
+      ]
+    }
+  ],
+  "incidents": [
+    {
+      "id": "I-023",
+      "caseId": "CASE-00123",
+      "title": "Mall Robbery",
+      "description": "Armed robbery at mall",
+      "type": "theft",
+      "locationId": "L-001",
+      "occurredAt": "2026-09-14T08:31:00Z",
+      "status": "unresolved"
+    },
+    {
+      "id": "I-004",
+      "caseId": "CASE-00001",
+      "title": "Assault",
+      "description": "Assault",
+      "type": "assault",
+      "locationId": "L-003",
+      "occurredAt": "2026-01-01T00:00:00Z",
+      "status": "resolved"
+    },
+    {
+      "id": "I-001",
+      "caseId": "CASE-00002",
+      "title": "Incident 1",
+      "description": "Desc",
+      "type": "other",
+      "locationId": "L-004",
+      "occurredAt": "2026-01-01T00:00:00Z",
+      "status": "resolved"
+    },
+    {
+      "id": "I-002",
+      "caseId": "CASE-00003",
+      "title": "Incident 2",
+      "description": "Desc",
+      "type": "other",
+      "locationId": "L-004",
+      "occurredAt": "2026-01-01T00:00:00Z",
+      "status": "resolved"
+    },
+    {
+      "id": "I-003",
+      "caseId": "CASE-00004",
+      "title": "Incident 3",
+      "description": "Desc",
+      "type": "other",
+      "locationId": "L-004",
+      "occurredAt": "2026-01-01T00:00:00Z",
+      "status": "resolved"
+    },
+    {
+      "id": "I-005",
+      "caseId": "CASE-00006",
+      "title": "Incident 5",
+      "description": "Desc",
+      "type": "other",
+      "locationId": "L-004",
+      "occurredAt": "2026-01-01T00:00:00Z",
+      "status": "resolved"
+    },
+    {
+      "id": "I-006",
+      "caseId": "CASE-00007",
+      "title": "Incident 6",
+      "description": "Desc",
+      "type": "other",
+      "locationId": "L-004",
+      "occurredAt": "2026-01-01T00:00:00Z",
+      "status": "resolved"
+    },
+    {
+      "id": "I-007",
+      "caseId": "CASE-00008",
+      "title": "Incident 7",
+      "description": "Desc",
+      "type": "other",
+      "locationId": "L-004",
+      "occurredAt": "2026-01-01T00:00:00Z",
+      "status": "resolved"
+    },
+    {
+      "id": "I-008",
+      "caseId": "CASE-00009",
+      "title": "Incident 8",
+      "description": "Desc",
+      "type": "other",
+      "locationId": "L-004",
+      "occurredAt": "2026-01-01T00:00:00Z",
+      "status": "resolved"
+    },
+    {
+      "id": "I-009",
+      "caseId": "CASE-00001",
+      "title": "Incident 9",
+      "description": "Desc",
+      "type": "other",
+      "locationId": "L-004",
+      "occurredAt": "2026-01-01T00:00:00Z",
+      "status": "resolved"
+    },
+    {
+      "id": "I-010",
+      "caseId": "CASE-00002",
+      "title": "Incident 10",
+      "description": "Desc",
+      "type": "other",
+      "locationId": "L-004",
+      "occurredAt": "2026-01-01T00:00:00Z",
+      "status": "resolved"
+    },
+    {
+      "id": "I-011",
+      "caseId": "CASE-00003",
+      "title": "Incident 11",
+      "description": "Desc",
+      "type": "other",
+      "locationId": "L-004",
+      "occurredAt": "2026-01-01T00:00:00Z",
+      "status": "resolved"
+    },
+    {
+      "id": "I-012",
+      "caseId": "CASE-00004",
+      "title": "Incident 12",
+      "description": "Desc",
+      "type": "other",
+      "locationId": "L-004",
+      "occurredAt": "2026-01-01T00:00:00Z",
+      "status": "resolved"
+    },
+    {
+      "id": "I-024",
+      "caseId": "CASE-00201",
+      "title": "Kasoa Fuel Station Cash Robbery",
+      "description": "Armed robbery at cash counter during morning shift handover",
+      "type": "theft",
+      "locationId": "L-003",
+      "occurredAt": "2026-03-12T08:50:00Z",
+      "status": "resolved"
+    },
+    {
+      "id": "I-025",
+      "caseId": "CASE-00202",
+      "title": "Basement Parking Car Break-in",
+      "description": "Saloon car broken into and driven out of the parking structure",
+      "type": "theft",
+      "locationId": "L-001",
+      "occurredAt": "2026-09-18T14:45:00Z",
+      "status": "unresolved"
+    },
+    {
+      "id": "I-026",
+      "caseId": "CASE-00203",
+      "title": "Mobile Money Kiosk Transfer Fraud",
+      "description": "Unauthorised transfer of funds using cloned SIM credentials",
+      "type": "fraud",
+      "locationId": "L-007",
+      "occurredAt": "2026-10-01T10:30:00Z",
+      "status": "unresolved"
+    },
+    {
+      "id": "I-027",
+      "caseId": "CASE-00204",
+      "title": "Hardware Warehouse Forcible Entry",
+      "description": "Padlocks pried open and copper fittings removed",
+      "type": "theft",
+      "locationId": "L-005",
+      "occurredAt": "2024-05-10T02:15:00Z",
+      "status": "resolved"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "E-024",
+      "caseId": "CASE-00123",
+      "type": "device",
+      "description": "Laptop found at scene",
+      "collectedAt": "2026-09-14T09:30:00Z",
+      "collectedBy": "O-001",
+      "locationId": "L-001",
+      "linkedPersons": [
+        "P-001"
+      ],
+      "title": "Laptop",
+      "status": "under-analysis",
+      "custodyHistory": [
+        {
+          "id": "CE-024-1",
+          "action": "collected",
+          "timestamp": "2026-09-14T09:30:00Z",
+          "officerId": "O-001"
+        },
+        {
+          "id": "CE-024-2",
+          "action": "transferred",
+          "timestamp": "2026-09-14T10:45:00Z",
+          "officerId": "O-001",
+          "toOfficerId": "O-002"
+        },
+        {
+          "id": "CE-024-3",
+          "action": "submitted-to-evidence-room",
+          "timestamp": "2026-09-14T14:12:00Z",
+          "officerId": "O-002"
+        },
+        {
+          "id": "CE-024-4",
+          "action": "analysis-started",
+          "timestamp": "2026-09-14T16:00:00Z",
+          "officerId": "O-003"
+        }
+      ]
+    },
+    {
+      "id": "E-031",
+      "caseId": "CASE-00123",
+      "type": "document",
+      "description": "Old document",
+      "collectedAt": "2026-09-10T09:30:00Z",
+      "collectedBy": "O-001",
+      "locationId": "L-001",
+      "linkedPersons": [],
+      "title": "Old Doc",
+      "status": "destroyed",
+      "custodyHistory": [
+        {
+          "id": "CE-031-1",
+          "action": "destroyed",
+          "timestamp": "2026-09-10T10:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-001",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 1",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-1-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-002",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 2",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-2-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-003",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 3",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-3-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-004",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 4",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-4-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-005",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 5",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-5-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-006",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 6",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-6-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-007",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 7",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-7-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-008",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 8",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-8-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-009",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 9",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-9-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-010",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 10",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-10-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-011",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 11",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-11-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-012",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 12",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-12-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-013",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 13",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-13-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-014",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 14",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-14-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-015",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 15",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-15-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-016",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 16",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-16-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-017",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 17",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-17-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-018",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 18",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-18-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-019",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 19",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-19-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-020",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 20",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-20-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-021",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 21",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-21-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-022",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 22",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-22-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-023",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 23",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-23-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-025",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 25",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-25-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-026",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 26",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-26-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-027",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 27",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-27-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-028",
+      "caseId": "CASE-00001",
+      "type": "photo",
+      "description": "Photo",
+      "collectedAt": "2026-01-01T00:00:00Z",
+      "collectedBy": "O-001",
+      "title": "Photo 28",
+      "status": "collected",
+      "linkedPersons": [],
+      "custodyHistory": [
+        {
+          "id": "CE-28-1",
+          "action": "collected",
+          "timestamp": "2026-01-01T00:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-029",
+      "caseId": "CASE-00123",
+      "type": "photo",
+      "title": "CCTV Footwear and Mask Frame",
+      "description": "Surveillance camera still showing grey balaclava worn by perpetrator",
+      "collectedAt": "2026-09-14T11:00:00Z",
+      "collectedBy": "O-001",
+      "locationId": "L-001",
+      "linkedPersons": [],
+      "status": "collected",
+      "tags": [
+        "grey-balaclava"
+      ],
+      "custodyHistory": [
+        {
+          "id": "CE-029-1",
+          "action": "collected",
+          "timestamp": "2026-09-14T11:00:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-030",
+      "caseId": "CASE-00123",
+      "type": "photo",
+      "title": "Service Door Toolmark Impressions",
+      "description": "Photographs of crowbar pry marks on the cash office entrance",
+      "collectedAt": "2026-09-14T11:30:00Z",
+      "collectedBy": "O-001",
+      "locationId": "L-001",
+      "linkedPersons": [],
+      "status": "collected",
+      "tags": [
+        "crowbar-pry-marks"
+      ],
+      "custodyHistory": [
+        {
+          "id": "CE-030-1",
+          "action": "collected",
+          "timestamp": "2026-09-14T11:30:00Z",
+          "officerId": "O-001"
+        }
+      ]
+    },
+    {
+      "id": "E-032",
+      "caseId": "CASE-00201",
+      "type": "photo",
+      "title": "Recovered Balaclava",
+      "description": "Grey woolen balaclava dropped behind fuel station generator house",
+      "collectedAt": "2026-03-12T09:30:00Z",
+      "collectedBy": "O-002",
+      "locationId": "L-003",
+      "linkedPersons": [
+        "P-002"
+      ],
+      "status": "in-evidence-room",
+      "tags": [
+        "grey-balaclava"
+      ],
+      "custodyHistory": [
+        {
+          "id": "CE-032-1",
+          "action": "collected",
+          "timestamp": "2026-03-12T09:30:00Z",
+          "officerId": "O-002"
+        },
+        {
+          "id": "CE-032-2",
+          "action": "submitted-to-evidence-room",
+          "timestamp": "2026-03-12T11:00:00Z",
+          "officerId": "O-002"
+        }
+      ]
+    },
+    {
+      "id": "E-033",
+      "caseId": "CASE-00202",
+      "type": "photo",
+      "title": "Shattered Quarter Glass",
+      "description": "Glass fragments collected from parking stall B12",
+      "collectedAt": "2026-09-18T15:30:00Z",
+      "collectedBy": "O-004",
+      "locationId": "L-001",
+      "linkedPersons": [],
+      "status": "collected",
+      "tags": [
+        "broken-glass"
+      ],
+      "custodyHistory": [
+        {
+          "id": "CE-033-1",
+          "action": "collected",
+          "timestamp": "2026-09-18T15:30:00Z",
+          "officerId": "O-004"
+        }
+      ]
+    },
+    {
+      "id": "E-034",
+      "caseId": "CASE-00203",
+      "type": "device",
+      "title": "Burner Mobile Handset",
+      "description": "Infinix keypad phone used to initiate SIM clone verification SMS",
+      "collectedAt": "2026-10-01T11:45:00Z",
+      "collectedBy": "O-006",
+      "locationId": "L-007",
+      "linkedPersons": [
+        "P-031"
+      ],
+      "status": "under-analysis",
+      "tags": [
+        "burner-phone"
+      ],
+      "custodyHistory": [
+        {
+          "id": "CE-034-1",
+          "action": "collected",
+          "timestamp": "2026-10-01T11:45:00Z",
+          "officerId": "O-006"
+        },
+        {
+          "id": "CE-034-2",
+          "action": "analysis-started",
+          "timestamp": "2026-10-01T14:00:00Z",
+          "officerId": "O-006"
+        }
+      ]
+    },
+    {
+      "id": "E-035",
+      "caseId": "CASE-00204",
+      "type": "photo",
+      "title": "Pry Mark Impressions on Padlock",
+      "description": "Striations and deformation on steel hasp from crowbar",
+      "collectedAt": "2024-05-10T09:30:00Z",
+      "collectedBy": "O-004",
+      "locationId": "L-005",
+      "linkedPersons": [
+        "P-035"
+      ],
+      "status": "in-evidence-room",
+      "tags": [
+        "crowbar-pry-marks"
+      ],
+      "custodyHistory": [
+        {
+          "id": "CE-035-1",
+          "action": "collected",
+          "timestamp": "2024-05-10T09:30:00Z",
+          "officerId": "O-004"
+        },
+        {
+          "id": "CE-035-2",
+          "action": "submitted-to-evidence-room",
+          "timestamp": "2024-05-10T12:00:00Z",
+          "officerId": "O-004"
+        }
+      ]
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "V-001",
+      "registration": "GT-4521-23",
+      "make": "Toyota",
+      "model": "Hilux",
+      "color": "White",
+      "ownerId": "P-001"
+    },
+    {
+      "id": "V-007",
+      "registration": "GR-1234-20",
+      "make": "Honda",
+      "model": "Civic",
+      "color": "Black"
+    },
+    {
+      "id": "V-002",
+      "registration": "XX-2-21",
+      "make": "Ford",
+      "model": "Focus",
+      "color": "Blue"
+    },
+    {
+      "id": "V-003",
+      "registration": "XX-3-21",
+      "make": "Ford",
+      "model": "Focus",
+      "color": "Blue"
+    },
+    {
+      "id": "V-004",
+      "registration": "XX-4-21",
+      "make": "Ford",
+      "model": "Focus",
+      "color": "Blue"
+    },
+    {
+      "id": "V-005",
+      "registration": "XX-5-21",
+      "make": "Ford",
+      "model": "Focus",
+      "color": "Blue"
+    },
+    {
+      "id": "V-006",
+      "registration": "XX-6-21",
+      "make": "Ford",
+      "model": "Focus",
+      "color": "Blue"
+    },
+    {
+      "id": "V-008",
+      "registration": "XX-8-21",
+      "make": "Ford",
+      "model": "Focus",
+      "color": "Blue"
+    },
+    {
+      "id": "V-009",
+      "registration": "XX-9-21",
+      "make": "Ford",
+      "model": "Focus",
+      "color": "Blue"
+    },
+    {
+      "id": "V-010",
+      "registration": "XX-10-21",
+      "make": "Ford",
+      "model": "Focus",
+      "color": "Blue"
+    },
+    {
+      "id": "V-011",
+      "registration": "GS-3311-24",
+      "make": "Hyundai",
+      "model": "Elantra",
+      "color": "Silver",
+      "ownerId": "P-029"
+    }
+  ],
+  "documents": [
+    {
+      "id": "D-001",
+      "caseId": "CASE-00123",
+      "title": "Doc 1",
+      "kind": "report",
+      "uploadedAt": "2026-09-14T00:00:00Z",
+      "uploadedBy": "O-001"
+    },
+    {
+      "id": "D-002",
+      "caseId": "CASE-00123",
+      "title": "Doc 2",
+      "kind": "report",
+      "uploadedAt": "2026-09-14T00:00:00Z",
+      "uploadedBy": "O-001"
+    },
+    {
+      "id": "D-003",
+      "caseId": "CASE-00123",
+      "title": "Doc 3",
+      "kind": "report",
+      "uploadedAt": "2026-09-14T00:00:00Z",
+      "uploadedBy": "O-001"
+    },
+    {
+      "id": "D-004",
+      "caseId": "CASE-00123",
+      "title": "Doc 4",
+      "kind": "report",
+      "uploadedAt": "2026-09-14T00:00:00Z",
+      "uploadedBy": "O-001"
+    },
+    {
+      "id": "D-005",
+      "caseId": "CASE-00123",
+      "title": "Doc 5",
+      "kind": "report",
+      "uploadedAt": "2026-09-14T00:00:00Z",
+      "uploadedBy": "O-001"
+    },
+    {
+      "id": "D-006",
+      "caseId": "CASE-00123",
+      "title": "Doc 6",
+      "kind": "report",
+      "uploadedAt": "2026-09-14T00:00:00Z",
+      "uploadedBy": "O-001"
+    },
+    {
+      "id": "D-007",
+      "caseId": "CASE-00123",
+      "title": "Carrier Analysis: Cloned Burner MSISDN 0241111111",
+      "kind": "report",
+      "uploadedAt": "2026-09-15T09:30:00Z",
+      "uploadedBy": "O-001"
+    },
+    {
+      "id": "D-008",
+      "caseId": "CASE-00203",
+      "title": "Telecom Carrier SIM Swap Audit (0241111111)",
+      "kind": "report",
+      "uploadedAt": "2026-10-01T14:00:00Z",
+      "uploadedBy": "O-006"
+    }
+  ],
+  "notes": [
+    {
+      "id": "N-001",
+      "caseId": "CASE-00123",
+      "authorId": "O-001",
+      "createdAt": "2026-09-14T00:00:00Z",
+      "text": "Note 1"
+    },
+    {
+      "id": "N-002",
+      "caseId": "CASE-00123",
+      "authorId": "O-001",
+      "createdAt": "2026-09-14T00:00:00Z",
+      "text": "Note 2"
+    },
+    {
+      "id": "N-003",
+      "caseId": "CASE-00123",
+      "authorId": "O-001",
+      "createdAt": "2026-09-14T00:00:00Z",
+      "text": "Note 3"
+    },
+    {
+      "id": "N-004",
+      "caseId": "CASE-00123",
+      "authorId": "O-001",
+      "createdAt": "2026-09-14T00:00:00Z",
+      "text": "Note 4"
+    },
+    {
+      "id": "N-005",
+      "caseId": "CASE-00123",
+      "authorId": "O-001",
+      "createdAt": "2026-09-14T00:00:00Z",
+      "text": "Note 5"
+    },
+    {
+      "id": "N-006",
+      "caseId": "CASE-00123",
+      "authorId": "O-001",
+      "createdAt": "2026-09-14T00:00:00Z",
+      "text": "Note 6"
+    },
+    {
+      "id": "N-007",
+      "caseId": "CASE-00123",
+      "authorId": "O-001",
+      "createdAt": "2026-09-14T00:00:00Z",
+      "text": "Note 7"
+    },
+    {
+      "id": "N-008",
+      "caseId": "CASE-00123",
+      "authorId": "O-001",
+      "createdAt": "2026-09-14T00:00:00Z",
+      "text": "Note 8"
+    },
+    {
+      "id": "N-009",
+      "caseId": "CASE-00123",
+      "authorId": "O-001",
+      "createdAt": "2026-09-14T00:00:00Z",
+      "text": "Note 9"
+    },
+    {
+      "id": "N-010",
+      "caseId": "CASE-00123",
+      "authorId": "O-001",
+      "createdAt": "2026-09-14T00:00:00Z",
+      "text": "Note 10"
+    },
+    {
+      "id": "N-011",
+      "caseId": "CASE-00123",
+      "authorId": "O-001",
+      "createdAt": "2026-09-14T00:00:00Z",
+      "text": "Note 11"
+    },
+    {
+      "id": "N-012",
+      "caseId": "CASE-00022",
+      "authorId": "O-002",
+      "createdAt": "2026-08-10T11:30:00Z",
+      "text": "Stolen Vehicle Report: Complainant Ama Boateng (P-004) reported white Toyota Hilux (GT-4521-23) stolen from Cantonments. Vehicle flagged on ANPR cameras and subsequently traced to suspect Kofi Boateng (P-002) in armed robbery operations."
+    },
+    {
+      "id": "N-013",
+      "caseId": "CASE-00123",
+      "authorId": "O-001",
+      "createdAt": "2026-09-14T11:00:00Z",
+      "text": "Vehicle Surveillance (V-001): White Toyota Hilux (GT-4521-23) driven by suspect Kofi Boateng (P-002) in the robbery was traced to civilian complainant Ama Boateng (P-004), who reported the vehicle stolen in CASE-00022. Suspects operated the stolen vehicle with falsified paperwork."
+    },
+    {
+      "id": "N-014",
+      "caseId": "CASE-00123",
+      "authorId": "O-001",
+      "createdAt": "2026-09-15T09:00:00Z",
+      "text": "SMS Intercept Analysis (PR-003): Outbound SMS record PR-003 links to MSISDN 0241111111. Telecommunications carrier investigation confirms this line belongs to Osu mobile money vendor Akua Agyemang (P-034), whose number was hijacked via a social engineering scam call in CASE-00203 and utilized by the robbery crew as an operational burner."
+    },
+    {
+      "id": "N-015",
+      "caseId": "CASE-00203",
+      "authorId": "O-006",
+      "createdAt": "2026-10-01T12:00:00Z",
+      "text": "Social Engineering Scam Call & SIM Hijack (PR-017): Vendor Akua Agyemang (P-034) reported that she received a deceptive voice call at her Oxford Street kiosk from a scammer posing as telco agent support. Tricked into entering an authorization code, her SIM on 0241111111 was hijacked virtually and her merchant float drained by suspect Kwame Asante (P-031). The hijacked number was then used in the Accra Mall armed robbery."
+    }
+  ],
+  "witnessStatements": [
+    {
+      "id": "WS-001",
+      "caseId": "CASE-00123",
+      "witnessId": "P-007",
+      "subjectPersonId": "P-001",
+      "locationId": "L-005",
+      "claimedTime": "2026-09-14T10:15:00Z",
+      "recordedAt": "2026-09-15T00:00:00Z",
+      "text": "Saw him at Takoradi"
+    },
+    {
+      "id": "WS-002",
+      "caseId": "CASE-00123",
+      "witnessId": "P-008",
+      "subjectPersonId": "P-002",
+      "locationId": "L-001",
+      "claimedTime": "2026-09-14T00:00:00Z",
+      "recordedAt": "2026-09-15T00:00:00Z",
+      "text": "Statement"
+    },
+    {
+      "id": "WS-003",
+      "caseId": "CASE-00123",
+      "witnessId": "P-009",
+      "subjectPersonId": "P-002",
+      "locationId": "L-001",
+      "claimedTime": "2026-09-14T00:00:00Z",
+      "recordedAt": "2026-09-15T00:00:00Z",
+      "text": "Statement"
+    },
+    {
+      "id": "WS-004",
+      "caseId": "CASE-00123",
+      "witnessId": "P-010",
+      "subjectPersonId": "P-002",
+      "locationId": "L-001",
+      "claimedTime": "2026-09-14T00:00:00Z",
+      "recordedAt": "2026-09-15T00:00:00Z",
+      "text": "Statement"
+    },
+    {
+      "id": "WS-005",
+      "caseId": "CASE-00123",
+      "witnessId": "P-011",
+      "subjectPersonId": "P-002",
+      "locationId": "L-001",
+      "claimedTime": "2026-09-14T00:00:00Z",
+      "recordedAt": "2026-09-15T00:00:00Z",
+      "text": "Statement"
+    },
+    {
+      "id": "WS-006",
+      "caseId": "CASE-00123",
+      "witnessId": "P-012",
+      "subjectPersonId": "P-002",
+      "locationId": "L-001",
+      "claimedTime": "2026-09-14T00:00:00Z",
+      "recordedAt": "2026-09-15T00:00:00Z",
+      "text": "Statement"
+    },
+    {
+      "id": "WS-007",
+      "caseId": "CASE-00123",
+      "witnessId": "P-013",
+      "subjectPersonId": "P-002",
+      "locationId": "L-001",
+      "claimedTime": "2026-09-14T00:00:00Z",
+      "recordedAt": "2026-09-15T00:00:00Z",
+      "text": "Statement"
+    },
+    {
+      "id": "WS-008",
+      "caseId": "CASE-00123",
+      "witnessId": "P-014",
+      "subjectPersonId": "P-002",
+      "locationId": "L-001",
+      "claimedTime": "2026-09-14T00:00:00Z",
+      "recordedAt": "2026-09-15T00:00:00Z",
+      "text": "Statement"
+    }
+  ],
+  "sightings": [
+    {
+      "id": "SG-001",
+      "caseId": "CASE-00123",
+      "source": "anpr",
+      "action": "entered",
+      "locationId": "L-001",
+      "timestamp": "2026-09-14T08:03:00Z",
+      "description": "Entered",
+      "vehicleId": "V-001"
+    },
+    {
+      "id": "SG-002",
+      "caseId": "CASE-00123",
+      "source": "cctv",
+      "action": "seen",
+      "locationId": "L-001",
+      "timestamp": "2026-09-14T08:20:00Z",
+      "description": "Seen",
+      "personId": "P-001"
+    },
+    {
+      "id": "SG-003",
+      "caseId": "CASE-00123",
+      "source": "anpr",
+      "action": "left",
+      "locationId": "L-001",
+      "timestamp": "2026-09-14T09:12:00Z",
+      "description": "Left",
+      "vehicleId": "V-001"
+    },
+    {
+      "id": "SG-004",
+      "caseId": "CASE-00123",
+      "source": "cctv",
+      "action": "seen",
+      "locationId": "L-001",
+      "timestamp": "2026-09-14T10:10:00Z",
+      "description": "Accra sighting",
+      "personId": "P-001"
+    },
+    {
+      "id": "SG-005",
+      "caseId": "CASE-00123",
+      "source": "cctv",
+      "action": "seen",
+      "locationId": "L-002",
+      "timestamp": "2026-09-14T12:00:00Z",
+      "description": "Tema sighting",
+      "personId": "P-001"
+    },
+    {
+      "id": "SG-006",
+      "caseId": "CASE-00123",
+      "source": "anpr",
+      "action": "seen",
+      "locationId": "L-002",
+      "timestamp": "2026-09-14T12:00:00Z",
+      "description": "Tema V-001",
+      "vehicleId": "V-001"
+    },
+    {
+      "id": "SG-007",
+      "caseId": "CASE-00123",
+      "source": "anpr",
+      "action": "seen",
+      "locationId": "L-003",
+      "timestamp": "2026-09-14T13:00:00Z",
+      "description": "Kasoa V-001",
+      "vehicleId": "V-001"
+    },
+    {
+      "id": "SG-008",
+      "caseId": "CASE-00123",
+      "source": "patrol",
+      "action": "seen",
+      "locationId": "L-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "description": "Sight"
+    },
+    {
+      "id": "SG-009",
+      "caseId": "CASE-00123",
+      "source": "patrol",
+      "action": "seen",
+      "locationId": "L-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "description": "Sight"
+    },
+    {
+      "id": "SG-010",
+      "caseId": "CASE-00123",
+      "source": "patrol",
+      "action": "seen",
+      "locationId": "L-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "description": "Sight"
+    },
+    {
+      "id": "SG-011",
+      "caseId": "CASE-00123",
+      "source": "patrol",
+      "action": "seen",
+      "locationId": "L-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "description": "Sight"
+    },
+    {
+      "id": "SG-012",
+      "caseId": "CASE-00123",
+      "source": "patrol",
+      "action": "seen",
+      "locationId": "L-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "description": "Sight"
+    },
+    {
+      "id": "SG-013",
+      "caseId": "CASE-00123",
+      "source": "patrol",
+      "action": "seen",
+      "locationId": "L-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "description": "Sight"
+    },
+    {
+      "id": "SG-014",
+      "caseId": "CASE-00123",
+      "source": "patrol",
+      "action": "seen",
+      "locationId": "L-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "description": "Sight"
+    },
+    {
+      "id": "SG-015",
+      "caseId": "CASE-00123",
+      "source": "patrol",
+      "action": "seen",
+      "locationId": "L-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "description": "Sight"
+    },
+    {
+      "id": "SG-016",
+      "caseId": "CASE-00123",
+      "source": "patrol",
+      "action": "seen",
+      "locationId": "L-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "description": "Sight"
+    },
+    {
+      "id": "SG-017",
+      "caseId": "CASE-00123",
+      "source": "patrol",
+      "action": "seen",
+      "locationId": "L-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "description": "Sight"
+    },
+    {
+      "id": "SG-018",
+      "caseId": "CASE-00123",
+      "source": "patrol",
+      "action": "seen",
+      "locationId": "L-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "description": "Sight"
+    },
+    {
+      "id": "SG-019",
+      "caseId": "CASE-00123",
+      "source": "patrol",
+      "action": "seen",
+      "locationId": "L-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "description": "Sight"
+    },
+    {
+      "id": "SG-020",
+      "caseId": "CASE-00123",
+      "source": "patrol",
+      "action": "seen",
+      "locationId": "L-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "description": "Sight"
+    },
+    {
+      "id": "SG-021",
+      "caseId": "CASE-00201",
+      "source": "cctv",
+      "action": "left",
+      "locationId": "L-003",
+      "timestamp": "2026-03-12T08:55:00Z",
+      "description": "Toyota Hilux GT-4521-23 observed speeding out of fuel station forecourt",
+      "vehicleId": "V-001"
+    },
+    {
+      "id": "SG-022",
+      "caseId": "CASE-00202",
+      "source": "cctv",
+      "action": "left",
+      "locationId": "L-001",
+      "timestamp": "2026-09-18T15:00:00Z",
+      "description": "Silver Elantra seen exiting parking gate without permit",
+      "vehicleId": "V-011"
+    }
+  ],
+  "phoneRecords": [
+    {
+      "id": "PR-001",
+      "caseId": "CASE-00123",
+      "personId": "P-001",
+      "phoneNumber": "0240000001",
+      "kind": "cell-tower",
+      "timestamp": "2026-09-14T08:14:00Z",
+      "locationId": "L-001"
+    },
+    {
+      "id": "PR-002",
+      "caseId": "CASE-00123",
+      "personId": "P-007",
+      "phoneNumber": "0240000002",
+      "kind": "call",
+      "timestamp": "2026-09-14T08:45:00Z",
+      "otherNumber": "191"
+    },
+    {
+      "id": "PR-003",
+      "caseId": "CASE-00123",
+      "personId": "P-034",
+      "phoneNumber": "0241111111",
+      "kind": "sms",
+      "timestamp": "2026-09-14T00:00:00Z"
+    },
+    {
+      "id": "PR-004",
+      "caseId": "CASE-00123",
+      "personId": "P-008",
+      "phoneNumber": "12345",
+      "kind": "call",
+      "timestamp": "2026-09-14T00:00:00Z"
+    },
+    {
+      "id": "PR-005",
+      "caseId": "CASE-00123",
+      "personId": "P-008",
+      "phoneNumber": "12345",
+      "kind": "call",
+      "timestamp": "2026-09-14T00:00:00Z"
+    },
+    {
+      "id": "PR-006",
+      "caseId": "CASE-00123",
+      "personId": "P-008",
+      "phoneNumber": "12345",
+      "kind": "call",
+      "timestamp": "2026-09-14T00:00:00Z"
+    },
+    {
+      "id": "PR-007",
+      "caseId": "CASE-00123",
+      "personId": "P-008",
+      "phoneNumber": "12345",
+      "kind": "call",
+      "timestamp": "2026-09-14T00:00:00Z"
+    },
+    {
+      "id": "PR-008",
+      "caseId": "CASE-00123",
+      "personId": "P-008",
+      "phoneNumber": "12345",
+      "kind": "call",
+      "timestamp": "2026-09-14T00:00:00Z"
+    },
+    {
+      "id": "PR-009",
+      "caseId": "CASE-00123",
+      "personId": "P-008",
+      "phoneNumber": "12345",
+      "kind": "call",
+      "timestamp": "2026-09-14T00:00:00Z"
+    },
+    {
+      "id": "PR-010",
+      "caseId": "CASE-00123",
+      "personId": "P-008",
+      "phoneNumber": "12345",
+      "kind": "call",
+      "timestamp": "2026-09-14T00:00:00Z"
+    },
+    {
+      "id": "PR-011",
+      "caseId": "CASE-00123",
+      "personId": "P-008",
+      "phoneNumber": "12345",
+      "kind": "call",
+      "timestamp": "2026-09-14T00:00:00Z"
+    },
+    {
+      "id": "PR-012",
+      "caseId": "CASE-00123",
+      "personId": "P-008",
+      "phoneNumber": "12345",
+      "kind": "call",
+      "timestamp": "2026-09-14T00:00:00Z"
+    },
+    {
+      "id": "PR-013",
+      "caseId": "CASE-00123",
+      "personId": "P-008",
+      "phoneNumber": "12345",
+      "kind": "call",
+      "timestamp": "2026-09-14T00:00:00Z"
+    },
+    {
+      "id": "PR-014",
+      "caseId": "CASE-00123",
+      "personId": "P-008",
+      "phoneNumber": "12345",
+      "kind": "call",
+      "timestamp": "2026-09-14T00:00:00Z"
+    },
+    {
+      "id": "PR-015",
+      "caseId": "CASE-00123",
+      "personId": "P-008",
+      "phoneNumber": "12345",
+      "kind": "call",
+      "timestamp": "2026-09-14T00:00:00Z"
+    },
+    {
+      "id": "PR-016",
+      "caseId": "CASE-00123",
+      "personId": "P-008",
+      "phoneNumber": "12345",
+      "kind": "call",
+      "timestamp": "2026-09-14T00:00:00Z"
+    },
+    {
+      "id": "PR-017",
+      "caseId": "CASE-00203",
+      "personId": "P-031",
+      "phoneNumber": "0241111111",
+      "kind": "call",
+      "timestamp": "2026-10-01T10:20:00Z",
+      "otherNumber": "0209988776"
+    },
+    {
+      "id": "PR-018",
+      "caseId": "CASE-00031",
+      "personId": "P-005",
+      "phoneNumber": "0242222222",
+      "kind": "call",
+      "timestamp": "2026-08-20T10:30:00Z"
+    }
+  ],
+  "activityLog": [
+    {
+      "id": "A-001",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-002",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-003",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-004",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-005",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-006",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-007",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-008",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-009",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-010",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-011",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-012",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-013",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-014",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-015",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-016",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-017",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-018",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-019",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-020",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-021",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-022",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-023",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-024",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-025",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-026",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-027",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-028",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-029",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-030",
+      "caseId": "CASE-00123",
+      "officerId": "O-001",
+      "timestamp": "2026-09-14T00:00:00Z",
+      "action": "note-added",
+      "description": "Log"
+    },
+    {
+      "id": "A-031",
+      "caseId": "CASE-00201",
+      "officerId": "O-002",
+      "timestamp": "2026-03-12T08:50:00Z",
+      "action": "case-created",
+      "description": "Case CASE-00201 created: Kasoa Fuel Station Robbery"
+    },
+    {
+      "id": "A-032",
+      "caseId": "CASE-00201",
+      "officerId": "O-002",
+      "timestamp": "2026-03-12T09:15:00Z",
+      "action": "person-added",
+      "description": "Added Kofi Boateng to the case"
+    },
+    {
+      "id": "A-033",
+      "caseId": "CASE-00201",
+      "officerId": "O-002",
+      "timestamp": "2026-03-12T09:30:00Z",
+      "action": "evidence-uploaded",
+      "description": "Evidence E-032 uploaded: Recovered Balaclava"
+    },
+    {
+      "id": "A-034",
+      "caseId": "CASE-00201",
+      "officerId": "O-002",
+      "timestamp": "2026-03-20T16:00:00Z",
+      "action": "status-changed",
+      "description": "Case status changed: INVESTIGATING → CLOSED"
+    },
+    {
+      "id": "A-035",
+      "caseId": "CASE-00202",
+      "officerId": "O-004",
+      "timestamp": "2026-09-18T14:00:00Z",
+      "action": "case-created",
+      "description": "Case CASE-00202 created: Accra Mall Parking Vehicle Theft"
+    },
+    {
+      "id": "A-036",
+      "caseId": "CASE-00202",
+      "officerId": "O-004",
+      "timestamp": "2026-09-18T15:30:00Z",
+      "action": "evidence-uploaded",
+      "description": "Evidence E-033 uploaded: Shattered Quarter Glass"
+    },
+    {
+      "id": "A-037",
+      "caseId": "CASE-00203",
+      "officerId": "O-006",
+      "timestamp": "2026-10-01T11:00:00Z",
+      "action": "case-created",
+      "description": "Case CASE-00203 created: Osu Mobile Money Fraud"
+    },
+    {
+      "id": "A-038",
+      "caseId": "CASE-00203",
+      "officerId": "O-006",
+      "timestamp": "2026-10-01T11:45:00Z",
+      "action": "evidence-uploaded",
+      "description": "Evidence E-034 uploaded: Burner Mobile Handset"
+    },
+    {
+      "id": "A-039",
+      "caseId": "CASE-00203",
+      "officerId": "O-006",
+      "timestamp": "2026-10-01T12:00:00Z",
+      "action": "status-changed",
+      "description": "Linked phone records added to analysis queue"
+    },
+    {
+      "id": "A-040",
+      "caseId": "CASE-00204",
+      "officerId": "O-004",
+      "timestamp": "2024-05-10T09:00:00Z",
+      "action": "case-created",
+      "description": "Case CASE-00204 created: Takoradi Market Theft (2024)"
+    },
+    {
+      "id": "A-041",
+      "caseId": "CASE-00204",
+      "officerId": "O-004",
+      "timestamp": "2024-05-10T09:30:00Z",
+      "action": "evidence-uploaded",
+      "description": "Evidence E-035 uploaded: Pry Mark Impressions on Padlock"
+    },
+    {
+      "id": "A-042",
+      "caseId": "CASE-00204",
+      "officerId": "O-004",
+      "timestamp": "2024-05-20T17:00:00Z",
+      "action": "status-changed",
+      "description": "Case status changed: INVESTIGATING → CLOSED"
+    }
+  ],
+  "relationships": [
+    {
+      "source": "P-001",
+      "target": "L-001",
+      "relationship": "visited"
+    },
+    {
+      "source": "P-001",
+      "target": "L-002",
+      "relationship": "visited"
+    },
+    {
+      "source": "P-002",
+      "target": "L-001",
+      "relationship": "visited"
+    },
+    {
+      "source": "P-002",
+      "target": "L-002",
+      "relationship": "visited"
+    },
+    {
+      "source": "P-001",
+      "target": "V-001",
+      "relationship": "owns"
+    },
+    {
+      "source": "P-002",
+      "target": "V-001",
+      "relationship": "connected-to"
+    },
+    {
+      "source": "P-001",
+      "target": "I-023",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-002",
+      "target": "I-023",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "V-001",
+      "target": "CASE-00022",
+      "relationship": "connected-to"
+    },
+    {
+      "source": "V-001",
+      "target": "CASE-00031",
+      "relationship": "connected-to"
+    },
+    {
+      "source": "P-004",
+      "target": "V-001",
+      "relationship": "connected-to"
+    },
+    {
+      "source": "P-001",
+      "target": "V-007",
+      "relationship": "connected-to"
+    },
+    {
+      "source": "P-003",
+      "target": "V-007",
+      "relationship": "owns"
+    },
+    {
+      "source": "P-003",
+      "target": "I-004",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-006",
+      "target": "I-004",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-017",
+      "target": "I-011",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-023",
+      "target": "I-006",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-022",
+      "target": "I-005",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-017",
+      "target": "I-002",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-017",
+      "target": "I-012",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-015",
+      "target": "I-002",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-012",
+      "target": "I-006",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-024",
+      "target": "I-012",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-020",
+      "target": "I-006",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-015",
+      "target": "I-001",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-020",
+      "target": "I-008",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-019",
+      "target": "I-001",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-018",
+      "target": "I-006",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-010",
+      "target": "I-004",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-016",
+      "target": "I-010",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-020",
+      "target": "I-001",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-023",
+      "target": "I-002",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-012",
+      "target": "I-004",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-020",
+      "target": "I-002",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-022",
+      "target": "I-007",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-024",
+      "target": "I-008",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-011",
+      "target": "I-009",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-017",
+      "target": "I-006",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-025",
+      "target": "I-001",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-012",
+      "target": "I-003",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-013",
+      "target": "I-010",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-024",
+      "target": "I-010",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-025",
+      "target": "I-007",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-021",
+      "target": "I-007",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-024",
+      "target": "I-005",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-022",
+      "target": "I-011",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-025",
+      "target": "I-012",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-022",
+      "target": "I-010",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-024",
+      "target": "I-001",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-015",
+      "target": "I-009",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-013",
+      "target": "I-012",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-022",
+      "target": "I-010",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-015",
+      "target": "I-007",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-012",
+      "target": "I-008",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-026",
+      "target": "I-007",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-023",
+      "target": "I-008",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-024",
+      "target": "I-005",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-017",
+      "target": "I-008",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-020",
+      "target": "I-012",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-010",
+      "target": "I-003",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-014",
+      "target": "I-001",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-016",
+      "target": "I-003",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-020",
+      "target": "I-002",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-013",
+      "target": "I-003",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-012",
+      "target": "I-007",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-010",
+      "target": "I-007",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-025",
+      "target": "I-011",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-018",
+      "target": "I-011",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-020",
+      "target": "I-011",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-017",
+      "target": "I-011",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-011",
+      "target": "I-008",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-023",
+      "target": "I-003",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-017",
+      "target": "I-007",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-020",
+      "target": "I-005",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-017",
+      "target": "I-001",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-015",
+      "target": "I-007",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-011",
+      "target": "I-005",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-011",
+      "target": "I-005",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-017",
+      "target": "I-009",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-026",
+      "target": "I-001",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-025",
+      "target": "I-011",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-015",
+      "target": "I-005",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-026",
+      "target": "I-007",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-011",
+      "target": "I-006",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-010",
+      "target": "I-012",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-002",
+      "target": "I-024",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-027",
+      "target": "I-024",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-028",
+      "target": "I-024",
+      "relationship": "witnessed"
+    },
+    {
+      "source": "P-027",
+      "target": "L-003",
+      "relationship": "visited"
+    },
+    {
+      "source": "P-028",
+      "target": "L-003",
+      "relationship": "visited"
+    },
+    {
+      "source": "V-001",
+      "target": "CASE-00201",
+      "relationship": "connected-to"
+    },
+    {
+      "source": "P-029",
+      "target": "I-025",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-030",
+      "target": "I-025",
+      "relationship": "witnessed"
+    },
+    {
+      "source": "P-029",
+      "target": "L-001",
+      "relationship": "visited"
+    },
+    {
+      "source": "P-029",
+      "target": "V-011",
+      "relationship": "owns"
+    },
+    {
+      "source": "P-031",
+      "target": "I-026",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-032",
+      "target": "I-026",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-033",
+      "target": "I-026",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-034",
+      "target": "I-026",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-031",
+      "target": "L-007",
+      "relationship": "visited"
+    },
+    {
+      "source": "P-032",
+      "target": "L-007",
+      "relationship": "visited"
+    },
+    {
+      "source": "P-033",
+      "target": "L-007",
+      "relationship": "visited"
+    },
+    {
+      "source": "P-035",
+      "target": "I-027",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-036",
+      "target": "I-027",
+      "relationship": "involved-in"
+    },
+    {
+      "source": "P-035",
+      "target": "L-005",
+      "relationship": "visited"
+    }
+  ]
+}

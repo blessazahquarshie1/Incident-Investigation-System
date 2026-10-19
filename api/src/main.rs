@@ -6,7 +6,9 @@ use sqlx::postgres::PgPoolOptions;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing_subscriber::EnvFilter;
 
+mod error;
 mod routes;
+mod seed;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -38,6 +40,14 @@ async fn main() -> anyhow::Result<()> {
 
     sqlx::migrate!("./migrations").run(&db).await?;
     tracing::info!("migrations applied");
+
+    // `cargo run -- seed [path]` loads the mock-data JSON into the database, then exits.
+    let args: Vec<String> = std::env::args().collect();
+    if args.get(1).map(String::as_str) == Some("seed") {
+        let path = args.get(2).map(String::as_str).unwrap_or("seed/mock_data.json");
+        seed::run(&db, path).await?;
+        return Ok(());
+    }
 
     let app = Router::new()
         .nest("/api", routes::router())
