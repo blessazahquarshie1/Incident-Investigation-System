@@ -20,8 +20,7 @@ import type {
 } from '../types'
 import { nextId } from '../lib/ids'
 import { applyCustodyAction } from '../lib/custody'
-import { getOfficerName, getPersonName, getLocationName, getEntityLabel, getVehicleOwner } from '../lib/lookup'
-import { findExistingLocation } from '../lib/validation'
+import { getOfficerName, getVehicleOwner } from '../lib/lookup'
 import { getCasePeople, getCaseIncidents, getCaseEvidence } from '../lib/caseScope'
 import { getConnectionSnapshot, diffSnapshots } from '../lib/connectionDiff'
 
@@ -46,6 +45,11 @@ function upsertById<T extends { id: string }>(list: T[], item: T): T[] {
   return list.some((x) => x.id === item.id)
     ? list.map((x) => (x.id === item.id ? item : x))
     : [...list, item]
+}
+
+interface MutationResult {
+  id: string | null
+  data: InvestigationData
 }
 
 interface ServerResult {
@@ -78,8 +82,8 @@ interface InvestigationStore {
   createCase: (input: { title: string; description: string; type: Case['type']; priority: Case['priority']; leadInvestigator: string }) => Promise<Case | null>
   changeCasePriority: (caseId: string, priority: Case['priority']) => Promise<void>
   changeCaseStatus: (caseId: string, status: Case['status']) => Promise<void>
-  addPersonToCase: (caseId: string, personId: string) => string[]
-  createPersonForCase: (caseId: string, input: { fullName: string; type: Person['type']; phone?: string; address?: string }) => string[]
+  addPersonToCase: (caseId: string, personId: string) => Promise<string[] | null>
+  createPersonForCase: (caseId: string, input: { fullName: string; type: Person['type']; phone?: string; address?: string }) => Promise<string[] | null>
   linkVehicleToPerson: (caseId: string, vehicleId: string, personId: string, relationship: 'owns' | 'connected-to') => string[]
   addEvidence: (caseId: string, input: { title: string; type: Evidence['type']; description: string; locationId?: string; linkedPersons: string[] }) => string[]
   addNote: (caseId: string, text: string) => Promise<void>
@@ -98,20 +102,20 @@ interface InvestigationStore {
       occurredAt: string
       status: Incident['status']
     }
-  ) => Incident & { diff: string[] }
+  ) => Promise<(Incident & { diff: string[] }) | null>
   addDocumentToCase: (
     caseId: string,
     input: { title: string; kind: CaseDocument['kind'] }
   ) => Promise<CaseDocument | null>
   changeLeadInvestigator: (caseId: string, officerId: string) => Promise<void>
-  createLocation: (input: { name: string; city: string; region: string }) => Location
-  addVisitedLocation: (caseId: string, locationId: string, personId: string) => string[]
+  createLocation: (input: { name: string; city: string; region: string }) => Promise<Location | null>
+  addVisitedLocation: (caseId: string, locationId: string, personId: string) => Promise<string[] | null>
   createVehicle: (
     caseId: string,
     input: { registration: string; make: string; model: string; color: string },
     connections?: Array<{ targetId: string; relationship: 'owns' | 'connected-to' | 'involved-in' }>
-  ) => Vehicle & { diff: string[] }
-  addConnection: (caseId: string, edge: InvestigationEdge) => string[]
+  ) => Promise<(Vehicle & { diff: string[] }) | null>
+  addConnection: (caseId: string, edge: InvestigationEdge) => Promise<string[] | null>
   addWitnessStatement: (
     caseId: string,
     input: {
@@ -122,7 +126,7 @@ interface InvestigationStore {
       recordedAt: string
       text: string
     }
-  ) => WitnessStatement & { diff: string[] }
+  ) => Promise<(WitnessStatement & { diff: string[] }) | null>
   addSighting: (
     caseId: string,
     input: {
@@ -134,7 +138,7 @@ interface InvestigationStore {
       personId?: string
       description: string
     }
-  ) => Sighting & { diff: string[] }
+  ) => Promise<(Sighting & { diff: string[] }) | null>
   addPhoneRecord: (
     caseId: string,
     input: {
@@ -145,7 +149,7 @@ interface InvestigationStore {
       locationId?: string
       otherNumber?: string
     }
-  ) => PhoneRecord & { diff: string[] }
+  ) => Promise<(PhoneRecord & { diff: string[] }) | null>
   removePersonFromCase: (caseId: string, personId: string) => string[]
   removeVehicleFromCase: (caseId: string, vehicleId: string) => string[]
   removeLocationFromCase: (caseId: string, locationId: string) => string[]
@@ -225,6 +229,52 @@ export const useInvestigationStore = create<InvestigationStore>()(
             documents: document ? [...s.data.documents, document] : s.data.documents,
           },
         }))
+      }
+
+            // Calls an endpoint that replies { id, data } and swaps in the fresh server snapshot.
+      async function mutate(
+        method: 'POST' | 'PATCH' | 'PUT' | 'DELETE',
+        path: string,
+        body?: unknown,
+      ): Promise<MutationResult | null> {
+        const r = await send<MutationResult>(method, path, body)
+        if (r) set({ data: r.data })
+        return r
+      }
+
+      // Like runWithCaseDiff, but the mutation is an API call. result is null if the call failed.
+      async function runWithCaseDiffAsync(
+        caseId: string,
+        request: () => Promise<MutationResult | null>,
+      ): Promise<{ result: MutationResult | null; diff: string[] }> {
+        const before = getConnectionSnapshot(get().data, caseId)
+        const result = await request()
+        if (!result) return { result, diff: [] }
+        const diff = diffSnapshots(before, getConnectionSnapshot(get().data, caseId))
+        get().showToast({
+          caseId,
+          title: diff.length > 0 ? 'Saved. New connections found:' : 'Saved. No new connections found.',
+          changes: diff.slice(0, 3),
+        })
+        set({ lastDiff: diff })
+        return { result, diff }
+      }
+
+      // Creates a record inside a case and returns it (read from the fresh snapshot) plus the connection diff.
+      async function createWithDiff<
+        K extends 'incidents' | 'vehicles' | 'witnessStatements' | 'sightings' | 'phoneRecords',
+      >(
+        caseId: string,
+        tail: string,
+        key: K,
+        body: unknown,
+      ): Promise<(InvestigationData[K][number] & { diff: string[] }) | null> {
+        const { result, diff } = await runWithCaseDiffAsync(caseId, () =>
+          mutate('POST', casePath(caseId, tail), body),
+        )
+        if (!result) return null
+        const created = (get().data[key] as unknown as { id: string }[]).find((x) => x.id === result.id)
+        return created ? ({ ...created, diff } as unknown as InvestigationData[K][number] & { diff: string[] }) : null
       }
 
       // Helper to wrap mutations with before & after connection snapshots
@@ -334,47 +384,18 @@ export const useInvestigationStore = create<InvestigationStore>()(
           if (r) applyServerResult(r)
         },
 
-        addPersonToCase: (caseId, personId) => {
-          return runWithCaseDiff(caseId, () => {
-            const state = get()
-            const person = state.data.persons.find(p => p.id === personId)
-            if (!person) return
-
-            set((s) => ({
-              data: {
-                ...s.data,
-                cases: s.data.cases.map(c => c.id === caseId ? { ...c, updatedAt: new Date().toISOString() } : c),
-                persons: s.data.persons.map(p => p.id === personId ? { ...p, relatedCases: Array.from(new Set([...p.relatedCases, caseId])) } : p),
-              },
-            }))
-
-            get().addActivity({ caseId, action: 'person-added', description: `Added ${person.fullName} to the case` })
-          }).diff
+        addPersonToCase: async (caseId, personId) => {
+          const { result, diff } = await runWithCaseDiffAsync(caseId, () =>
+            mutate('POST', casePath(caseId, 'persons/link'), { personId }),
+          )
+          return result ? diff : null
         },
 
-        createPersonForCase: (caseId, input) => {
-          return runWithCaseDiff(caseId, () => {
-            const state = get()
-            const existingIds = state.data.persons.map(p => p.id)
-            const id = nextId('P', existingIds)
-
-            const newPerson: Person = {
-              ...input,
-              id,
-              knownAliases: [],
-              relatedCases: [caseId],
-            }
-
-            set((s) => ({
-              data: {
-                ...s.data,
-                cases: s.data.cases.map(c => c.id === caseId ? { ...c, updatedAt: new Date().toISOString() } : c),
-                persons: [...s.data.persons, newPerson],
-              },
-            }))
-
-            get().addActivity({ caseId, action: 'person-added', description: `Added ${input.fullName} to the case` })
-          }).diff
+        createPersonForCase: async (caseId, input) => {
+          const { result, diff } = await runWithCaseDiffAsync(caseId, () =>
+            mutate('POST', casePath(caseId, 'persons'), input),
+          )
+          return result ? diff : null
         },
 
         linkVehicleToPerson: (caseId, vehicleId, personId, relationship) => {
@@ -543,24 +564,7 @@ export const useInvestigationStore = create<InvestigationStore>()(
           return { ok: true }
         },
 
-        addIncidentToCase: (caseId, input) => {
-          const { result } = runWithCaseDiff(caseId, () => {
-            const state = get()
-            const id = nextId('I', state.data.incidents.map(i => i.id))
-            const now = new Date().toISOString()
-            const newIncident: Incident = { ...input, id, caseId }
-            set((s) => ({
-              data: {
-                ...s.data,
-                incidents: [...s.data.incidents, newIncident],
-                cases: s.data.cases.map(c => c.id === caseId ? { ...c, updatedAt: now } : c),
-              },
-            }))
-            get().addActivity({ caseId, action: 'incident-added', description: `Incident ${id} added: ${input.title}` })
-            return newIncident
-          })
-          return Object.assign(result, { diff: get().lastDiff })
-        },
+        addIncidentToCase: (caseId, input) => createWithDiff(caseId, 'incidents', 'incidents', input),
 
         addDocumentToCase: async (caseId, input) => {
           const r = await send<ServerResult>('POST', casePath(caseId, 'documents'), input)
@@ -574,235 +578,34 @@ export const useInvestigationStore = create<InvestigationStore>()(
           if (r) applyServerResult(r)
         },
 
-        createLocation: (input) => {
-          const state = get()
-          const existing = findExistingLocation(state.data, input.name, input.city)
-          if (existing) {
-            return existing
-          }
-          const id = nextId('L', state.data.locations.map(l => l.id))
-          const newLoc: Location = { ...input, id }
-          set((s) => ({
-            data: {
-              ...s.data,
-              locations: [...s.data.locations, newLoc],
-            },
-          }))
-          get().addActivity({
-            caseId: '',
-            action: 'location-added',
-            description: `Location ${input.name} added`,
-          })
-          return newLoc
+        createLocation: async (input) => {
+          const r = await mutate('POST', '/locations', input)
+          return r ? (get().data.locations.find((l) => l.id === r.id) ?? null) : null
         },
 
-        addVisitedLocation: (caseId, locationId, personId) => {
-          return runWithCaseDiff(caseId, () => {
-            const state = get()
-            const exists = state.data.relationships.some(
-              r => r.source === personId && r.target === locationId && r.relationship === 'visited'
-            )
-            const now = new Date().toISOString()
-            const personName = getPersonName(state.data, personId)
-            const locationName = getLocationName(state.data, locationId)
-
-            if (!exists) {
-              const edge: InvestigationEdge = { source: personId, target: locationId, relationship: 'visited' }
-              set((s) => ({
-                data: {
-                  ...s.data,
-                  relationships: [...s.data.relationships, edge],
-                  cases: s.data.cases.map(c => c.id === caseId ? { ...c, updatedAt: now } : c),
-                },
-              }))
-            }
-            get().addActivity({
-              caseId,
-              action: 'location-added',
-              description: `${personName} linked to ${locationName}: visited`,
-            })
-          }).diff
+        addVisitedLocation: async (caseId, locationId, personId) => {
+          const { result, diff } = await runWithCaseDiffAsync(caseId, () =>
+            mutate('POST', casePath(caseId, 'visited-locations'), { locationId, personId }),
+          )
+          return result ? diff : null
         },
 
-        createVehicle: (caseId, input, connections = []) => {
-          const { result } = runWithCaseDiff(caseId, () => {
-            const state = get()
-            const id = nextId('V', state.data.vehicles.map(v => v.id))
-            const now = new Date().toISOString()
-            const ownerConn = connections.find(c => c.relationship === 'owns')
-            const ownerId = ownerConn ? ownerConn.targetId : undefined
-            const newVehicle: Vehicle = { ...input, id, ownerId }
+        createVehicle: (caseId, input, connections = []) =>
+          createWithDiff(caseId, 'vehicles', 'vehicles', { ...input, connections }),
 
-            const newEdges: InvestigationEdge[] = connections.map(conn => {
-              if (conn.relationship === 'involved-in') {
-                return { source: id, target: conn.targetId, relationship: 'involved-in' }
-              }
-              return { source: conn.targetId, target: id, relationship: conn.relationship }
-            })
-
-            const uniqueNewEdges = newEdges.filter(
-              ne => !state.data.relationships.some(r => r.source === ne.source && r.target === ne.target && r.relationship === ne.relationship)
-            )
-
-            set((s) => ({
-              data: {
-                ...s.data,
-                vehicles: [...s.data.vehicles, newVehicle],
-                relationships: [...s.data.relationships, ...uniqueNewEdges],
-                cases: s.data.cases.map(c => c.id === caseId ? { ...c, updatedAt: now } : c),
-              },
-            }))
-
-            get().addActivity({
-              caseId,
-              action: 'vehicle-added',
-              description: `Vehicle ${input.registration} added`,
-            })
-            return newVehicle
-          })
-          return Object.assign(result, { diff: get().lastDiff })
+        addConnection: async (caseId, edge) => {
+          const { result, diff } = await runWithCaseDiffAsync(caseId, () =>
+            mutate('POST', casePath(caseId, 'connections'), edge),
+          )
+          return result ? diff : null
         },
 
-        addConnection: (caseId, edge) => {
-          return runWithCaseDiff(caseId, () => {
-            const state = get()
-            let relationships = [...state.data.relationships]
-            let vehicles = [...state.data.vehicles]
+        addWitnessStatement: (caseId, input) =>
+          createWithDiff(caseId, 'witness-statements', 'witnessStatements', input),
 
-            if (edge.relationship === 'owns') {
-              const vehicleId = edge.target.startsWith('V-') ? edge.target : edge.source
-              const personId = edge.target.startsWith('V-') ? edge.source : edge.target
-              const vehicle = state.data.vehicles.find(v => v.id === vehicleId)
-              const person = state.data.persons.find(p => p.id === personId)
+        addSighting: (caseId, input) => createWithDiff(caseId, 'sightings', 'sightings', input),
 
-              if (vehicle && person) {
-                const currentOwner = getVehicleOwner(state.data, vehicleId)
-                if (currentOwner && currentOwner.id !== personId) {
-                  // Owner conflict rule: demote previous owner to connected-to
-                  relationships = relationships.map(r => {
-                    const isOldOwnerEdge =
-                      r.relationship === 'owns' &&
-                      ((r.source === currentOwner.id && r.target === vehicleId) ||
-                       (r.source === vehicleId && r.target === currentOwner.id))
-                    return isOldOwnerEdge ? { ...r, relationship: 'connected-to' as const } : r
-                  })
-
-                  const hasOldEdge = relationships.some(
-                    r => (r.source === currentOwner.id && r.target === vehicleId) ||
-                         (r.source === vehicleId && r.target === currentOwner.id)
-                  )
-                  if (!hasOldEdge) {
-                    relationships.push({ source: currentOwner.id, target: vehicleId, relationship: 'connected-to' })
-                  }
-
-                  get().addActivity({
-                    caseId,
-                    action: 'vehicle-linked',
-                    description: `${vehicle.registration} owner changed from ${currentOwner.fullName} to ${person.fullName}; ${currentOwner.fullName} is now connected to the vehicle.`,
-                  })
-                }
-
-                // Keep Vehicle.ownerId in sync
-                vehicles = vehicles.map(v => v.id === vehicleId ? { ...v, ownerId: personId } : v)
-              }
-            }
-
-            const exists = relationships.some(
-              r => r.source === edge.source && r.target === edge.target && r.relationship === edge.relationship
-            )
-            if (!exists) {
-              relationships.push(edge)
-            }
-
-            const now = new Date().toISOString()
-            const sourceLabel = getEntityLabel(state.data, edge.source)
-            const targetLabel = getEntityLabel(state.data, edge.target)
-
-            set((s) => ({
-              data: {
-                ...s.data,
-                vehicles,
-                relationships,
-                cases: s.data.cases.map(c => c.id === caseId ? { ...c, updatedAt: now } : c),
-              },
-            }))
-
-            get().addActivity({
-              caseId,
-              action: 'link-added',
-              description: `${sourceLabel} linked to ${targetLabel}: ${edge.relationship}`,
-            })
-          }).diff
-        },
-
-        addWitnessStatement: (caseId, input) => {
-          const { result } = runWithCaseDiff(caseId, () => {
-            const state = get()
-            const id = nextId('WS', state.data.witnessStatements.map(ws => ws.id))
-            const now = new Date().toISOString()
-            const newWs: WitnessStatement = { ...input, id, caseId }
-            set((s) => ({
-              data: {
-                ...s.data,
-                witnessStatements: [...s.data.witnessStatements, newWs],
-                cases: s.data.cases.map(c => c.id === caseId ? { ...c, updatedAt: now } : c),
-              },
-            }))
-            get().addActivity({
-              caseId,
-              action: 'timeline-record-added',
-              description: `Witness statement ${id} recorded`,
-            })
-            return newWs
-          })
-          return Object.assign(result, { diff: get().lastDiff })
-        },
-
-        addSighting: (caseId, input) => {
-          const { result } = runWithCaseDiff(caseId, () => {
-            const state = get()
-            const id = nextId('SG', state.data.sightings.map(s => s.id))
-            const now = new Date().toISOString()
-            const newSg: Sighting = { ...input, id, caseId }
-            set((s) => ({
-              data: {
-                ...s.data,
-                sightings: [...s.data.sightings, newSg],
-                cases: s.data.cases.map(c => c.id === caseId ? { ...c, updatedAt: now } : c),
-              },
-            }))
-            get().addActivity({
-              caseId,
-              action: 'timeline-record-added',
-              description: `Sighting ${id} recorded`,
-            })
-            return newSg
-          })
-          return Object.assign(result, { diff: get().lastDiff })
-        },
-
-        addPhoneRecord: (caseId, input) => {
-          const { result } = runWithCaseDiff(caseId, () => {
-            const state = get()
-            const id = nextId('PR', state.data.phoneRecords.map(pr => pr.id))
-            const now = new Date().toISOString()
-            const newPr: PhoneRecord = { ...input, id, caseId }
-            set((s) => ({
-              data: {
-                ...s.data,
-                phoneRecords: [...s.data.phoneRecords, newPr],
-                cases: s.data.cases.map(c => c.id === caseId ? { ...c, updatedAt: now } : c),
-              },
-            }))
-            get().addActivity({
-              caseId,
-              action: 'timeline-record-added',
-              description: `Phone record ${id} recorded`,
-            })
-            return newPr
-          })
-          return Object.assign(result, { diff: get().lastDiff })
-        },
+        addPhoneRecord: (caseId, input) => createWithDiff(caseId, 'phone-records', 'phoneRecords', input),
 
         removePersonFromCase: (caseId, personId) => {
           return runWithCaseDiff(caseId, () => {

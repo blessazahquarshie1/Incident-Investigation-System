@@ -57,7 +57,7 @@ export default function AddPersonModal({
     onClose()
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setErrors({})
 
@@ -67,7 +67,7 @@ export default function AddPersonModal({
         setErrors({ existingPersonId: 'Please select a person to add to the case.' })
         return
       }
-      addPersonToCase(caseId, targetId)
+         if (!(await addPersonToCase(caseId, targetId))) return
       setSuccessMsg('Person added to case.')
       setTimeout(() => handleClose(), 700)
     } else {
@@ -80,13 +80,14 @@ export default function AddPersonModal({
         return
       }
 
-      createPersonForCase(caseId, {
+       const created = await createPersonForCase(caseId, {
         fullName: fullName.trim(),
         type,
         phone: phone.trim() || undefined,
         address: address.trim() || undefined,
       })
 
+            if (!created) return
       setSuccessMsg('New person created and added to case.')
       setTimeout(() => handleClose(), 700)
     }

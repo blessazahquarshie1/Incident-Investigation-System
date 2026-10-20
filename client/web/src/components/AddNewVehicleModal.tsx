@@ -72,7 +72,7 @@ export default function AddNewVehicleModal({
     setErrors(prev => ({ ...prev, connections: '' }))
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
 
     // Build connections array
@@ -101,7 +101,7 @@ export default function AddNewVehicleModal({
       return
     }
 
-    createVehicle(
+      const created = await createVehicle(
       caseId,
       {
         registration: registration.trim().toUpperCase(),
@@ -111,6 +111,8 @@ export default function AddNewVehicleModal({
       },
       connections
     )
+
+       if (!created) return
 
     setSuccessMsg('Vehicle added and linked to case.')
     setTimeout(() => handleClose(), 700)
@@ -196,13 +198,13 @@ export default function AddNewVehicleModal({
             <span className="block text-[14px] font-medium text-slate-800">
               Connect to this case <span className="text-red-500">*</span>
             </span>
-            <p className="text-[13px] text-slate-500">
+            <p className="text-minimum-caption text-slate-500">
               A vehicle must be connected to at least one person or incident of this case.
             </p>
           </div>
 
           {errors.connections && (
-            <p className="text-[13px] font-medium text-red-600 leading-tight" role="alert">
+            <p className="text-minimum-caption font-medium text-red-600 leading-tight" role="alert">
               {errors.connections}
             </p>
           )}
@@ -210,7 +212,7 @@ export default function AddNewVehicleModal({
           {/* People Connections */}
           {casePeople.length > 0 && (
             <div className="space-y-1.5">
-              <label className="block text-[13px] font-semibold text-slate-700">
+              <label className="block text-minimum-caption font-semibold text-slate-700">
                 Case People Links
               </label>
               <div className="space-y-2 rounded-lg border border-slate-200 p-2.5 bg-slate-50/50 max-h-40 overflow-y-auto">
@@ -220,7 +222,7 @@ export default function AddNewVehicleModal({
                       {p.fullName} <span className="text-[12px] text-slate-400">({p.type})</span>
                     </div>
                     <select
-                      className="rounded border border-slate-200 px-2 py-1 text-[13px] bg-white focus:outline-none focus:border-blue-500"
+                      className="rounded border border-slate-200 px-2 py-1 text-minimum-caption bg-white focus:outline-none focus:border-blue-500"
                       value={personConnections[p.id] || 'none'}
                       onChange={e =>
                         handlePersonRoleChange(p.id, e.target.value as 'none' | 'owns' | 'connected-to')
@@ -239,7 +241,7 @@ export default function AddNewVehicleModal({
           {/* Incident Involvements */}
           {caseIncidents.length > 0 && (
             <div className="space-y-1.5">
-              <label className="block text-[13px] font-semibold text-slate-700">
+              <label className="block text-minimum-caption font-semibold text-slate-700">
                 Case Incidents Involvement
               </label>
               <div className="space-y-1.5 rounded-lg border border-slate-200 p-2.5 bg-slate-50/50 max-h-32 overflow-y-auto">

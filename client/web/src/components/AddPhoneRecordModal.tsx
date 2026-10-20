@@ -71,7 +71,7 @@ export default function AddPhoneRecordModal({
     }))
   }, [data.locations])
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const validationErrors = validatePhoneRecordInput(data, {
       personId,
@@ -87,7 +87,7 @@ export default function AddPhoneRecordModal({
       return
     }
 
-    addPhoneRecord(caseId, {
+    const created = await addPhoneRecord(caseId, {
       personId,
       phoneNumber: phoneNumber.trim(),
       kind,
@@ -95,6 +95,8 @@ export default function AddPhoneRecordModal({
       locationId: kind === 'cell-tower' ? locationId : undefined,
       otherNumber: kind !== 'cell-tower' ? otherNumber.trim() : undefined,
     })
+
+        if (!created) return
 
     setSuccessMsg('Phone record successfully saved.')
     setTimeout(() => {

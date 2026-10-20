@@ -1,6 +1,7 @@
 //! Shared database helpers for the mutation endpoints.
-use serde_json::Value;
-use sqlx::PgConnection;
+use axum::Json;
+use serde_json::{json, Value};
+use sqlx::{PgConnection, Postgres, Transaction};
 
 use crate::error::{AppError, AppResult};
 
@@ -41,6 +42,26 @@ pub async fn next_id(conn: &mut PgConnection, prefix: &str, width: usize) -> App
     .fetch_one(&mut *conn)
     .await?;
     Ok(format!("{}-{:0w$}", prefix, n, w = width))
+}
+
+const SNAPSHOT_SQL: &str = include_str!("sql/snapshot.sql");
+
+/// The whole dataset in the frontend's InvestigationData shape.
+pub async fn snapshot(conn: &mut PgConnection) -> AppResult<Value> {
+    Ok(sqlx::query_scalar::<_, Value>(SNAPSHOT_SQL)
+        .fetch_one(&mut *conn)
+        .await?)
+}
+
+/// Ends a mutation: reads the fresh snapshot inside the transaction, commits,
+/// and replies { id, data } (id = the created/affected record, if any).
+pub async fn finish(
+    mut tx: Transaction<'_, Postgres>,
+    id: Option<String>,
+) -> AppResult<Json<Value>> {
+    let data = snapshot(&mut *tx).await?;
+    tx.commit().await?;
+    Ok(Json(json!({ "id": id, "data": data })))
 }
 
 /// Appends an activity-log entry and returns it as frontend-shaped JSON.

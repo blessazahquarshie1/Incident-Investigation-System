@@ -54,7 +54,7 @@ export default function AddIncidentModal({
     }))
   }, [data.locations])
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const validationErrors = validateIncidentInput(data, {
       title,
@@ -70,7 +70,7 @@ export default function AddIncidentModal({
       return
     }
 
-    addIncidentToCase(caseId, {
+   const created = await addIncidentToCase(caseId, {
       title: title.trim(),
       description: description.trim(),
       type,
@@ -78,6 +78,8 @@ export default function AddIncidentModal({
       occurredAt: parseInputAsUtc(occurredAt),
       status,
     })
+
+       if (!created) return
 
     setSuccessMsg('Incident successfully added to case.')
     setTimeout(() => {

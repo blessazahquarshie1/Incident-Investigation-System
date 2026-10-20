@@ -130,27 +130,27 @@ export default function CustodySection({ evidence }: CustodySectionProps) {
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg bg-slate-50 p-4 border border-slate-200 mb-6">
           <div className="flex items-center gap-3">
             <div>
-              <span className="text-[13px] font-semibold text-slate-500 uppercase tracking-wide block">Current status</span>
+              <span className="text-minimum-caption font-semibold text-slate-500 uppercase tracking-wide block">Current status</span>
               <div className="mt-1">
                 <StatusBadge status={currentStatus} />
               </div>
             </div>
             <div className="h-8 w-px bg-slate-200 mx-2" />
             <div>
-              <span className="text-[13px] font-semibold text-slate-500 uppercase tracking-wide block">Current custodian</span>
+              <span className="text-minimum-caption font-semibold text-slate-500 uppercase tracking-wide block">Current custodian</span>
               <span className="text-[14px] font-medium text-slate-900 mt-1 block">
-                {currentHolderName} <span className="font-mono text-slate-400 text-[13px]">({currentHolderId})</span>
+                {currentHolderName} <span className="font-mono text-slate-400 text-minimum-caption">({currentHolderId})</span>
               </span>
             </div>
           </div>
-          <div className="text-[13px] text-slate-500">
+          <div className="text-minimum-caption text-slate-500">
             Active logged-in officer: <span className="font-semibold text-slate-700">{getOfficerName(data, currentOfficerId)}</span>
           </div>
         </div>
 
         {/* Error message banner */}
         {errorMessage && (
-          <div className="flex items-center gap-2 rounded-lg bg-red-50 p-3 text-[13px] text-red-700 border border-red-200 mb-4">
+          <div className="flex items-center gap-2 rounded-lg bg-red-50 p-3 text-minimum-caption text-red-700 border border-red-200 mb-4">
             <AlertTriangle className="h-4 w-4 shrink-0 text-red-600" />
             <span>{errorMessage}</span>
           </div>
@@ -162,7 +162,7 @@ export default function CustodySection({ evidence }: CustodySectionProps) {
           <div className="space-y-6 border-l-2 border-slate-200 ml-4 pl-4">
             {Object.entries(groupedHistory).map(([dateStr, entries]) => (
               <div key={dateStr} className="space-y-3">
-                <div className="text-[13px] font-bold text-slate-500 uppercase tracking-wider -ml-8 bg-white pr-2 inline-block">
+                <div className="text-minimum-caption font-bold text-slate-500 uppercase tracking-wider -ml-8 bg-white pr-2 inline-block">
                   {dateStr}
                 </div>
                 {entries.map(entry => {
@@ -188,9 +188,9 @@ export default function CustodySection({ evidence }: CustodySectionProps) {
 
                   return (
                     <div key={entry.id} className="relative pb-2">
-                      <div className="absolute -left-[23px] top-1.5 h-3 w-3 rounded-full border-2 border-white bg-blue-600" />
+                      <div className="absolute -left-5.75 top-1.5 h-3 w-3 rounded-full border-2 border-white bg-blue-600" />
                       <div className="flex items-baseline gap-2">
-                        <span className="font-mono text-[13px] font-semibold text-slate-500">
+                        <span className="font-mono text-minimum-caption font-semibold text-slate-500">
                           {formatTime(entry.timestamp)}
                         </span>
                         <span className="text-[14px] font-medium text-slate-900">
@@ -198,7 +198,7 @@ export default function CustodySection({ evidence }: CustodySectionProps) {
                         </span>
                       </div>
                       {entry.note && (
-                        <p className="mt-0.5 text-[13px] text-slate-500 italic">Note: {entry.note}</p>
+                        <p className="mt-0.5 text-minimum-caption text-slate-500 italic">Note: {entry.note}</p>
                       )}
                     </div>
                   )
@@ -235,7 +235,7 @@ export default function CustodySection({ evidence }: CustodySectionProps) {
                     <button
                       onClick={() => handleActionClick(action)}
                       disabled={!isAllowed}
-                      className={`rounded-md px-3 py-1 text-[13px] font-medium transition-colors ${
+                      className={`rounded-md px-3 py-1 text-minimum-caption font-medium transition-colors ${
                         isAllowed
                           ? 'bg-blue-600 text-white hover:bg-blue-700'
                           : 'bg-slate-200 text-slate-400 cursor-not-allowed'
@@ -245,7 +245,7 @@ export default function CustodySection({ evidence }: CustodySectionProps) {
                     </button>
                   </div>
                   {disabledReason && (
-                    <p className="text-[13px] text-red-600 font-medium leading-tight">
+                    <p className="text-minimum-caption text-red-600 font-medium leading-tight">
                       {disabledReason}
                     </p>
                   )}
@@ -263,11 +263,11 @@ export default function CustodySection({ evidence }: CustodySectionProps) {
         title="Transfer evidence custody"
       >
         <form onSubmit={handleTransferSubmit} className="space-y-4">
-          <p className="text-[13px] text-slate-600">
+          <p className="text-minimum-caption text-slate-600">
             Transfer responsibility for <strong>{evidence.title} ({evidence.id})</strong> to another sworn officer.
           </p>
           <div>
-            <label className="block text-[13px] font-medium text-slate-700 mb-1">
+            <label className="block text-minimum-caption font-medium text-slate-700 mb-1">
               Receiving officer
             </label>
             <select
@@ -287,7 +287,7 @@ export default function CustodySection({ evidence }: CustodySectionProps) {
             </select>
           </div>
           <div>
-            <label className="block text-[13px] font-medium text-slate-700 mb-1">
+            <label className="block text-minimum-caption font-medium text-slate-700 mb-1">
               Transfer note (optional)
             </label>
             <input
@@ -302,13 +302,13 @@ export default function CustodySection({ evidence }: CustodySectionProps) {
             <button
               type="button"
               onClick={() => setTransferModalOpen(false)}
-              className="rounded-lg border border-slate-200 px-4 py-2 text-[13px] font-medium text-slate-700 hover:bg-slate-50"
+              className="rounded-lg border border-slate-200 px-4 py-2 text-minimum-caption font-medium text-slate-700 hover:bg-slate-50"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="rounded-lg bg-blue-600 px-4 py-2 text-[13px] font-medium text-white hover:bg-blue-700"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-minimum-caption font-medium text-white hover:bg-blue-700"
             >
               Confirm transfer
             </button>
@@ -325,7 +325,7 @@ export default function CustodySection({ evidence }: CustodySectionProps) {
         <div className="space-y-4">
           <div className="flex items-start gap-3 rounded-lg bg-amber-50 p-3 border border-amber-200">
             <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
-            <div className="text-[13px] text-amber-800">
+            <div className="text-minimum-caption text-amber-800">
               <p className="font-semibold mb-1">Warning: Irreversible action</p>
               <p>
                 {confirmAction === 'destroyed'
@@ -334,7 +334,7 @@ export default function CustodySection({ evidence }: CustodySectionProps) {
               </p>
             </div>
           </div>
-          <p className="text-[13px] text-slate-600">
+          <p className="text-minimum-caption text-slate-600">
             Are you sure you want to mark <strong>{evidence.title} ({evidence.id})</strong> as{' '}
             <strong className="uppercase">{confirmAction}</strong>?
           </p>
@@ -342,14 +342,14 @@ export default function CustodySection({ evidence }: CustodySectionProps) {
             <button
               type="button"
               onClick={() => setConfirmAction(null)}
-              className="rounded-lg border border-slate-200 px-4 py-2 text-[13px] font-medium text-slate-700 hover:bg-slate-50"
+              className="rounded-lg border border-slate-200 px-4 py-2 text-minimum-caption font-medium text-slate-700 hover:bg-slate-50"
             >
               Cancel
             </button>
             <button
               type="button"
               onClick={handleConfirmExecute}
-              className={`rounded-lg px-4 py-2 text-[13px] font-medium text-white ${
+              className={`rounded-lg px-4 py-2 text-minimum-caption font-medium text-white ${
                 confirmAction === 'destroyed' ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'
               }`}
             >

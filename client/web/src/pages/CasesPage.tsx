@@ -61,10 +61,11 @@ export default function CasesPage() {
   const [formPriority, setFormPriority] = useState<Case['priority']>('medium')
   const [formLead, setFormLead] = useState('')
 
-  function handleCreate(e: React.FormEvent) {
+   async function handleCreate(e: React.FormEvent) {
     e.preventDefault()
     if (!formTitle || !formDesc || !formType || !formPriority || !formLead) return
-    createCase({ title: formTitle, description: formDesc, type: formType, priority: formPriority, leadInvestigator: formLead })
+       const created = await createCase({ title: formTitle, description: formDesc, type: formType, priority: formPriority, leadInvestigator: formLead })
+    if (!created) return
     setIsModalOpen(false)
     setFormTitle('')
     setFormDesc('')

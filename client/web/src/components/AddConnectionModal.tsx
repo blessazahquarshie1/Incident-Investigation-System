@@ -104,7 +104,7 @@ export default function AddConnectionModal({
     }))
   }, [casePeople])
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const validationErrors = validateConnectionInput(data, {
       personId: effectivePersonId,
@@ -138,7 +138,7 @@ export default function AddConnectionModal({
       }
     }
 
-    addConnection(caseId, edge)
+    if (!(await addConnection(caseId, edge))) return
     setSuccessMsg('Connection successfully linked.')
     setTimeout(() => {
       handleClose()
@@ -177,7 +177,7 @@ export default function AddConnectionModal({
             if (neighbors.length === 0) return null
 
             return (
-              <div className="rounded-lg bg-slate-50 border border-slate-200 p-2.5 space-y-1 text-[13px]">
+              <div className="rounded-lg bg-slate-50 border border-slate-200 p-2.5 space-y-1 text-minimum-caption">
                 <p className="font-semibold text-slate-700">Currently linked to:</p>
                 <div className="flex flex-wrap gap-1.5 mt-1">
                   {neighbors.map(nid => {
@@ -247,9 +247,12 @@ export default function AddConnectionModal({
       <ConfirmDeleteModal
         isOpen={Boolean(pendingOwnerConflict)}
         onClose={() => setPendingOwnerConflict(null)}
-        onConfirm={() => {
+           onConfirm={async () => {
           if (pendingOwnerConflict) {
-            addConnection(caseId, pendingOwnerConflict.edge)
+                        if (!(await addConnection(caseId, pendingOwnerConflict.edge))) {
+              setPendingOwnerConflict(null)
+              return
+            }
             setSuccessMsg('Connection successfully linked.')
             setPendingOwnerConflict(null)
             setTimeout(() => handleClose(), 700)

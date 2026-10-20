@@ -31,7 +31,7 @@ export default function AddDocumentModal({
     onClose()
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const validationErrors = validateDocumentInput({ title, kind })
     if (Object.keys(validationErrors).length > 0) {
@@ -39,10 +39,12 @@ export default function AddDocumentModal({
       return
     }
 
-    addDocumentToCase(caseId, {
+     const created = await addDocumentToCase(caseId, {
       title: title.trim(),
       kind,
     })
+
+       if (!created) return
 
     setSuccessMsg('Document successfully added to case.')
     setTimeout(() => {

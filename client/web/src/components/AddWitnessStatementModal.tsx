@@ -69,7 +69,7 @@ export default function AddWitnessStatementModal({
     }))
   }, [data.locations])
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const validationErrors = validateWitnessStatementInput(data, {
       witnessId: effectiveWitnessId,
@@ -85,7 +85,7 @@ export default function AddWitnessStatementModal({
       return
     }
 
-    addWitnessStatement(caseId, {
+     const created = await addWitnessStatement(caseId, {
       witnessId: effectiveWitnessId,
       subjectPersonId: effectiveSubjectId,
       locationId: effectiveLocationId,
@@ -93,6 +93,8 @@ export default function AddWitnessStatementModal({
       recordedAt: parseInputAsUtc(recordedAt),
       text: text.trim(),
     })
+
+        if (!created) return
 
     setSuccessMsg('Witness statement successfully recorded.')
     setTimeout(() => {

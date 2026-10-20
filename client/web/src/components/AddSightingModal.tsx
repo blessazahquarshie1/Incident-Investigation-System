@@ -72,7 +72,7 @@ export default function AddSightingModal({
     }))
   }, [data.vehicles])
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const validationErrors = validateSightingInput(data, {
       source,
@@ -89,7 +89,7 @@ export default function AddSightingModal({
       return
     }
 
-    addSighting(caseId, {
+    const created = await addSighting(caseId, {
       source,
       action,
       locationId,
@@ -98,6 +98,8 @@ export default function AddSightingModal({
       personId: personId || undefined,
       description: description.trim(),
     })
+
+        if (!created) return
 
     setSuccessMsg('Sighting record successfully saved.')
     setTimeout(() => {
@@ -179,7 +181,7 @@ export default function AddSightingModal({
           </FormField>
 
           {errors.vehicleOrPerson && (
-            <p className="text-[13px] font-medium text-red-600 leading-tight" role="alert">
+            <p className="text-minimum-caption font-medium text-red-600 leading-tight" role="alert">
               {errors.vehicleOrPerson}
             </p>
           )}

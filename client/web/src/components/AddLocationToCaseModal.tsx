@@ -64,7 +64,7 @@ export default function AddLocationToCaseModal({
     }))
   }, [casePeople])
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const newErrors: Record<string, string> = {}
 
@@ -81,7 +81,7 @@ export default function AddLocationToCaseModal({
         return
       }
 
-      addVisitedLocation(caseId, existingLocationId, visitedByPersonId)
+      if (!(await addVisitedLocation(caseId, existingLocationId, visitedByPersonId))) return
       setSuccessMsg('Location linked to case via person visit.')
       setTimeout(() => handleClose(), 700)
     } else {
@@ -102,11 +102,12 @@ export default function AddLocationToCaseModal({
         setInfoMsg(`Location "${existing.name}, ${existing.city}" already exists. Using existing record.`)
         finalLocationId = existing.id
       } else {
-        const created = createLocation({
+           const created = await createLocation({
           name: name.trim(),
           city: city.trim(),
           region: region.trim(),
         })
+                if (!created) return
         finalLocationId = created.id
       }
 
