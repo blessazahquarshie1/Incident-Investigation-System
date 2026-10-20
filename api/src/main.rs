@@ -6,7 +6,9 @@ use sqlx::postgres::PgPoolOptions;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing_subscriber::EnvFilter;
 
+mod db;
 mod error;
+mod extract;
 mod routes;
 mod seed;
 

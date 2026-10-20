@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { apiGet } from '../lib/api'
+import { apiGet, apiSend } from '../lib/api'
 import type {
   InvestigationData,
   ActivityLogEntry,
@@ -42,6 +42,12 @@ const emptyData: InvestigationData = {
   relationships: [],
 }
 
+interface ServerResult {
+  case?: Case
+  activity?: ActivityLogEntry
+  note?: Note
+}
+
 export interface ToastNotification {
   id: string
   caseId?: string
@@ -63,13 +69,13 @@ interface InvestigationStore {
   resetDemoData: () => void
   addActivity: (entry: Omit<ActivityLogEntry, 'id' | 'timestamp' | 'officerId'>) => void
   createCase: (input: { title: string; description: string; type: Case['type']; priority: Case['priority']; leadInvestigator: string }) => Case
-  changeCasePriority: (caseId: string, priority: Case['priority']) => void
-  changeCaseStatus: (caseId: string, status: Case['status']) => void
+  changeCasePriority: (caseId: string, priority: Case['priority']) => Promise<void>
+  changeCaseStatus: (caseId: string, status: Case['status']) => Promise<void>
   addPersonToCase: (caseId: string, personId: string) => string[]
   createPersonForCase: (caseId: string, input: { fullName: string; type: Person['type']; phone?: string; address?: string }) => string[]
   linkVehicleToPerson: (caseId: string, vehicleId: string, personId: string, relationship: 'owns' | 'connected-to') => string[]
   addEvidence: (caseId: string, input: { title: string; type: Evidence['type']; description: string; locationId?: string; linkedPersons: string[] }) => string[]
-  addNote: (caseId: string, text: string) => void
+  addNote: (caseId: string, text: string) => Promise<void>
   applyEvidenceCustodyAction: (
     evidenceId: string,
     action: CustodyAction,
@@ -90,7 +96,7 @@ interface InvestigationStore {
     caseId: string,
     input: { title: string; kind: CaseDocument['kind'] }
   ) => CaseDocument
-  changeLeadInvestigator: (caseId: string, officerId: string) => void
+  changeLeadInvestigator: (caseId: string, officerId: string) => Promise<void>
   createLocation: (input: { name: string; city: string; region: string }) => Location
   addVisitedLocation: (caseId: string, locationId: string, personId: string) => string[]
   createVehicle: (
@@ -179,6 +185,40 @@ const safeLocalStorage = {
 export const useInvestigationStore = create<InvestigationStore>()(
   persist(
     (set, get) => {
+      const casePath = (caseId: string, tail: string) => `/cases/${encodeURIComponent(caseId)}/${tail}`
+
+      // Calls the API as the current officer. Shows a toast and returns null on failure.
+      async function send<T>(
+        method: 'POST' | 'PATCH' | 'PUT' | 'DELETE',
+        path: string,
+        body?: unknown,
+      ): Promise<T | null> {
+        try {
+          return await apiSend<T>(method, path, get().currentOfficerId, body)
+        } catch (e) {
+          get().showToast({
+            title: `Could not save: ${e instanceof Error ? e.message : 'unknown error'}`,
+            changes: [],
+          })
+          return null
+        }
+      }
+
+      // Merges what the server returned (updated case, new activity entry, new note) into local state.
+      function applyServerResult(r: ServerResult) {
+        const { case: updatedCase, activity, note } = r
+        set((s) => ({
+          data: {
+            ...s.data,
+            cases: updatedCase
+              ? s.data.cases.map((c) => (c.id === updatedCase.id ? updatedCase : c))
+              : s.data.cases,
+            activityLog: activity ? [activity, ...s.data.activityLog] : s.data.activityLog,
+            notes: note ? [...s.data.notes, note] : s.data.notes,
+          },
+        }))
+      }
+
       // Helper to wrap mutations with before & after connection snapshots
       function runWithCaseDiff<T>(
         caseId: string | undefined,
@@ -291,36 +331,14 @@ export const useInvestigationStore = create<InvestigationStore>()(
           return newCase
         },
 
-        changeCasePriority: (caseId, priority) => {
-          const state = get()
-          const oldCase = state.data.cases.find(c => c.id === caseId)
-          if (!oldCase) return
-
-          const oldPriority = oldCase.priority
-          set((s) => ({
-            data: {
-              ...s.data,
-              cases: s.data.cases.map(c => c.id === caseId ? { ...c, priority, updatedAt: new Date().toISOString() } : c),
-            },
-          }))
-
-          get().addActivity({ caseId, action: 'priority-changed', description: `Case priority changed: ${oldPriority.toUpperCase()} → ${priority.toUpperCase()}` })
+        changeCasePriority: async (caseId, priority) => {
+          const r = await send<ServerResult>('PATCH', casePath(caseId, 'priority'), { priority })
+          if (r) applyServerResult(r)
         },
 
-        changeCaseStatus: (caseId, status) => {
-          const state = get()
-          const oldCase = state.data.cases.find(c => c.id === caseId)
-          if (!oldCase) return
-
-          const oldStatus = oldCase.status
-          set((s) => ({
-            data: {
-              ...s.data,
-              cases: s.data.cases.map(c => c.id === caseId ? { ...c, status, updatedAt: new Date().toISOString() } : c),
-            },
-          }))
-
-          get().addActivity({ caseId, action: 'status-changed', description: `Case status changed: ${oldStatus.toUpperCase()} → ${status.toUpperCase()}` })
+        changeCaseStatus: async (caseId, status) => {
+          const r = await send<ServerResult>('PATCH', casePath(caseId, 'status'), { status })
+          if (r) applyServerResult(r)
         },
 
         addPersonToCase: (caseId, personId) => {
@@ -472,28 +490,9 @@ export const useInvestigationStore = create<InvestigationStore>()(
           }).diff
         },
 
-        addNote: (caseId, text) => {
-          const state = get()
-          const existingIds = state.data.notes.map(n => n.id)
-          const id = nextId('N', existingIds)
-
-          const newNote: Note = {
-            id,
-            caseId,
-            authorId: state.currentOfficerId,
-            text,
-            createdAt: new Date().toISOString(),
-          }
-
-          set((s) => ({
-            data: {
-              ...s.data,
-              notes: [...s.data.notes, newNote],
-              cases: s.data.cases.map(c => c.id === caseId ? { ...c, updatedAt: new Date().toISOString() } : c),
-            },
-          }))
-
-          get().addActivity({ caseId, action: 'note-added', description: 'Note added' })
+        addNote: async (caseId, text) => {
+          const r = await send<ServerResult>('POST', casePath(caseId, 'notes'), { text })
+          if (r) applyServerResult(r)
         },
 
         applyEvidenceCustodyAction: (evidenceId, action, options) => {
@@ -592,24 +591,9 @@ export const useInvestigationStore = create<InvestigationStore>()(
           return newDoc
         },
 
-        changeLeadInvestigator: (caseId, officerId) => {
-          const state = get()
-          const targetCase = state.data.cases.find(c => c.id === caseId)
-          if (!targetCase) return
-          const oldOfficerName = getOfficerName(state.data, targetCase.leadInvestigator)
-          const newOfficerName = getOfficerName(state.data, officerId)
-          const now = new Date().toISOString()
-          set((s) => ({
-            data: {
-              ...s.data,
-              cases: s.data.cases.map(c => c.id === caseId ? { ...c, leadInvestigator: officerId, updatedAt: now } : c),
-            },
-          }))
-          get().addActivity({
-            caseId,
-            action: 'lead-changed',
-            description: `Lead investigator changed: ${oldOfficerName} → ${newOfficerName}`,
-          })
+        changeLeadInvestigator: async (caseId, officerId) => {
+          const r = await send<ServerResult>('PATCH', casePath(caseId, 'lead-investigator'), { officerId })
+          if (r) applyServerResult(r)
         },
 
         createLocation: (input) => {
