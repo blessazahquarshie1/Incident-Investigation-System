@@ -1,14 +1,14 @@
-import React, { useState } from 'react'
-import Modal from './Modal'
-import FormField from './FormField'
-import { useInvestigationStore } from '../store/useInvestigationStore'
-import { findExistingLocation } from '../lib/validation'
-import type { Location } from '../types'
+import React, { useState } from "react";
+import Modal from "./Modal";
+import FormField from "./FormField";
+import { useInvestigationStore } from "../store/useInvestigationStore";
+import { findExistingLocation } from "../lib/validation";
+import type { Location } from "../types";
 
 interface CreateLocationModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSuccess: (location: Location) => void
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: (location: Location) => void;
 }
 
 export default function CreateLocationModal({
@@ -16,60 +16,64 @@ export default function CreateLocationModal({
   onClose,
   onSuccess,
 }: CreateLocationModalProps) {
-  const data = useInvestigationStore(s => s.data)
-  const createLocation = useInvestigationStore(s => s.createLocation)
+  const data = useInvestigationStore((s) => s.data);
+  const createLocation = useInvestigationStore((s) => s.createLocation);
 
-  const [name, setName] = useState('')
-  const [city, setCity] = useState('')
-  const [region, setRegion] = useState('')
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const [infoMessage, setInfoMessage] = useState('')
+  const [name, setName] = useState("");
+  const [city, setCity] = useState("");
+  const [region, setRegion] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [infoMessage, setInfoMessage] = useState("");
 
   function handleReset() {
-    setName('')
-    setCity('')
-    setRegion('')
-    setErrors({})
-    setInfoMessage('')
+    setName("");
+    setCity("");
+    setRegion("");
+    setErrors({});
+    setInfoMessage("");
   }
 
   function handleClose() {
-    handleReset()
-    onClose()
+    handleReset();
+    onClose();
   }
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    const newErrors: Record<string, string> = {}
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const newErrors: Record<string, string> = {};
 
-    if (!name.trim()) newErrors.name = 'Location name is required.'
-    if (!city.trim()) newErrors.city = 'City is required.'
-    if (!region.trim()) newErrors.region = 'Region is required.'
+    if (!name.trim()) newErrors.name = "Location name is required.";
+    if (!city.trim()) newErrors.city = "City is required.";
+    if (!region.trim()) newErrors.region = "Region is required.";
 
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
-      return
+      setErrors(newErrors);
+      return;
     }
 
     // Check duplicate
-    const existing = findExistingLocation(data, name, city)
+    const existing = findExistingLocation(data, name, city);
     if (existing) {
-      setInfoMessage(`Location "${existing.name}, ${existing.city}" already exists. Using existing record.`)
+      setInfoMessage(
+        `Location "${existing.name}, ${existing.city}" already exists. Using existing record.`,
+      );
       setTimeout(() => {
-        onSuccess(existing)
-        handleClose()
-      }, 1000)
-      return
+        onSuccess(existing);
+        handleClose();
+      }, 1000);
+      return;
     }
 
-    const created = createLocation({
+    const created = await createLocation({
       name: name.trim(),
       city: city.trim(),
       region: region.trim(),
-    })
+    });
 
-    onSuccess(created)
-    handleClose()
+    if (!created) return;
+
+    onSuccess(created);
+    handleClose();
   }
 
   return (
@@ -81,7 +85,12 @@ export default function CreateLocationModal({
           </div>
         )}
 
-        <FormField label="Location Name" required error={errors.name} htmlFor="loc-name">
+        <FormField
+          label="Location Name"
+          required
+          error={errors.name}
+          htmlFor="loc-name"
+        >
           <input
             id="loc-name"
             type="text"
@@ -89,7 +98,7 @@ export default function CreateLocationModal({
             placeholder="e.g. Makola Market East Gate"
             className="w-full rounded-lg border border-slate-200 px-3 py-2 text-base focus:border-blue-500 focus:outline-none"
             value={name}
-            onChange={e => setName(e.target.value)}
+            onChange={(e) => setName(e.target.value)}
           />
         </FormField>
 
@@ -100,18 +109,23 @@ export default function CreateLocationModal({
             placeholder="e.g. Accra"
             className="w-full rounded-lg border border-slate-200 px-3 py-2 text-base focus:border-blue-500 focus:outline-none"
             value={city}
-            onChange={e => setCity(e.target.value)}
+            onChange={(e) => setCity(e.target.value)}
           />
         </FormField>
 
-        <FormField label="Region" required error={errors.region} htmlFor="loc-region">
+        <FormField
+          label="Region"
+          required
+          error={errors.region}
+          htmlFor="loc-region"
+        >
           <input
             id="loc-region"
             type="text"
             placeholder="e.g. Greater Accra"
             className="w-full rounded-lg border border-slate-200 px-3 py-2 text-base focus:border-blue-500 focus:outline-none"
             value={region}
-            onChange={e => setRegion(e.target.value)}
+            onChange={(e) => setRegion(e.target.value)}
           />
         </FormField>
 
@@ -132,6 +146,5 @@ export default function CreateLocationModal({
         </div>
       </form>
     </Modal>
-  )
+  );
 }
-

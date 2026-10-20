@@ -60,7 +60,7 @@ export default function CustodySection({ evidence }: CustodySectionProps) {
     return acc
   }, {} as Record<string, typeof evidence.custodyHistory>)
 
-  function handleActionClick(action: CustodyAction) {
+  async function handleActionClick(action: CustodyAction) {
     setErrorMessage(null)
 
     if (action === 'transferred') {
@@ -78,17 +78,17 @@ export default function CustodySection({ evidence }: CustodySectionProps) {
     }
 
     // Direct actions: submitted-to-evidence-room, analysis-started, analysis-completed
-    const res = applyCustodyAction(evidence.id, action)
+    const res = await applyCustodyAction(evidence.id, action)
     if (!res.ok) {
       setErrorMessage(res.reason)
     }
   }
 
-  function handleTransferSubmit(e: React.FormEvent) {
+  async function handleTransferSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!transferToOfficerId) return
 
-    const res = applyCustodyAction(evidence.id, 'transferred', {
+    const res = await applyCustodyAction(evidence.id, 'transferred', {
       toOfficerId: transferToOfficerId,
       note: transferNote || undefined,
     })
@@ -101,9 +101,9 @@ export default function CustodySection({ evidence }: CustodySectionProps) {
     }
   }
 
-  function handleConfirmExecute() {
+  async function handleConfirmExecute() {
     if (!confirmAction) return
-    const res = applyCustodyAction(evidence.id, confirmAction)
+    const res = await applyCustodyAction(evidence.id, confirmAction)
     if (!res.ok) {
       setErrorMessage(res.reason)
     }

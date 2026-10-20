@@ -1,60 +1,63 @@
-import React, { useState } from 'react'
-import Modal from './Modal'
-import FormField from './FormField'
-import { useInvestigationStore } from '../store/useInvestigationStore'
-import type { Person } from '../types'
+import React, { useState } from "react";
+import Modal from "./Modal";
+import FormField from "./FormField";
+import { useInvestigationStore } from "../store/useInvestigationStore";
+import type { Person } from "../types";
 
 interface EditPersonModalProps {
-  isOpen: boolean
-  onClose: () => void
-  person: Person | null
-  caseId: string
+  isOpen: boolean;
+  onClose: () => void;
+  person: Person | null;
+  caseId: string;
 }
 
 interface EditPersonFormProps {
-  person: Person
-  onClose: () => void
+  person: Person;
+  onClose: () => void;
 }
 
 function EditPersonForm({ person, onClose }: EditPersonFormProps) {
-  const updatePerson = useInvestigationStore(s => s.updatePerson)
+  const updatePerson = useInvestigationStore((s) => s.updatePerson);
 
-  const [fullName, setFullName] = useState(person.fullName)
-  const [type, setType] = useState<Person['type']>(person.type)
-  const [phone, setPhone] = useState(person.phone || '')
-  const [address, setAddress] = useState(person.address || '')
-  const [aliases, setAliases] = useState((person.knownAliases || []).join(', '))
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const [successMsg, setSuccessMsg] = useState('')
+  const [fullName, setFullName] = useState(person.fullName);
+  const [type, setType] = useState<Person["type"]>(person.type);
+  const [phone, setPhone] = useState(person.phone || "");
+  const [address, setAddress] = useState(person.address || "");
+  const [aliases, setAliases] = useState(
+    (person.knownAliases || []).join(", "),
+  );
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [successMsg, setSuccessMsg] = useState("");
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
 
-    const newErrors: Record<string, string> = {}
-    if (!fullName.trim()) newErrors.fullName = 'Full name is required.'
+    const newErrors: Record<string, string> = {};
+    if (!fullName.trim()) newErrors.fullName = "Full name is required.";
 
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
-      return
+      setErrors(newErrors);
+      return;
     }
 
     const aliasList = aliases
-      .split(',')
-      .map(a => a.trim())
-      .filter(Boolean)
+      .split(",")
+      .map((a) => a.trim())
+      .filter(Boolean);
 
-    updatePerson(person.id, {
+    const saved = await updatePerson(person.id, {
       fullName: fullName.trim(),
       type,
       phone: phone.trim() || undefined,
       address: address.trim() || undefined,
       knownAliases: aliasList.length > 0 ? aliasList : undefined,
-    })
+    });
 
-    setSuccessMsg('Person details updated successfully.')
+    if (!saved) return;
+    setSuccessMsg("Person details updated successfully.");
     setTimeout(() => {
-      onClose()
-    }, 700)
+      onClose();
+    }, 700);
   }
 
   return (
@@ -69,9 +72,10 @@ function EditPersonForm({ person, onClose }: EditPersonFormProps) {
         <input
           type="text"
           value={fullName}
-          onChange={e => {
-            setFullName(e.target.value)
-            if (errors.fullName) setErrors(prev => ({ ...prev, fullName: '' }))
+          onChange={(e) => {
+            setFullName(e.target.value);
+            if (errors.fullName)
+              setErrors((prev) => ({ ...prev, fullName: "" }));
           }}
           placeholder="e.g. Kwame Asante"
           className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-blue-500 focus:outline-none"
@@ -81,7 +85,7 @@ function EditPersonForm({ person, onClose }: EditPersonFormProps) {
       <FormField label="Person Type" required>
         <select
           value={type}
-          onChange={e => setType(e.target.value as Person['type'])}
+          onChange={(e) => setType(e.target.value as Person["type"])}
           className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-blue-500 focus:outline-none"
         >
           <option value="suspect">Suspect</option>
@@ -95,7 +99,7 @@ function EditPersonForm({ person, onClose }: EditPersonFormProps) {
         <input
           type="text"
           value={phone}
-          onChange={e => setPhone(e.target.value)}
+          onChange={(e) => setPhone(e.target.value)}
           placeholder="e.g. 0241111111"
           className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-blue-500 focus:outline-none"
         />
@@ -105,7 +109,7 @@ function EditPersonForm({ person, onClose }: EditPersonFormProps) {
         <input
           type="text"
           value={address}
-          onChange={e => setAddress(e.target.value)}
+          onChange={(e) => setAddress(e.target.value)}
           placeholder="e.g. 14 Independence Ave, Ridge, Accra"
           className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-blue-500 focus:outline-none"
         />
@@ -119,7 +123,7 @@ function EditPersonForm({ person, onClose }: EditPersonFormProps) {
         <input
           type="text"
           value={aliases}
-          onChange={e => setAliases(e.target.value)}
+          onChange={(e) => setAliases(e.target.value)}
           placeholder="e.g. Junior, Big Man"
           className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-blue-500 focus:outline-none"
         />
@@ -141,7 +145,7 @@ function EditPersonForm({ person, onClose }: EditPersonFormProps) {
         </button>
       </div>
     </form>
-  )
+  );
 }
 
 export default function EditPersonModal({
@@ -149,11 +153,15 @@ export default function EditPersonModal({
   onClose,
   person,
 }: EditPersonModalProps) {
-  if (!person || !isOpen) return null
+  if (!person || !isOpen) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={`Edit Details: ${person.fullName}`}>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={`Edit Details: ${person.fullName}`}
+    >
       <EditPersonForm key={person.id} person={person} onClose={onClose} />
     </Modal>
-  )
+  );
 }
