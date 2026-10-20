@@ -1,5 +1,5 @@
 import type { InvestigationData } from '../types'
-import { getTravelMinutes } from '../data/travelTimes'
+import { getTravelMinutes } from './travelTimes'
 
 export interface PresenceClaim {
   personId: string

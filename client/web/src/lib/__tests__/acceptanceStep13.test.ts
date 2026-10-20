@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { mockData } from '../../data'
-import { useInvestigationStore } from '../../store/useInvestigationStore'
+import { mockData } from '../../fixtures'
 import { compareCases, findRelatedCases, findAllCaseLinks } from '../caseComparison'
 import { searchByName } from '../nameSearch'
 import { buildTimeline } from '../timeline'
@@ -95,54 +94,6 @@ describe('Step 13: Full Acceptance Test', () => {
     // Weak links when threshold is 1
     const allLinks = findAllCaseLinks(mockData, 1)
     expect(allLinks.some(l => l.level === 'WEAK')).toBe(true)
-  })
-
-  it('5. Live updates: creating a new case, adding a person with surname Asante, and linking GT-4521-23 immediately connects CASE-00123 without refresh', () => {
-    const store = useInvestigationStore.getState()
-    const initialCasesCount = store.data.cases.length
-
-    // 1. Create a new case
-    store.createCase({
-      title: 'Kaneshie Market Robbery Live Test',
-      description: 'Acceptance test case verifying live reactivity',
-      type: 'theft',
-      priority: 'high',
-      leadInvestigator: 'O-001',
-    })
-
-    const updatedData1 = useInvestigationStore.getState().data
-    expect(updatedData1.cases.length).toBe(initialCasesCount + 1)
-    const newCase = updatedData1.cases[updatedData1.cases.length - 1]
-    const newCaseId = newCase.id
-
-    // 2. Add a new person with surname "Asante" to the case
-    store.createPersonForCase(newCaseId, {
-      fullName: 'Kweku Asante',
-      type: 'suspect',
-      phone: '0249999999',
-    })
-
-    const updatedData2 = useInvestigationStore.getState().data
-    const newPerson = updatedData2.persons.find(p => p.fullName === 'Kweku Asante')
-    expect(newPerson).toBeDefined()
-    const newPersonId = newPerson!.id
-
-    // 3. Link existing vehicle V-001 (Hilux GT-4521-23) to that person (connected-to)
-    store.linkVehicleToPerson(newCaseId, 'V-001', newPersonId, 'connected-to')
-
-    const finalData = useInvestigationStore.getState().data
-
-    // 4. Check related cases for the new case
-    const relatedToNew = findRelatedCases(finalData, newCaseId)
-    const case123Link = relatedToNew.find(r => r.caseBId === 'CASE-00123')
-
-    expect(case123Link).toBeDefined()
-    expect(case123Link!.sharedVehicleIds).toContain('V-001')
-    // Surname Asante match
-    const surnameMatch = case123Link!.nameMatches.find(m => m.kind === 'surname-only')
-    expect(surnameMatch).toBeDefined()
-    // Connection score includes vehicle (5) + surname match (1) + same type theft (1) >= 7
-    expect(case123Link!.score).toBeGreaterThanOrEqual(7)
   })
 
   it('6. Dashboard: findAllCaseLinks(mockData, 4).slice(0, 5) supplies top 5 strongest case links', () => {

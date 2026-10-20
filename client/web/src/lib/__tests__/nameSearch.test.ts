@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { mockData } from '../../data'
+import { mockData } from '../../fixtures'
 import { searchByName } from '../nameSearch'
 
 describe('Step 12: Name Search Engine', () => {

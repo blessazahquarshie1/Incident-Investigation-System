@@ -1,9 +1,15 @@
 use std::net::SocketAddr;
 use std::time::Duration;
 
-use axum::Router;
+use axum::{
+    http::{header, HeaderName, HeaderValue, Method},
+    Router,
+};
 use sqlx::postgres::PgPoolOptions;
-use tower_http::{cors::CorsLayer, trace::TraceLayer};
+use tower_http::{
+    cors::{AllowOrigin, CorsLayer},
+    trace::TraceLayer,
+};
 use tracing_subscriber::EnvFilter;
 
 mod db;
@@ -15,6 +21,20 @@ mod seed;
 #[derive(Clone)]
 pub struct AppState {
     pub db: sqlx::PgPool,
+}
+
+/// CORS is off unless CORS_ORIGINS="https://a.example,https://b.example" is set.
+/// In dev the Vite proxy makes requests same-origin, so nothing is needed.
+fn cors_layer() -> CorsLayer {
+    let origins: Vec<HeaderValue> = std::env::var("CORS_ORIGINS")
+        .unwrap_or_default()
+        .split(',')
+        .filter_map(|o| o.trim().parse().ok())
+        .collect();
+    CorsLayer::new()
+        .allow_origin(AllowOrigin::list(origins))
+        .allow_methods([Method::GET, Method::POST, Method::PATCH, Method::DELETE])
+        .allow_headers([header::CONTENT_TYPE, HeaderName::from_static("x-officer-id")])
 }
 
 #[tokio::main]
@@ -53,7 +73,7 @@ async fn main() -> anyhow::Result<()> {
 
     let app = Router::new()
         .nest("/api", routes::router())
-        .layer(CorsLayer::permissive()) // dev only; the Vite proxy will make this unnecessary
+        .layer(cors_layer())
         .layer(TraceLayer::new_for_http())
         .with_state(AppState { db });
 

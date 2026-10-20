@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { mockData } from '../../data'
+import { mockData } from '../../fixtures'
 import {
   calculateConnection, classifyScore, findConnections, SCORE_WEIGHTS
 } from '../connections'

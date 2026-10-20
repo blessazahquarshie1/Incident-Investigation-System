@@ -85,7 +85,7 @@ export default function CasesPage() {
         filters={[
           { key: 'type', label: 'Type', value: type, onChange: v => setParam('type', v), options: Array.from(new Set(data.cases.map(c => c.type))).map(t => ({ value: t, label: t })) },
           { key: 'priority', label: 'Priority', value: priority, onChange: v => setParam('priority', v), options: ['low', 'medium', 'high', 'critical'].map(t => ({ value: t, label: t })) },
-          { key: 'status', label: 'Status', value: status, onChange: v => setParam('status', v), options: ['open', 'closed', 'cold'].map(t => ({ value: t, label: t })) }
+          { key: 'status', label: 'Status', value: status, onChange: v => setParam('status', v), options: ['open', 'investigating', 'pending', 'closed'].map(t => ({ value: t, label: t })) }
         ]}
       />
       
