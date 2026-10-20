@@ -36,6 +36,8 @@ web/
 ├── public
 │   ├── favicon.svg
 │   └── icons.svg
+├── scripts
+│   └── dumpMockData.test.ts
 ├── src
 │   ├── assets
 │   │   ├── hero.png
@@ -64,6 +66,7 @@ web/
 │   │   ├── ConnectionToast.tsx
 │   │   ├── CreateLocationModal.tsx
 │   │   ├── CustodySection.tsx
+│   │   ├── DataGate.tsx
 │   │   ├── DataTable.tsx
 │   │   ├── EditPersonModal.tsx
 │   │   ├── EmptyState.tsx
@@ -117,6 +120,7 @@ web/
 │   │   │   ├── pathfinding.test.ts
 │   │   │   ├── timeline.test.ts
 │   │   │   └── validation.test.ts
+│   │   ├── api.ts
 │   │   ├── caseComparison.ts
 │   │   ├── caseFingerprint.ts
 │   │   ├── caseMap.ts
