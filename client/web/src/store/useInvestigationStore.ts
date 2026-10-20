@@ -42,10 +42,17 @@ const emptyData: InvestigationData = {
   relationships: [],
 }
 
+function upsertById<T extends { id: string }>(list: T[], item: T): T[] {
+  return list.some((x) => x.id === item.id)
+    ? list.map((x) => (x.id === item.id ? item : x))
+    : [...list, item]
+}
+
 interface ServerResult {
   case?: Case
   activity?: ActivityLogEntry
   note?: Note
+  document?: CaseDocument
 }
 
 export interface ToastNotification {
@@ -68,7 +75,7 @@ interface InvestigationStore {
   dismissToast: () => void
   resetDemoData: () => void
   addActivity: (entry: Omit<ActivityLogEntry, 'id' | 'timestamp' | 'officerId'>) => void
-  createCase: (input: { title: string; description: string; type: Case['type']; priority: Case['priority']; leadInvestigator: string }) => Case
+  createCase: (input: { title: string; description: string; type: Case['type']; priority: Case['priority']; leadInvestigator: string }) => Promise<Case | null>
   changeCasePriority: (caseId: string, priority: Case['priority']) => Promise<void>
   changeCaseStatus: (caseId: string, status: Case['status']) => Promise<void>
   addPersonToCase: (caseId: string, personId: string) => string[]
@@ -95,7 +102,7 @@ interface InvestigationStore {
   addDocumentToCase: (
     caseId: string,
     input: { title: string; kind: CaseDocument['kind'] }
-  ) => CaseDocument
+  ) => Promise<CaseDocument | null>
   changeLeadInvestigator: (caseId: string, officerId: string) => Promise<void>
   createLocation: (input: { name: string; city: string; region: string }) => Location
   addVisitedLocation: (caseId: string, locationId: string, personId: string) => string[]
@@ -206,15 +213,16 @@ export const useInvestigationStore = create<InvestigationStore>()(
 
       // Merges what the server returned (updated case, new activity entry, new note) into local state.
       function applyServerResult(r: ServerResult) {
-        const { case: updatedCase, activity, note } = r
+        const { case: updatedCase, activity, note, document } = r
         set((s) => ({
           data: {
             ...s.data,
             cases: updatedCase
-              ? s.data.cases.map((c) => (c.id === updatedCase.id ? updatedCase : c))
+              ? upsertById(s.data.cases, updatedCase)
               : s.data.cases,
             activityLog: activity ? [activity, ...s.data.activityLog] : s.data.activityLog,
             notes: note ? [...s.data.notes, note] : s.data.notes,
+            documents: document ? [...s.data.documents, document] : s.data.documents,
           },
         }))
       }
@@ -309,26 +317,11 @@ export const useInvestigationStore = create<InvestigationStore>()(
           set((s) => ({ data: { ...s.data, activityLog: [newEntry, ...s.data.activityLog] } }))
         },
 
-        createCase: (input) => {
-          const state = get()
-          const maxNum = state.data.cases.reduce((max, c) => {
-            const num = parseInt(c.id.replace('CASE-', ''))
-            return num > max ? num : max
-          }, 0)
-          const id = `CASE-${String(maxNum + 1).padStart(5, '0')}`
-          const now = new Date().toISOString()
-
-          const newCase: Case = {
-            ...input,
-            id,
-            status: 'open',
-            createdAt: now,
-            updatedAt: now,
-          }
-
-          set((s) => ({ data: { ...s.data, cases: [...s.data.cases, newCase] } }))
-          get().addActivity({ caseId: id, action: 'case-created', description: `Case ${id} created: ${input.title}` })
-          return newCase
+        createCase: async (input) => {
+          const r = await send<ServerResult>('POST', '/cases', input)
+          if (!r?.case) return null
+          applyServerResult(r)
+          return r.case
         },
 
         changeCasePriority: async (caseId, priority) => {
@@ -569,26 +562,11 @@ export const useInvestigationStore = create<InvestigationStore>()(
           return Object.assign(result, { diff: get().lastDiff })
         },
 
-        addDocumentToCase: (caseId, input) => {
-          const state = get()
-          const id = nextId('D', state.data.documents.map(d => d.id))
-          const now = new Date().toISOString()
-          const newDoc: CaseDocument = {
-            ...input,
-            id,
-            caseId,
-            uploadedAt: now,
-            uploadedBy: state.currentOfficerId,
-          }
-          set((s) => ({
-            data: {
-              ...s.data,
-              documents: [...s.data.documents, newDoc],
-              cases: s.data.cases.map(c => c.id === caseId ? { ...c, updatedAt: now } : c),
-            },
-          }))
-          get().addActivity({ caseId, action: 'document-added', description: `Document "${input.title}" added` })
-          return newDoc
+        addDocumentToCase: async (caseId, input) => {
+          const r = await send<ServerResult>('POST', casePath(caseId, 'documents'), input)
+          if (!r) return null
+          applyServerResult(r)
+          return r.document ?? null
         },
 
         changeLeadInvestigator: async (caseId, officerId) => {
