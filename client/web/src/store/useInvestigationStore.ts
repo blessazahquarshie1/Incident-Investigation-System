@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { mockData } from '../data'
+import { apiGet } from '../lib/api'
 import type {
   InvestigationData,
   ActivityLogEntry,
@@ -25,6 +25,23 @@ import { findExistingLocation } from '../lib/validation'
 import { getCasePeople, getCaseIncidents, getCaseEvidence } from '../lib/caseScope'
 import { getConnectionSnapshot, diffSnapshots } from '../lib/connectionDiff'
 
+const emptyData: InvestigationData = {
+  cases: [],
+  persons: [],
+  incidents: [],
+  evidence: [],
+  vehicles: [],
+  locations: [],
+  officers: [],
+  documents: [],
+  notes: [],
+  witnessStatements: [],
+  sightings: [],
+  phoneRecords: [],
+  activityLog: [],
+  relationships: [],
+}
+
 export interface ToastNotification {
   id: string
   caseId?: string
@@ -34,6 +51,9 @@ export interface ToastNotification {
 }
 
 interface InvestigationStore {
+  status: 'idle' | 'loading' | 'ready' | 'error'
+  error: string | null
+  load: () => Promise<void>
   data: InvestigationData
   currentOfficerId: string
   toast: ToastNotification | null
@@ -193,10 +213,23 @@ export const useInvestigationStore = create<InvestigationStore>()(
       }
 
       return {
-        data: mockData,
+        data: emptyData,
+        status: 'idle',
+        error: null,
         currentOfficerId: 'O-001',
         toast: null,
         lastDiff: [],
+
+        load: async () => {
+          if (get().status === 'loading') return
+          set({ status: 'loading', error: null })
+          try {
+            const data = await apiGet<InvestigationData>('/investigation')
+            set({ data, status: 'ready', error: null, toast: null, lastDiff: [] })
+          } catch (e) {
+            set({ status: 'error', error: e instanceof Error ? e.message : 'Failed to load data' })
+          }
+        },
 
         showToast: (t) => {
           set({
@@ -211,7 +244,7 @@ export const useInvestigationStore = create<InvestigationStore>()(
         dismissToast: () => set({ toast: null }),
 
         resetDemoData: () => {
-          set({ data: mockData, toast: null, lastDiff: [] })
+          void get().load()
           if (typeof window !== 'undefined' && window.localStorage) {
             try {
               localStorage.removeItem('iis-investigation-data-v1')
@@ -996,30 +1029,11 @@ export const useInvestigationStore = create<InvestigationStore>()(
       }
     },
     {
-      name: 'iis-investigation-data-v5',
-      version: 5,
+      name: 'iis-investigation-data-v6',
+      version: 6,
       storage: createJSONStorage(() => safeLocalStorage),
-      partialize: (state) => ({ data: state.data }),
-      onRehydrateStorage: () => (state) => {
-        if (state?.data?.persons) {
-          const mergedPersons = state.data.persons.map((p) => {
-            const defaultPerson = mockData.persons.find((mp) => mp.id === p.id)
-            if (defaultPerson) {
-              return {
-                ...p,
-                phone: defaultPerson.phone || p.phone,
-                type: defaultPerson.type,
-                relatedCases: defaultPerson.relatedCases,
-              }
-            }
-            return p
-          })
-          state.data = {
-            ...state.data,
-            persons: mergedPersons,
-          }
-        }
-      },
+      partialize: () => ({}),
+
     }
   )
 )

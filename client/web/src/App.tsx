@@ -21,10 +21,12 @@ import InvestigatorsPage from './pages/InvestigatorsPage'
 import ReportsPage from './pages/ReportsPage'
 import SearchPage from './pages/SearchPage'
 import NotFoundPage from './pages/NotFoundPage'
+import DataGate from './components/DataGate'
 
 export default function App() {
   return (
     <ErrorBoundary>
+      <DataGate>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<AppShell />}>
@@ -51,6 +53,7 @@ export default function App() {
           </Route>
         </Routes>
       </BrowserRouter>
+      </DataGate>
     </ErrorBoundary>
   )
 }
